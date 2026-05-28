@@ -73,7 +73,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
 
       {/* Conteúdo 1: Funil de Conversão */}
       {activeTab === 'funnel' && (
-        <div className="flex-grow flex items-center justify-between gap-2 min-h-0">
+        <div className="flex-grow flex items-center justify-between gap-2 min-h-0 animate-fade-in-tab">
           
           {/* Funil Métrica Esquerda (Absoluto) */}
           <div className="flex flex-col justify-between h-full py-1 text-[10px] w-20 shrink-0 select-none">
@@ -190,7 +190,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
 
       {/* Conteúdo 2: Origem dos Leads */}
       {activeTab === 'origin' && (
-        <div className="flex-grow flex flex-col justify-between py-2 min-h-0">
+        <div className="flex-grow flex flex-col justify-between py-2 min-h-0 animate-fade-in-tab">
           <div className="flex justify-between items-center mb-3 shrink-0 select-none">
             <h4 className="text-xs font-bold text-gray-700 uppercase">Leads Qualificados</h4>
             <span className="px-2.5 py-0.5 bg-pink-50 text-pink-700 font-bold text-[11px] rounded-full border border-pink-100">
@@ -260,7 +260,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
 
       {/* Conteúdo 3: Cidades */}
       {activeTab === 'cities' && (
-        <div className="flex-grow flex flex-col min-h-0 justify-between">
+        <div className="flex-grow flex flex-col min-h-0 justify-between animate-fade-in-tab">
           <div className="overflow-y-auto custom-scrollbar pr-1 flex-grow min-h-0">
             <table className="w-full text-left border-collapse">
               <thead>

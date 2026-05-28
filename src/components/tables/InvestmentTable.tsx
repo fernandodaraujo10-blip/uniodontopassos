@@ -8,7 +8,7 @@ interface InvestmentTableProps {
   monthLabel: string;
 }
 
-type InvestmentCategory = 'Todos' | 'Marketing' | 'Ads' | 'Offline';
+type InvestmentCategory = 'Todos' | 'Marketing' | 'Ads' | 'Offline' | 'Ferramentas';
 
 export const InvestmentTable: React.FC<InvestmentTableProps> = ({
   investimentos,
@@ -17,11 +17,11 @@ export const InvestmentTable: React.FC<InvestmentTableProps> = ({
 }) => {
   const [activeCategory, setActiveCategory] = useState<InvestmentCategory>('Todos');
 
-  const categories: InvestmentCategory[] = ['Todos', 'Marketing', 'Ads', 'Offline'];
+  const categories: InvestmentCategory[] = ['Todos', 'Marketing', 'Ads', 'Offline', 'Ferramentas'];
 
-  // Filtra itens de acordo com a categoria selecionada
-  const filteredInvestments = investimentos.filter(
-    (item) => activeCategory === 'Todos' || item.categoria === activeCategory
+  // Filtra itens de acordo com a categoria selecionada (com fallback de segurança para evitar quebras)
+  const filteredInvestments = (investimentos || []).filter(
+    (item) => activeCategory === 'Todos' || item.categoria === activeCategory || (activeCategory === 'Ads' && item.categoria === 'Online')
   );
 
   // Calcula o total consolidado dos itens filtrados
@@ -33,9 +33,12 @@ export const InvestmentTable: React.FC<InvestmentTableProps> = ({
       case 'Marketing':
         return 'bg-purple-500';
       case 'Ads':
+      case 'Online':
         return 'bg-pink-500';
       case 'Offline':
         return 'bg-yellow-500';
+      case 'Ferramentas':
+        return 'bg-teal-500';
       default:
         return 'bg-gray-400';
     }
@@ -93,7 +96,11 @@ export const InvestmentTable: React.FC<InvestmentTableProps> = ({
             </thead>
             <tbody className="divide-y divide-gray-50">
               {filteredInvestments.map((item, index) => (
-                <tr key={`${item.metric}-${index}`} className="hover:bg-gray-50 transition-colors duration-150">
+                <tr 
+                  key={`${activeCategory}-${item.metric}-${index}`} 
+                  className="hover:bg-gray-50 transition-colors duration-150 animate-fade-in-row"
+                  style={{ animationDelay: `${index * 35}ms` }}
+                >
                   <td className="py-1.5 font-medium text-gray-400">{monthLabel}</td>
                   <td className="py-1.5 text-gray-800 flex items-center gap-1.5">
                     <span className={`w-1.5 h-1.5 rounded-full ${getTagColorClass(item.categoria)}`}></span>

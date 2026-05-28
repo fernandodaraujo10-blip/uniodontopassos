@@ -1,18 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Header from '../components/layout/Header';
 import KPICardGrid from '../components/cards/KPICardGrid';
 import AdPerformanceChart from '../components/charts/AdPerformanceChart';
 import ConversionFunnelTabs from '../components/charts/ConversionFunnelTabs';
 import InvestmentTable from '../components/tables/InvestmentTable';
-import { dashboardData } from '../data/mockData';
 import { DashboardArea } from '../components/filters/FilterTabs';
+import { useDashboard } from '../hooks/useDashboard';
+import { adaptModernToLegacy } from '../utils/dashboardAdapter';
 
 export const Dashboard: React.FC = () => {
-  const [currentMonthKey, setCurrentMonthKey] = useState<'abril' | 'maio' | 'junho'>('maio');
+  const { 
+    selectedMonth, 
+    setSelectedMonth, 
+    currentMonthData,
+    allDashboardData,
+    investmentsData
+  } = useDashboard();
+  
   const [currentArea, setCurrentArea] = useState<DashboardArea>('geral');
 
-  // Dados do mês selecionado
-  const activeMonthData = dashboardData[currentMonthKey];
+  // Obter o mês anterior para cálculo de taxas de variação
+  const previousMonthData = useMemo(() => {
+    const months = Object.keys(allDashboardData).sort();
+    const idx = months.indexOf(selectedMonth);
+    if (idx > 0) {
+      return allDashboardData[months[idx - 1]];
+    }
+    return undefined;
+  }, [allDashboardData, selectedMonth]);
+
+  // Adaptar os dados dinâmicos do contexto para o formato esperado pelos componentes da UI
+  const activeMonthData = useMemo(() => {
+    if (!currentMonthData) return null;
+    return adaptModernToLegacy(currentMonthData, previousMonthData, investmentsData);
+  }, [currentMonthData, previousMonthData, investmentsData]);
 
   // Mapeamento do título da página com base na área ativa
   const getHeaderTitle = () => {
@@ -26,27 +47,23 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  // Mapeamento da label do mês para exibição nas tabelas
-  const getMonthLabel = () => {
-    switch (currentMonthKey) {
-      case 'abril':
-        return 'Abril/2026';
-      case 'junho':
-        return 'Junho/2026';
-      default:
-        return 'Maio/2026';
-    }
-  };
+  if (!activeMonthData) {
+    return (
+      <div className="flex-grow flex items-center justify-center bg-[#F8F9FA] text-gray-500 font-sans">
+        Nenhum dado disponível para este período.
+      </div>
+    );
+  }
 
   return (
-    <div className="flex-grow overflow-hidden p-5 bg-[#F8F9FA] scrollbar-hide flex flex-col h-full max-h-screen">
+    <div className="flex-grow overflow-hidden p-5 bg-[#F8F9FA] scrollbar-hide flex flex-col h-full max-h-screen page-transition">
       {/* Top Header Bar */}
       <Header
         title={getHeaderTitle()}
         currentArea={currentArea}
         onChangeArea={setCurrentArea}
-        currentMonthKey={currentMonthKey}
-        onChangeMonth={setCurrentMonthKey}
+        currentMonthKey={selectedMonth}
+        onChangeMonth={setSelectedMonth}
       />
 
       {/* Grid Principal */}
@@ -63,7 +80,7 @@ export const Dashboard: React.FC = () => {
             {/* Gráfico de Desempenho de Anúncios */}
             <AdPerformanceChart
               anunciosData={activeMonthData.anuncios}
-              monthLabel={getMonthLabel()}
+              monthLabel={currentMonthData?.summary.monthLabel || ''}
             />
 
             {/* Abas do Funil de Conversão / Origens / Cidades */}
@@ -80,7 +97,7 @@ export const Dashboard: React.FC = () => {
           <InvestmentTable
             investimentos={activeMonthData.investimentosTabela}
             timestamp={activeMonthData.timestamp}
-            monthLabel={getMonthLabel()}
+            monthLabel={currentMonthData?.summary.monthLabel || ''}
           />
         </div>
 

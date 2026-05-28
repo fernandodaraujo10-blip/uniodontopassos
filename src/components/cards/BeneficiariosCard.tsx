@@ -1,5 +1,5 @@
-import React from 'react';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import React, { useState } from 'react';
+import { TrendingUp, TrendingDown, HelpCircle, Users } from 'lucide-react';
 import { BeneficiariosData } from '../../types/dashboard';
 
 interface BeneficiariosCardProps {
@@ -7,12 +7,21 @@ interface BeneficiariosCardProps {
 }
 
 export const BeneficiariosCard: React.FC<BeneficiariosCardProps> = ({ data }) => {
+  const [showHelp, setShowHelp] = useState(false);
   const isUp = data.percentType === 'up';
 
   return (
     <div className="bg-white p-4 rounded-2xl border border-gray-100 relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full">
+      <button 
+        onClick={(e) => { e.stopPropagation(); setShowHelp(true); }}
+        className="absolute top-3.5 right-3.5 text-gray-400 hover:text-pink-700 transition-colors p-1 rounded-full hover:bg-gray-50 focus:outline-none shrink-0 cursor-pointer z-20"
+        title="Explicar métrica"
+      >
+        <HelpCircle className="w-4 h-4" />
+      </button>
+
       <div>
-        <div className="flex justify-between items-start mb-2">
+        <div className="flex justify-between items-start mb-2 pr-7">
           <h3 className="text-[10px] font-bold text-pink-700 uppercase tracking-wider">Total de Beneficiários</h3>
           <span className="text-[10px] px-2 py-0.5 bg-pink-50 text-pink-700 border border-pink-700/20 rounded-full cursor-pointer hover:bg-pink-100 transition-colors">
             Parcial ▾
@@ -79,6 +88,34 @@ export const BeneficiariosCard: React.FC<BeneficiariosCardProps> = ({ data }) =>
           </div>
         </div>
       </div>
+
+      {showHelp && (
+        <div className="absolute inset-0 bg-white rounded-2xl p-4 border border-gray-100 shadow-xl flex flex-col justify-between z-30 animate-fadeIn text-left">
+          <div>
+            <div className="flex justify-between items-center mb-3">
+              <h4 className="text-xs font-bold text-pink-700 uppercase flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5" />
+                Explicação: Beneficiários
+              </h4>
+              <button 
+                onClick={(e) => { e.stopPropagation(); setShowHelp(false); }}
+                className="text-gray-400 hover:text-pink-700 font-semibold text-[10px] bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded transition-colors cursor-pointer"
+              >
+                Fechar
+              </button>
+            </div>
+            <div className="text-[10px] text-gray-600 space-y-2 leading-relaxed font-normal normal-case">
+              <p><strong>Total de Beneficiários ({data.total}):</strong> Número absoluto de vidas (clientes) com planos odontológicos ativos sob a cobertura da Uniodonto Passos.</p>
+              <p><strong>Novos do mês ({data.novos}):</strong> Total de novos beneficiários que ingressaram e ativaram o plano no período corrente.</p>
+              <p><strong>Cancelamentos ({data.cancelados}):</strong> Vidas que saíram da base de clientes (*churn*) no período.</p>
+              <p><strong>Distribuição PF vs PJ:</strong> Divisão percentual e quantitativa de clientes entre **Pessoa Física** (PF - planos individuais/familiares) e **Pessoa Jurídica** (PJ - planos empresariais).</p>
+            </div>
+          </div>
+          <div className="text-[9px] text-gray-400 border-t border-gray-50 pt-2 text-center">
+            Dica: Manter uma taxa de cancelamentos (*churn*) baixa é crucial para sustentar o crescimento orgânico da cooperativa!
+          </div>
+        </div>
+      )}
     </div>
   );
 };

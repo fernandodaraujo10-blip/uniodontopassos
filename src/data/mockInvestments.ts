@@ -1,12 +1,37 @@
 import { InvestmentPayload, InvestmentCategory } from '../types/investments';
 
 export const mockInvestmentCategories: InvestmentCategory[] = [
-  { id: 'marketing_google', name: 'Google Ads', type: 'marketing' },
-  { id: 'marketing_meta', name: 'Meta Ads', type: 'marketing' },
-  { id: 'marketing_events', name: 'Eventos & Feiras', type: 'marketing' },
-  { id: 'sales_commissions', name: 'Comissões de Corretores', type: 'sales' },
-  { id: 'sales_tools', name: 'SDR/CRM & Ferramentas', type: 'sales' },
-  { id: 'sales_team', name: 'Equipe de SDR/Vendas', type: 'sales' }
+  { id: 'offline_radio_vida', name: 'Rádio Vida (Passos)', type: 'marketing' },
+  { id: 'offline_radio_itau', name: 'Rádio (Itaú de Minas)', type: 'marketing' },
+  { id: 'offline_radio_paraiso', name: 'Rádio (S. S. Paraíso)', type: 'marketing' },
+  { id: 'offline_radio_cassia', name: 'Rádio (Cássia)', type: 'marketing' },
+  { id: 'offline_jornal', name: 'Jornal (Folha da Manhã)', type: 'marketing' },
+  { id: 'offline_led', name: 'Telão/Painel LED (Paraíso)', type: 'marketing' },
+  { id: 'online_meta', name: 'Meta (Facebook/Instagram)', type: 'marketing' },
+  { id: 'online_google', name: 'Google Ads', type: 'marketing' },
+  { id: 'marketing_agency', name: 'Agencia de Marketing', type: 'marketing' },
+  { id: 'tools_rd_station', name: 'RD Station (Mkt e Conversas)', type: 'sales' },
+  { id: 'tools_rd_conversas', name: 'RD Conversas', type: 'sales' },
+  { id: 'tools_rd_marketing', name: 'RD Marketing', type: 'sales' },
+  { id: 'tools_rd_crm', name: 'RD CRM', type: 'sales' },
+  { id: 'tools_fertaise', name: 'FerTaise', type: 'sales' }
+];
+
+const mockHistoricalInvestments = [
+  { categoryId: 'offline_radio_vida', amount: 1750.00 },
+  { categoryId: 'offline_radio_itau', amount: 240.00 },
+  { categoryId: 'offline_radio_paraiso', amount: 79.00 },
+  { categoryId: 'offline_radio_cassia', amount: 271.00 },
+  { categoryId: 'offline_jornal', amount: 120.18 },
+  { categoryId: 'offline_led', amount: 400.00 },
+  { categoryId: 'online_meta', amount: 1242.00 },
+  { categoryId: 'online_google', amount: 800.00 },
+  { categoryId: 'marketing_agency', amount: 2000.00 },
+  { categoryId: 'tools_rd_station', amount: 1121.00 },
+  { categoryId: 'tools_rd_conversas', amount: 2087.28 },
+  { categoryId: 'tools_rd_marketing', amount: 1121.00 },
+  { categoryId: 'tools_rd_crm', amount: 786.00 },
+  { categoryId: 'tools_fertaise', amount: 2000.00 }
 ];
 
 export const mockInvestmentsData: InvestmentPayload = {
@@ -14,78 +39,66 @@ export const mockInvestmentsData: InvestmentPayload = {
   monthlyDetails: {
     '2026-01': {
       month: '2026-01',
-      investments: [
-        { categoryId: 'marketing_google', amount: 15000 },
-        { categoryId: 'marketing_meta', amount: 12000 },
-        { categoryId: 'marketing_events', amount: 3000 },
-        { categoryId: 'sales_commissions', amount: 8000 },
-        { categoryId: 'sales_tools', amount: 2500 },
-        { categoryId: 'sales_team', amount: 14000 }
-      ],
-      totalMarketing: 30000,
-      totalSales: 24500,
+      investments: [...mockHistoricalInvestments],
+      totalMarketing: 6902.18,
+      totalSales: 7115.28,
       totalOperational: 0,
-      totalAmount: 54500
+      totalAmount: 14017.46
     },
     '2026-02': {
       month: '2026-02',
-      investments: [
-        { categoryId: 'marketing_google', amount: 18000 },
-        { categoryId: 'marketing_meta', amount: 13500 },
-        { categoryId: 'marketing_events', amount: 4000 },
-        { categoryId: 'sales_commissions', amount: 9500 },
-        { categoryId: 'sales_tools', amount: 2500 },
-        { categoryId: 'sales_team', amount: 14500 }
-      ],
-      totalMarketing: 35500,
-      totalSales: 26500,
+      investments: [...mockHistoricalInvestments],
+      totalMarketing: 6902.18,
+      totalSales: 7115.28,
       totalOperational: 0,
-      totalAmount: 62000
+      totalAmount: 14017.46
     },
     '2026-03': {
       month: '2026-03',
-      investments: [
-        { categoryId: 'marketing_google', amount: 21000 },
-        { categoryId: 'marketing_meta', amount: 15000 },
-        { categoryId: 'marketing_events', amount: 5000 },
-        { categoryId: 'sales_commissions', amount: 11000 },
-        { categoryId: 'sales_tools', amount: 3000 },
-        { categoryId: 'sales_team', amount: 15000 }
-      ],
-      totalMarketing: 41000,
-      totalSales: 29000,
+      investments: [...mockHistoricalInvestments],
+      totalMarketing: 6902.18,
+      totalSales: 7115.28,
       totalOperational: 0,
-      totalAmount: 70000
+      totalAmount: 14017.46
     },
     '2026-04': {
       month: '2026-04',
-      investments: [
-        { categoryId: 'marketing_google', amount: 25000 },
-        { categoryId: 'marketing_meta', amount: 18000 },
-        { categoryId: 'marketing_events', amount: 6000 },
-        { categoryId: 'sales_commissions', amount: 13000 },
-        { categoryId: 'sales_tools', amount: 3000 },
-        { categoryId: 'sales_team', amount: 16000 }
-      ],
-      totalMarketing: 49000,
-      totalSales: 32000,
+      investments: [...mockHistoricalInvestments],
+      totalMarketing: 6902.18,
+      totalSales: 7115.28,
       totalOperational: 0,
-      totalAmount: 81000
+      totalAmount: 14017.46
     },
     '2026-05': {
       month: '2026-05',
-      investments: [
-        { categoryId: 'marketing_google', amount: 28000 },
-        { categoryId: 'marketing_meta', amount: 22000 },
-        { categoryId: 'marketing_events', amount: 7000 },
-        { categoryId: 'sales_commissions', amount: 15000 },
-        { categoryId: 'sales_tools', amount: 3500 },
-        { categoryId: 'sales_team', amount: 17500 }
-      ],
-      totalMarketing: 57000,
-      totalSales: 36000,
+      investments: [...mockHistoricalInvestments],
+      totalMarketing: 6902.18,
+      totalSales: 7115.28,
       totalOperational: 0,
-      totalAmount: 93000
+      totalAmount: 14017.46
+    },
+    '2026-06': {
+      month: '2026-06',
+      investments: [
+        { categoryId: 'offline_radio_vida', amount: 613.32 },
+        { categoryId: 'offline_radio_itau', amount: 0 },
+        { categoryId: 'offline_radio_paraiso', amount: 0 },
+        { categoryId: 'offline_radio_cassia', amount: 0 },
+        { categoryId: 'offline_jornal', amount: 0 },
+        { categoryId: 'offline_led', amount: 0 },
+        { categoryId: 'online_meta', amount: 3200.00 },
+        { categoryId: 'online_google', amount: 4200.00 },
+        { categoryId: 'marketing_agency', amount: 0 },
+        { categoryId: 'tools_rd_station', amount: 2300.00 },
+        { categoryId: 'tools_rd_conversas', amount: 2486.68 },
+        { categoryId: 'tools_rd_marketing', amount: 0 },
+        { categoryId: 'tools_rd_crm', amount: 0 },
+        { categoryId: 'tools_fertaise', amount: 0 }
+      ],
+      totalMarketing: 8013.32,
+      totalSales: 4786.68,
+      totalOperational: 0,
+      totalAmount: 12800.00
     }
   }
 };

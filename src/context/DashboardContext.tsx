@@ -1,10 +1,11 @@
-import React, { createContext, useContext, useState, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect, ReactNode } from 'react';
 import { MonthDataMap, DashboardDataPayload, MonthlySummary, TrafficSource, AcquisitionChannel, CityDistribution, CampaignPerformance } from '../types/dashboard';
 import { InvestmentPayload, MonthlyCategoryInvestment } from '../types/investments';
 import { ReportFilter, ConsolidatedReport } from '../types/reports';
 import { mockDashboardData } from '../data/mockDashboardData';
 import { mockInvestmentsData } from '../data/mockInvestments';
 import { generateConsolidatedReport } from '../data/mockReports';
+import { safeDivide } from '../utils/dataValidator';
 
 interface DashboardContextProps {
   selectedMonth: string;
@@ -16,6 +17,7 @@ interface DashboardContextProps {
   reportFilter: ReportFilter;
   setReportFilter: (filter: ReportFilter) => void;
   consolidatedReport: ConsolidatedReport;
+  resetToDefaultData: () => void;
   upsertMonthData: (
     month: string,
     summaryInput: {
@@ -25,6 +27,7 @@ interface DashboardContextProps {
       leads: number;
       conversions: number;
       ltv?: number;
+      nps?: number;
     },
     trafficInput: Omit<TrafficSource, 'conversionRate'>[],
     channelsInput: Omit<AcquisitionChannel, 'conversionRate'>[],
@@ -37,11 +40,46 @@ interface DashboardContextProps {
 const DashboardContext = createContext<DashboardContextProps | undefined>(undefined);
 
 export const DashboardProvider = ({ children }: { children: ReactNode }) => {
-  // Estado para os dados de dashboard mensais
-  const [allDashboardData, setAllDashboardData] = useState<MonthDataMap>(mockDashboardData);
+  // Estado para os dados de dashboard mensais e investimentos com controle de versão para limpar caches antigos
+  const [allDashboardData, setAllDashboardData] = useState<MonthDataMap>(() => {
+    const version = localStorage.getItem('uniodonto_dashboard_version');
+    if (version !== 'v1.5') {
+      localStorage.setItem('uniodonto_dashboard_version', 'v1.5');
+      localStorage.setItem('uniodonto_dashboard_data', JSON.stringify(mockDashboardData));
+      localStorage.setItem('uniodonto_investments_data', JSON.stringify(mockInvestmentsData));
+      return mockDashboardData;
+    }
+    const saved = localStorage.getItem('uniodonto_dashboard_data');
+    return saved ? JSON.parse(saved) : mockDashboardData;
+  });
   
   // Estado para os investimentos
-  const [investmentsData, setInvestmentsData] = useState<InvestmentPayload>(mockInvestmentsData);
+  const [investmentsData, setInvestmentsData] = useState<InvestmentPayload>(() => {
+    const version = localStorage.getItem('uniodonto_dashboard_version');
+    if (version !== 'v1.5') {
+      return mockInvestmentsData;
+    }
+    const saved = localStorage.getItem('uniodonto_investments_data');
+    return saved ? JSON.parse(saved) : mockInvestmentsData;
+  });
+
+  // Salvar no LocalStorage sempre que houver alteração
+  useEffect(() => {
+    localStorage.setItem('uniodonto_dashboard_data', JSON.stringify(allDashboardData));
+  }, [allDashboardData]);
+
+  useEffect(() => {
+    localStorage.setItem('uniodonto_investments_data', JSON.stringify(investmentsData));
+  }, [investmentsData]);
+
+  // Função para limpar o banco de dados local e restaurar mocks
+  const resetToDefaultData = () => {
+    localStorage.removeItem('uniodonto_dashboard_data');
+    localStorage.removeItem('uniodonto_investments_data');
+    setAllDashboardData(mockDashboardData);
+    setInvestmentsData(mockInvestmentsData);
+    setSelectedMonth('2026-05');
+  };
 
   // Mês selecionado no dashboard
   const [selectedMonth, setSelectedMonth] = useState<string>('2026-05');
@@ -49,7 +87,8 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   // Filtro dos relatórios
   const [reportFilter, setReportFilter] = useState<ReportFilter>({
     startMonth: '2026-01',
-    endMonth: '2026-05'
+    endMonth: '2026-05',
+    reportType: 'executive'
   });
 
   // Lista de meses disponíveis ordenada
@@ -82,6 +121,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       leads: number;
       conversions: number;
       ltv?: number;
+      nps?: number;
     },
     trafficInput: Omit<TrafficSource, 'conversionRate'>[],
     channelsInput: Omit<AcquisitionChannel, 'conversionRate'>[],
@@ -90,7 +130,20 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     investmentsInput: MonthlyCategoryInvestment[]
   ) => {
     // 1. Processar Investimentos
-    const categories = investmentsData.categories;
+    let categories = [...investmentsData.categories];
+    let categoriesUpdated = false;
+
+    investmentsInput.forEach(inv => {
+      const exists = categories.some(c => c.id === inv.categoryId);
+      if (!exists) {
+        categories.push({
+          id: inv.categoryId,
+          name: inv.customName || inv.categoryId,
+          type: inv.customType || 'marketing'
+        });
+        categoriesUpdated = true;
+      }
+    });
     
     let totalMarketing = 0;
     let totalSales = 0;
@@ -109,7 +162,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
 
     const newMonthlyInvestmentDetail = {
       month,
-      investments: investmentsInput,
+      investments: investmentsInput.map(inv => ({ categoryId: inv.categoryId, amount: inv.amount, isFixed: !!inv.isFixed })),
       totalMarketing,
       totalSales,
       totalOperational,
@@ -128,18 +181,10 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
 
     setInvestmentsData(nextInvestmentsData);
 
-    // 2. Calcular KPIs para o Dashboard
-    const conversionRate = summaryInput.leads > 0 
-      ? (summaryInput.conversions / summaryInput.leads) * 100 
-      : 0;
-
-    const cac = summaryInput.newBeneficiaries > 0 
-      ? totalAmount / summaryInput.newBeneficiaries 
-      : 0;
-
-    const churnRate = summaryInput.activeBeneficiaries > 0 
-      ? (summaryInput.canceledBeneficiaries / summaryInput.activeBeneficiaries) * 100 
-      : 0;
+    // 2. Calcular KPIs para o Dashboard usando divisão segura
+    const conversionRate = safeDivide(summaryInput.conversions, summaryInput.leads) * 100;
+    const cac = safeDivide(totalAmount, summaryInput.newBeneficiaries);
+    const churnRate = safeDivide(summaryInput.canceledBeneficiaries, summaryInput.activeBeneficiaries) * 100;
 
     // Calcular taxa de crescimento comparando com o mês anterior
     let growthRate = 0;
@@ -150,13 +195,13 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       const prevMonth = monthsSorted[currentIdx - 1];
       const prevData = allDashboardData[prevMonth];
       if (prevData && prevData.summary.activeBeneficiaries > 0) {
-        growthRate = ((summaryInput.activeBeneficiaries - prevData.summary.activeBeneficiaries) / prevData.summary.activeBeneficiaries) * 100;
+        growthRate = safeDivide(summaryInput.activeBeneficiaries - prevData.summary.activeBeneficiaries, prevData.summary.activeBeneficiaries) * 100;
       }
     }
 
     const ticketMedio = 120; // Ticket médio hipotético padrão
     const totalRevenue = summaryInput.activeBeneficiaries * ticketMedio;
-    const ltv = summaryInput.ltv || (ticketMedio * (1 / (churnRate / 100 || 0.01)));
+    const ltv = summaryInput.ltv || (ticketMedio * safeDivide(1, churnRate / 100 || 0.01));
 
     // Formatar rótulo do mês (Ex: '2026-06' -> 'Junho/2026')
     const parts = month.split('-');
@@ -181,7 +226,8 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       cac: Math.round(cac * 100) / 100,
       ltv: Math.round(ltv * 100) / 100,
       totalRevenue,
-      churnRate: Math.round(churnRate * 100) / 100
+      churnRate: Math.round(churnRate * 100) / 100,
+      nps: summaryInput.nps
     };
 
     // Processar origens de tráfego com taxa de conversão calculada
@@ -207,11 +253,11 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       conversionRate: c.leads > 0 ? Math.round((c.conversions / c.leads) * 10000) / 100 : 0
     }));
 
-    // Processar campanhas
+    // Processar campanhas usando divisão segura
     const campaigns: CampaignPerformance[] = campaignsInput.map(c => {
-      const ctr = c.impressions > 0 ? (c.clicks / c.impressions) * 100 : 0;
-      const cpl = c.leads > 0 ? c.spend / c.leads : 0;
-      const cacCamp = c.conversions > 0 ? c.spend / c.conversions : 0;
+      const ctr = safeDivide(c.clicks, c.impressions) * 100;
+      const cpl = safeDivide(c.spend, c.leads);
+      const cacCamp = safeDivide(c.spend, c.conversions);
 
       return {
         ...c,
@@ -250,6 +296,7 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
         reportFilter,
         setReportFilter,
         consolidatedReport,
+        resetToDefaultData,
         upsertMonthData
       }}
     >

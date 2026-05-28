@@ -9,6 +9,9 @@ export interface InvestmentCategory {
 export interface MonthlyCategoryInvestment {
   categoryId: string;
   amount: number;
+  customName?: string;
+  customType?: InvestmentType;
+  isFixed?: boolean;
 }
 
 export interface MonthlyInvestmentDetail {

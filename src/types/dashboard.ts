@@ -162,6 +162,7 @@ export interface MonthlySummary {
   ltv: number; // Lifetime Value estimado (R$)
   totalRevenue: number; // Receita mensal (R$)
   churnRate: number; // Taxa de Churn (%)
+  nps?: number; // Pontuação NPS opcional
 }
 
 export interface TrafficSource {

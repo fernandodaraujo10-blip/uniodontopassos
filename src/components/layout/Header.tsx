@@ -6,8 +6,8 @@ interface HeaderProps {
   title: string;
   currentArea: DashboardArea;
   onChangeArea: (area: DashboardArea) => void;
-  currentMonthKey: 'abril' | 'maio' | 'junho';
-  onChangeMonth: (month: 'abril' | 'maio' | 'junho') => void;
+  currentMonthKey: string;
+  onChangeMonth: (month: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({

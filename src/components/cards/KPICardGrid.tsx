@@ -115,11 +115,11 @@ export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area }) => {
       >
         <div className="grid grid-flow-col auto-cols-[100%] sm:auto-cols-[calc(50%-8px)] lg:auto-cols-[calc(25%-12px)] gap-4 shrink-0 transition-all duration-300">
           <BeneficiariosCard data={data.beneficiarios} />
-          <LeadsCard data={data.leads} />
-          <ConversoesCard data={data.conversoes} />
           <InvestimentoCard data={data.investimento} />
           <RoiCard data={data.roi} />
           <NpsCard data={data.nps} />
+          <LeadsCard data={data.leads} />
+          <ConversoesCard data={data.conversoes} />
         </div>
       </div>
 

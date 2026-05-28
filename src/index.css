@@ -12,13 +12,35 @@
 }
 
 .card-shadow {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 4px 20px -2px rgba(136, 14, 79, 0.02), 
+    0 2px 6px -1px rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(243, 244, 246, 0.8);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card-shadow:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  box-shadow: 
+    0 12px 28px -4px rgba(136, 14, 79, 0.05), 
+    0 4px 12px -2px rgba(0, 0, 0, 0.03);
   transform: translateY(-2px);
+  border-color: rgba(216, 27, 96, 0.15);
+}
+
+/* Transição de Entrada de Página Suave */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-transition {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Funil de Conversão - Formatos e Animações */
@@ -46,4 +68,184 @@
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #D1D5DB;
+}
+
+/* Animação do Modal Premium */
+@keyframes modalScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal {
+  animation: modalScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Animação Suave de Linhas de Tabela (Staggered Fade-in) */
+@keyframes fadeInRow {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-row {
+  animation: fadeInRow 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Animação Suave de Transição de Abas (Fade-in) */
+@keyframes fadeInTab {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-tab {
+  animation: fadeInTab 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ==========================================
+   SISTEMA DE TEMA ESCURO (DARK MODE) 100% SEGURO
+   ========================================== */
+
+/* Efeito suave de transição de cores para a aplicação inteira */
+body, 
+aside, 
+main, 
+div, 
+section, 
+table, 
+tr, 
+td, 
+th, 
+input, 
+select, 
+textarea, 
+span, 
+h1, 
+h2, 
+h3, 
+h4, 
+p, 
+a {
+  transition: background-color 0.25s ease-in-out, border-color 0.25s ease-in-out, color 0.2s ease-in-out, box-shadow 0.25s ease-in-out;
+}
+
+/* Regras aplicadas quando a classe .dark está ativa */
+.dark body {
+  background-color: #0F172A !important; /* slate-900 */
+  color: #F8FAFC !important; /* slate-50 */
+}
+
+/* Fundos Gerais e Principais */
+.dark main.flex-grow,
+.dark .bg-\[\#F8F9FA\] {
+  background-color: #0F172A !important;
+}
+
+/* Cards, Modais, Asides, Menus e Elementos Brancos */
+.dark .bg-white,
+.dark .bg-white\/90 {
+  background-color: #1E293B !important; /* slate-800 */
+}
+
+/* Fundos Secundários e Inputs */
+.dark .bg-slate-50,
+.dark .bg-slate-50\/50,
+.dark .bg-slate-50\/60,
+.dark .bg-slate-100 {
+  background-color: #0F172A !important; /* slate-900 */
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #0F172A !important;
+  color: #F8FAFC !important;
+  border-color: #334155 !important; /* slate-700 */
+}
+
+.dark input:focus,
+.dark select:focus {
+  border-color: #EC4899 !important; /* pink-500 */
+  box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.2) !important;
+}
+
+/* Títulos e Textos Principais */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark th,
+.dark .text-gray-800,
+.dark .text-slate-800,
+.dark .text-slate-700,
+.dark .text-slate-900,
+.dark .text-gray-900 {
+  color: #F8FAFC !important;
+}
+
+/* Parágrafos e Textos Secundários */
+.dark p,
+.dark .text-gray-500,
+.dark .text-slate-400,
+.dark .text-slate-500,
+.dark .text-gray-400 {
+  color: #94A3B8 !important; /* slate-400 */
+}
+
+/* Bordas Gerais e Divisores */
+.dark .border,
+.dark .border-gray-100,
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-100\/60,
+.dark .border-white\/20,
+.dark .border-white\/10 {
+  border-color: #334155 !important; /* slate-700 */
+}
+
+/* Tabela e Listagens */
+.dark table thead tr {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+}
+
+.dark table tbody tr {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+}
+
+.dark table tbody tr:hover {
+  background-color: #334155 !important; /* slate-700 */
+}
+
+/* Sombras e Cards Premium */
+.dark .card-shadow {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.4) !important;
+  border-color: #334155 !important;
+}
+
+.dark .card-shadow:hover {
+  border-color: rgba(216, 27, 96, 0.4) !important;
+  box-shadow: 0 15px 35px -8px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Ajustes Especiais para Gráficos e Legendas em Dark Mode */
+.dark .text-slate-600 {
+  color: #CBD5E1 !important; /* slate-300 */
 }

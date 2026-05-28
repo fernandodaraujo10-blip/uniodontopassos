@@ -1,10 +1,14 @@
 import { MonthlySummary } from './dashboard';
 
+export type ReportType = 'executive' | 'efficiency' | 'campaigns' | 'churn';
+
 export interface ReportFilter {
   startMonth: string; // Formato 'YYYY-MM'
   endMonth: string; // Formato 'YYYY-MM'
   cities?: string[];
   channels?: string[];
+  channel?: 'all' | 'google' | 'meta' | 'offline';
+  reportType?: ReportType;
 }
 
 export interface ConsolidatedReportRow {
@@ -22,6 +26,9 @@ export interface ConsolidatedReportRow {
   cac: number;
   cpl: number;
   churnRate: number;
+  googleAdsSpend: number;
+  metaAdsSpend: number;
+  offlineSpend: number;
 }
 
 export interface ConsolidatedReportTotals {
@@ -37,6 +44,9 @@ export interface ConsolidatedReportTotals {
   averageCpl: number;
   averageChurnRate: number;
   averageGrowthRate: number;
+  totalGoogleAdsSpend: number;
+  totalMetaAdsSpend: number;
+  totalOfflineSpend: number;
 }
 
 export interface ConsolidatedReport {
