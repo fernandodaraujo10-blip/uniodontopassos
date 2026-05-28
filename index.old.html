@@ -1,0 +1,1901 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>Dashboard Uniodonto Passos</title>
+  
+  <!-- BEGIN: External Scripts and Styles -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <!-- Chart.js para Gráficos Dinâmicos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- END: External Scripts and Styles -->
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              primary: '#D81B60',
+              secondary: '#E91E63',
+              dark: '#2D0A1B',
+              bg: '#F8F9FA'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style data-purpose="layout-styles">
+    body {
+      background-color: #F8F9FA;
+      font-family: 'Inter', sans-serif;
+    }
+    .sidebar-gradient {
+      background: linear-gradient(180deg, #D81B60 0%, #880E4F 100%);
+    }
+    .card-shadow {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-shadow:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+      transform: translateY(-2px);
+    }
+    /* Esconder scrollbar mantendo funcionalidade */
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+    }
+    
+    /* Funil de Conversão - Formatos e Animações */
+    .funnel-step {
+      clip-path: polygon(0 0, 100% 0, 85% 100%, 15% 100%);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .funnel-step:hover {
+      filter: brightness(1.08) drop-shadow(0 4px 8px rgba(216, 27, 96, 0.3));
+      transform: scale(1.02);
+    }
+    
+    /* Animação suave para troca de valores */
+    .value-transition {
+      transition: all 0.4s ease-in-out;
+    }
+    
+    /* Custom scrollbar para tabela de investimentos */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #F3F4F6;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #E5E7EB;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #D1D5DB;
+    }
+    
+    /* --- SIDEBAR COLLAPSE STYLES --- */
+    #sidebar {
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #sidebar.collapsed {
+      width: 76px !important;
+    }
+    #sidebar.collapsed .sidebar-text,
+    #sidebar.collapsed .sidebar-header-title {
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+      margin-left: 0 !important;
+      display: none;
+    }
+    #sidebar.collapsed .sidebar-header-container {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    #sidebar.collapsed .sidebar-nav {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+    #sidebar.collapsed .sidebar-nav-link {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    #sidebar.collapsed .sidebar-nav-link > :not([hidden]) ~ :not([hidden]) {
+      margin-left: 0px !important;
+    }
+    #sidebar.collapsed .sidebar-footer {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+    #sidebar.collapsed .sidebar-footer-link {
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+    #sidebar.collapsed .sidebar-footer-link > :not([hidden]) ~ :not([hidden]) {
+      margin-left: 0px !important;
+    }
+    #sidebar.collapsed #toggle-icon {
+      transform: rotate(180deg);
+    }
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+  <!-- BEGIN: Sidebar -->
+  <aside id="sidebar" class="sidebar-gradient w-64 flex-shrink-0 flex flex-col text-white transition-all duration-300 ease-in-out relative">
+    <!-- Botão de recolher/expandir barra lateral -->
+    <button id="btn-toggle-sidebar" class="absolute -right-3 top-8 z-50 w-6 h-6 bg-white text-brand-primary border border-pink-100 rounded-full flex items-center justify-center shadow-md transition-all duration-300 hover:scale-110 focus:outline-none hover:bg-pink-50" aria-label="Recolher barra lateral">
+      <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" id="toggle-icon">
+        <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+      </svg>
+    </button>
+
+    <div class="p-6 flex items-center space-x-3 sidebar-header-container" id="sidebar-header">
+      <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand-primary font-bold text-xl shadow-md transition-transform duration-300 hover:scale-105 flex-shrink-0">U</div>
+      <span class="font-semibold text-lg tracking-wide sidebar-header-title transition-all duration-300 whitespace-nowrap">Uniodonto Passos</span>
+    </div>
+    
+    <nav class="mt-8 flex-grow px-4 space-y-2 sidebar-nav">
+      <a id="nav-dashboard" class="sidebar-nav-link flex items-center space-x-3 p-3 bg-white/20 rounded-lg transition-all duration-200" href="#">
+        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="font-medium sidebar-text transition-all duration-300 whitespace-nowrap">Dashboard</span>
+      </a>
+      <a id="nav-relatorios" class="sidebar-nav-link flex items-center space-x-3 p-3 hover:bg-white/10 rounded-lg transition-all duration-200" href="#" onclick="alert('Funcionalidade de Relatórios em desenvolvimento!')">
+        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="font-medium sidebar-text transition-all duration-300 whitespace-nowrap">Relatórios</span>
+      </a>
+      <a id="nav-envio" class="sidebar-nav-link flex items-center space-x-3 p-3 hover:bg-white/10 rounded-lg transition-all duration-200" href="#" onclick="alert('Painel de Envio de Dados em desenvolvimento!')">
+        <svg class="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="font-medium sidebar-text transition-all duration-300 whitespace-nowrap">Envio de Dados</span>
+      </a>
+    </nav>
+    
+    <div class="p-6 space-y-4 border-t border-white/10 sidebar-footer">
+      <a class="sidebar-footer-link flex items-center space-x-3 text-sm opacity-80 hover:opacity-100 transition-opacity duration-200" href="#">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="sidebar-text transition-all duration-300 whitespace-nowrap">Ajuda</span>
+      </a>
+      <a class="sidebar-footer-link flex items-center space-x-3 text-sm opacity-80 hover:opacity-100 transition-opacity duration-200" href="#">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+        <span class="sidebar-text transition-all duration-300 whitespace-nowrap">Sair</span>
+      </a>
+    </div>
+  </aside>
+  <!-- END: Sidebar -->
+
+  <!-- BEGIN: Main Content -->
+  <main class="flex-grow overflow-hidden p-5 bg-brand-bg scrollbar-hide flex flex-col h-full max-h-screen">
+    
+    <!-- BEGIN: Top Header Bar -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4 shrink-0">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:w-auto">
+        <h1 id="header-title" class="text-3xl font-bold text-gray-800 transition-all duration-300">Visão geral</h1>
+        
+        <!-- Botões de Área (Filtros de Visão do Dashboard) -->
+        <div class="flex bg-white rounded-xl p-1 gap-1 border border-gray-100 shadow-sm w-fit shrink-0">
+          <button id="tab-area-geral" onclick="changeDashboardArea('geral')" class="px-4 py-1.5 text-xs bg-brand-primary text-white rounded-lg transition-all duration-300 font-semibold shadow-sm">
+            Geral
+          </button>
+          <button id="tab-area-marketing" onclick="changeDashboardArea('marketing')" class="px-4 py-1.5 text-xs text-gray-600 hover:text-brand-primary rounded-lg transition-all duration-200 font-semibold">
+            Marketing
+          </button>
+          <button id="tab-area-analise" onclick="changeDashboardArea('analise')" class="px-4 py-1.5 text-xs text-gray-600 hover:text-brand-primary rounded-lg transition-all duration-200 font-semibold">
+            Análise & Crescimento
+          </button>
+        </div>
+      </div>
+      
+      <!-- Seletor de Período Dinâmico -->
+      <div class="flex items-center bg-white rounded-xl shadow-sm border border-gray-100 p-1">
+        <button onclick="navigateMonth(-1)" class="px-3 py-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-colors">&lt;</button>
+        
+        <button id="btn-month-prev" onclick="selectMonthByIndex(0)" class="px-3 py-1.5 hover:bg-gray-50 rounded-lg text-xs text-gray-500 font-medium transition-all duration-200">
+          Abril de 2026
+        </button>
+        
+        <button id="btn-month-current" onclick="selectMonthByIndex(1)" class="px-4 py-2 bg-pink-100 text-brand-primary rounded-lg font-semibold text-xs flex items-center gap-2 transition-all duration-300 shadow-sm">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"></path>
+          </svg>
+          <span id="label-month-current">Maio de 2026</span>
+        </button>
+        
+        <button id="btn-month-next" onclick="selectMonthByIndex(2)" class="px-3 py-1.5 hover:bg-gray-50 rounded-lg text-xs text-gray-500 font-medium transition-all duration-200">
+          Junho de 2026
+        </button>
+        
+        <button onclick="navigateMonth(1)" class="px-3 py-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-colors">&gt;</button>
+      </div>
+    </header>
+    <!-- END: Top Header Bar -->
+
+    <!-- MAIN GRID LAYOUT (ANINHADO E EXTREMAMENTE COMPACTO PARA TELA ÚNICA) -->
+    <div class="grid grid-cols-12 gap-4 items-stretch flex-grow min-h-0">
+      
+      <!-- COLUNA ESQUERDA: KPIs (Linha Superior) + Gráficos (Linha Inferior) -->
+      <div class="col-span-12 xl:col-span-9 flex flex-col gap-4 h-full min-h-0">
+        
+        <!-- LINHA DOS KPIs (Carrossel Dinâmico de 4 a 6 Cards) -->
+        <div class="relative w-full shrink-0 group">
+          
+          <!-- Seta Scroll Anterior -->
+          <button id="btn-prev-kpi" onclick="scrollKPICards(-1)" class="absolute -left-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-md transition-all duration-300 hover:scale-110 opacity-0 group-hover:opacity-100 disabled:opacity-0 focus:outline-none text-brand-primary hover:bg-pink-50" style="pointer-events: none;" disabled>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+          </button>
+          
+          <!-- Container de Scroll Oculto -->
+          <div id="kpi-scroll-container" class="overflow-x-auto scrollbar-hide scroll-smooth w-full pr-1">
+            <div id="kpi-grid-container" class="grid grid-flow-col auto-cols-[100%] sm:auto-cols-[calc(50%-8px)] lg:auto-cols-[calc(25%-12px)] gap-4 shrink-0 transition-all duration-300">
+          
+          <!-- Card: Beneficiários -->
+          <div id="card-kpi-beneficiarios" class="bg-white p-4 rounded-2xl border border-gray-100 relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300">
+            <div>
+              <div class="flex justify-between items-start mb-2">
+                <h3 class="text-[10px] font-bold text-brand-primary uppercase tracking-wider">Total de Beneficiários</h3>
+                <span class="text-[10px] px-2 py-0.5 bg-pink-50 text-brand-primary border border-brand-primary/20 rounded-full cursor-pointer hover:bg-pink-100 transition-colors">Parcial ▾</span>
+              </div>
+              
+              <div id="kpi-beneficiarios-total" class="text-3xl font-bold text-gray-900 mb-0.5 value-transition">10.289</div>
+              
+              <div id="kpi-beneficiarios-percent" class="text-[11px] text-green-500 font-semibold mb-3 flex items-center value-transition">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"></path>
+                </svg>
+                <span>2,1%</span> <span class="text-gray-400 font-normal ml-1">vs. anterior</span>
+              </div>
+              
+              <div class="space-y-1 text-[10px] text-gray-500">
+                <div class="flex justify-between border-b border-gray-50 pb-0.5">
+                  <span>Base <span class="text-[9px] block">Resumo</span></span>
+                  <span class="text-right">versus período anterior <span id="kpi-beneficiarios-comparacao" class="block font-medium">Nomes: 42</span></span>
+                </div>
+                <div class="flex justify-between pt-0.5">
+                  <span>Total de ativos</span>
+                  <span id="kpi-beneficiarios-ativos" class="font-bold text-gray-800">10.289</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Novos do mês</span>
+                  <span id="kpi-beneficiarios-novos" class="font-bold text-gray-800">42</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>Cancelamentos</span>
+                  <span id="kpi-beneficiarios-cancelados" class="font-bold text-gray-800">18</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Gráfico Rosca Minimalista -->
+            <div class="mt-3 flex items-center gap-4 border-t border-gray-50 pt-2 shrink-0">
+              <div class="relative w-10 h-10 flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-pink-100" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path id="donut-segment" class="text-brand-primary transition-all duration-1000 ease-out" stroke-dasharray="59, 100" stroke-width="3.7" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <span id="donut-percent" class="absolute text-[8px] font-bold text-brand-primary">59%</span>
+              </div>
+              <div class="text-[9px]">
+                <div class="flex items-center gap-1">
+                  <span class="w-2 h-2 rounded-full bg-brand-primary"></span>
+                  <span id="donut-label-pf">PF 59% (6.774)</span>
+                </div>
+                <div class="flex items-center gap-1 mt-0.5">
+                  <span class="w-2 h-2 rounded-full bg-pink-200"></span>
+                  <span id="donut-label-pj">PJ 41% (3.515)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card: Leads -->
+          <div id="card-kpi-leads" class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex flex-col justify-between transition-all duration-300">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-7 h-7 bg-pink-100 rounded-lg flex items-center justify-center text-brand-primary shrink-0">
+                  <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path>
+                  </svg>
+                </div>
+                <h3 class="text-[10px] font-bold text-brand-primary uppercase">Leads no Período</h3>
+              </div>
+              
+              <div id="kpi-leads-total" class="text-3xl font-bold text-gray-900 mb-0.5 value-transition">145</div>
+              
+              <div id="kpi-leads-percent" class="text-[11px] text-green-500 font-semibold mb-3 flex items-center value-transition">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"></path>
+                </svg>
+                <span>14,7%</span> <span class="text-gray-400 font-normal ml-1">vs. anterior</span>
+              </div>
+            </div>
+            
+            <div class="space-y-1.5 mt-2 pt-2 border-t border-gray-50 shrink-0">
+              <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Origem principal</p>
+              <div class="text-[11px] space-y-1.5">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-600">Google Ads</span>
+                  <span id="kpi-leads-origin-google" class="font-bold">65%</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-600">Meta ADS</span>
+                  <span id="kpi-leads-origin-meta" class="font-bold">20%</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-600">Indicação</span>
+                  <span id="kpi-leads-origin-ind" class="font-bold">8%</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-600">Outros</span>
+                  <span id="kpi-leads-origin-outros" class="font-bold">4%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card: Conversões -->
+          <div id="card-kpi-conversoes" class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex flex-col justify-between transition-all duration-300">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-7 h-7 bg-pink-100 rounded-lg flex items-center justify-center text-brand-primary shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                  </svg>
+                </div>
+                <h3 class="text-[10px] font-bold text-brand-primary uppercase">Conversões</h3>
+              </div>
+              
+              <div id="kpi-conversoes-taxa" class="text-3xl font-bold text-gray-900 mb-0.5 value-transition">12,4%</div>
+              
+              <div id="kpi-conversoes-percent" class="text-[11px] text-green-500 font-semibold mb-3 flex items-center value-transition">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"></path>
+                </svg>
+                <span>1,8 p.p.</span> <span class="text-gray-400 font-normal ml-1">vs. anterior</span>
+              </div>
+              
+              <div class="space-y-1.5 mt-2 pt-2 border-t border-gray-50 text-[11px]">
+                <div class="flex justify-between items-center py-0.5">
+                  <span class="text-gray-600">Vendas</span>
+                  <span id="kpi-conversoes-vendas" class="font-bold">18</span>
+                </div>
+                <div class="flex justify-between items-center py-0.5">
+                  <span class="text-gray-600">Leads qualif.</span>
+                  <span id="kpi-conversoes-leads" class="font-bold">145</span>
+                </div>
+                <div class="flex justify-between items-center py-0.5">
+                  <span class="text-gray-600">Taxa final</span>
+                  <span id="kpi-conversoes-taxa-final" class="font-bold">12,4%</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-2.5 p-2 bg-pink-50 rounded-xl border border-pink-100 flex items-center gap-2 shrink-0">
+              <div class="w-8 h-8 shrink-0 border-2 border-pink-200 rounded-full flex items-center justify-center text-brand-primary bg-white">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-[8px] text-brand-primary font-bold uppercase tracking-wider">Meta mensal</p>
+                <p id="kpi-conversoes-meta" class="text-xs font-bold text-brand-primary">12%</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card: Investimento Mensal -->
+          <div id="card-kpi-investimento" class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex flex-col justify-between transition-all duration-300">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-7 h-7 bg-pink-100 rounded-lg flex items-center justify-center text-brand-primary shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                  </svg>
+                </div>
+                <h3 class="text-[10px] font-bold text-brand-primary uppercase">Investimento</h3>
+              </div>
+              
+              <div id="kpi-investimento-total" class="text-2xl font-bold text-gray-900 mb-0.5 value-transition">R$ 12,5 mil</div>
+              
+              <div id="kpi-investimento-percent" class="text-[11px] text-red-500 font-semibold mb-3 flex items-center value-transition">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"></path>
+                </svg>
+                <span>-5,2%</span> <span class="text-gray-400 font-normal ml-1">vs. anterior</span>
+              </div>
+              
+              <div class="space-y-1.5 mt-2 pt-2 border-t border-gray-50 text-[11px]">
+                <div>
+                  <p class="text-gray-400 text-[10px]">Investido no mês</p>
+                  <p id="kpi-investimento-atual" class="font-bold text-gray-800">R$ 11.915,32</p>
+                </div>
+                <div class="pt-0.5">
+                  <p class="text-gray-400 text-[10px]">Orçado para o mês</p>
+                  <p id="kpi-investimento-orcamento" class="font-bold text-gray-800">R$ 13.000,00</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-2.5 shrink-0">
+              <div class="flex justify-between text-[10px] mb-1">
+                <span class="text-gray-500">% utilizado</span>
+                <span id="kpi-investimento-progresso-percent" class="font-bold">91,7%</span>
+              </div>
+              <div class="w-full bg-pink-100 h-2 rounded-full overflow-hidden">
+                <div id="kpi-investimento-progresso-bar" class="bg-brand-primary h-full rounded-full transition-all duration-1000 ease-out" style="width: 91.7%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card: ROI & CAC (Card 5) -->
+          <div id="card-kpi-roi" class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex flex-col justify-between transition-all duration-300">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-7 h-7 bg-pink-100 rounded-lg flex items-center justify-center text-brand-primary shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                  </svg>
+                </div>
+                <h3 class="text-[10px] font-bold text-brand-primary uppercase">Retorno (ROI)</h3>
+              </div>
+              
+              <div id="kpi-roi-total" class="text-3xl font-bold text-gray-900 mb-0.5 value-transition">4,2x</div>
+              
+              <div id="kpi-roi-percent" class="text-[11px] text-green-500 font-semibold mb-3 flex items-center value-transition">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"></path>
+                </svg>
+                <span>+0,4x</span> <span class="text-gray-400 font-normal ml-1">vs. anterior</span>
+              </div>
+              
+              <div class="space-y-1.5 mt-2 pt-2 border-t border-gray-50 text-[11px]">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">CAC do período</span>
+                  <span id="kpi-roi-cac" class="font-bold text-gray-800">R$ 283,69</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">LTV Estimado</span>
+                  <span id="kpi-roi-ltv" class="font-bold text-gray-800">R$ 1.190,00</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">Fator LTV/CAC</span>
+                  <span id="kpi-roi-fator" class="font-bold text-gray-800">4,2x</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-2.5 shrink-0">
+              <div class="flex justify-between text-[10px] mb-1">
+                <span class="text-gray-500">Eficiência de ROI</span>
+                <span id="kpi-roi-progresso-percent" class="font-bold">84%</span>
+              </div>
+              <div class="w-full bg-pink-100 h-2 rounded-full overflow-hidden">
+                <div id="kpi-roi-progresso-bar" class="bg-brand-primary h-full rounded-full transition-all duration-1000 ease-out" style="width: 84%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card: Satisfação NPS (Card 6) -->
+          <div id="card-kpi-nps" class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex flex-col justify-between transition-all duration-300">
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <div class="w-7 h-7 bg-pink-100 rounded-lg flex items-center justify-center text-brand-primary shrink-0">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                  </svg>
+                </div>
+                <h3 class="text-[10px] font-bold text-brand-primary uppercase">Satisfação (NPS)</h3>
+              </div>
+              
+              <div id="kpi-nps-total" class="text-3xl font-bold text-gray-900 mb-0.5 value-transition">78</div>
+              
+              <div id="kpi-nps-percent" class="text-[11px] text-green-500 font-semibold mb-3 flex items-center value-transition">
+                <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"></path>
+                </svg>
+                <span>+2 pts</span> <span class="text-gray-400 font-normal ml-1">vs. anterior</span>
+              </div>
+              
+              <div class="space-y-1.5 mt-2 pt-2 border-t border-gray-50 text-[11px]">
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">Classificação</span>
+                  <span id="kpi-nps-status" class="font-bold text-green-500">Excelência</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">Total de respostas</span>
+                  <span id="kpi-nps-respostas" class="font-bold text-gray-800">342</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-gray-400">Detratores / Promotores</span>
+                  <span id="kpi-nps-pro-det" class="font-bold text-gray-800">4% / 82%</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="mt-2.5 shrink-0">
+              <div class="flex justify-between text-[10px] mb-1">
+                <span class="text-gray-500">Taxa de Promotores</span>
+                <span id="kpi-nps-progresso-percent" class="font-bold">82%</span>
+              </div>
+              <div class="w-full bg-pink-100 h-2 rounded-full overflow-hidden">
+                <div id="kpi-nps-progresso-bar" class="bg-brand-primary h-full rounded-full transition-all duration-1000 ease-out" style="width: 82%"></div>
+              </div>
+            </div>
+          </div>
+          
+        </div> <!-- FIM kpi-grid-container -->
+      </div> <!-- FIM kpi-scroll-container -->
+      
+      <!-- Seta Scroll Próxima -->
+      <button id="btn-next-kpi" onclick="scrollKPICards(1)" class="absolute -right-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-md transition-all duration-300 hover:scale-110 opacity-0 group-hover:opacity-100 disabled:opacity-0 focus:outline-none text-brand-primary hover:bg-pink-50">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+      </button>
+      
+    </div> <!-- FIM Carrossel Wrapper group -->
+        
+        <!-- LINHA DOS GRÁFICOS (Bar Chart Escuro + Funil adaptados para preenchimento de tela) -->
+        <div class="grid grid-cols-12 gap-4 flex-grow min-h-0">
+          
+          <!-- Google Ads Bar Chart (Painel Escuro Premium) -->
+          <div class="col-span-12 lg:col-span-7 bg-[#0D040A] text-white p-5 rounded-3xl shadow-xl flex flex-col justify-between h-full min-h-0">
+            <div class="shrink-0">
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-3">
+                <h2 class="text-xl font-bold text-pink-500">Desempenho de Anúncios</h2>
+                
+                <!-- Seleção da Plataforma de Anúncio -->
+                <div class="flex bg-[#1A0A14] rounded-xl p-1 gap-1 border border-white/5 self-end">
+                  <button id="ad-btn-instagram" onclick="changeAdPlatform('Instagram')" class="px-3 py-1 text-[9px] rounded-lg text-gray-400 hover:text-white transition-all duration-200 font-semibold">
+                    Instagram
+                  </button>
+                  <button id="ad-btn-meta" onclick="changeAdPlatform('Meta ADS')" class="px-3 py-1 text-[9px] rounded-lg text-gray-400 hover:text-white transition-all duration-200 font-semibold">
+                    Meta ADS
+                  </button>
+                  <button id="ad-btn-google" onclick="changeAdPlatform('Google Ads')" class="px-3 py-1 text-[9px] bg-brand-primary text-white rounded-lg transition-all duration-300 font-semibold">
+                    Google Ads
+                  </button>
+                </div>
+              </div>
+              
+              <p id="ad-chart-subtitle" class="text-[10px] text-gray-400 mb-1">Desempenho semanal (Pistas geradas por dia)</p>
+            </div>
+            
+            <!-- Canvas para Chart.js -->
+            <div class="relative flex-grow min-h-0 w-full flex items-center justify-center py-2">
+              <canvas id="adChart"></canvas>
+            </div>
+            
+            <!-- Grid de métricas do anúncio -->
+            <div class="grid grid-cols-3 gap-2 mt-3 text-xs shrink-0">
+              <div class="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
+                <p class="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Visualizações</p>
+                <p id="ad-metric-views" class="text-sm font-bold text-white transition-all duration-300">312.850</p>
+              </div>
+              <div class="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
+                <p class="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Campanhas</p>
+                <p id="ad-metric-groups" class="text-sm font-bold text-white transition-all duration-300">19.842 <span class="text-red-500 text-[9px] ml-0.5 font-normal">▼ 2</span></p>
+              </div>
+              <div class="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
+                <p class="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Investido</p>
+                <p id="ad-metric-invested" class="text-sm font-bold text-white transition-all duration-300">R$ 17.171,72</p>
+              </div>
+              <div class="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
+                <p class="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Leads</p>
+                <p id="ad-metric-leads" class="text-sm font-bold text-white transition-all duration-300">58</p>
+              </div>
+              <div class="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
+                <p class="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Conversões</p>
+                <p id="ad-metric-conversions" class="text-sm font-bold text-white transition-all duration-300">245</p>
+              </div>
+              <div class="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
+                <p class="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Tx. Agendamento</p>
+                <p id="ad-metric-sched-rate" class="text-sm font-bold text-white transition-all duration-300">41,20%</p>
+              </div>
+            </div>
+            
+            <p id="ad-chart-footer" class="text-[8px] text-gray-600 mt-2 text-right shrink-0">Fonte: Envio de Dados (05/2026)</p>
+          </div>
+
+          <!-- Card: Funil de Conversão -->
+          <div class="col-span-12 lg:col-span-5 bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex flex-col justify-between h-full min-h-0">
+            <div class="flex gap-1.5 mb-3 bg-gray-50 p-1 rounded-xl w-fit shrink-0">
+              <button id="funnel-tab-btn" onclick="toggleFunnelTab('funnel')" class="px-3 py-1 bg-brand-primary text-white text-xs font-bold rounded-lg shadow-sm transition-all duration-300">
+                Funil de Conversão
+              </button>
+              <button id="origin-tab-btn" onclick="toggleFunnelTab('origin')" class="px-3 py-1 text-gray-600 text-xs font-bold rounded-lg transition-all duration-200 hover:bg-gray-100">
+                Origem dos Leads
+              </button>
+              <button id="cities-tab-btn" onclick="toggleFunnelTab('cities')" class="px-3 py-1 text-gray-600 text-xs font-bold rounded-lg transition-all duration-200 hover:bg-gray-100">
+                Cidades
+              </button>
+            </div>
+
+            <!-- Conteúdo 1: Funil de Conversão (Alturas e Espaçamentos Otimizados) -->
+            <div id="tab-content-funnel" class="flex-grow flex items-center justify-between gap-2 min-h-0">
+              
+              <!-- Funil Métrica Esquerda (Absoluto) -->
+              <div class="flex flex-col justify-between h-full py-1 text-[10px] w-20 shrink-0">
+                <div class="hover:scale-105 transition-transform duration-200">
+                  <p class="text-gray-400 font-medium leading-none">Impressões</p>
+                  <p id="funnel-val-impressoes" class="font-bold text-gray-800 text-xs mt-0.5">414.792</p>
+                  <p id="funnel-ind-impressoes" class="text-green-500 font-bold text-[9px] leading-none">▲ 4,3%</p>
+                </div>
+                <div class="hover:scale-105 transition-transform duration-200">
+                  <p class="text-gray-400 font-medium leading-none">Cliques</p>
+                  <p id="funnel-val-cliques" class="font-bold text-gray-800 text-xs mt-0.5">28.875</p>
+                  <p id="funnel-ind-cliques" class="text-red-500 font-bold text-[9px] leading-none">▼ -2,1%</p>
+                </div>
+                <div class="hover:scale-105 transition-transform duration-200">
+                  <p class="text-gray-400 font-medium leading-none">Leads</p>
+                  <p id="funnel-val-leads" class="font-bold text-gray-800 text-xs mt-0.5">87</p>
+                  <p id="funnel-ind-leads" class="text-red-500 font-bold text-[9px] leading-none">▼ -8,7%</p>
+                </div>
+                <div class="hover:scale-105 transition-transform duration-200">
+                  <p class="text-gray-400 font-medium leading-none">Agendamentos</p>
+                  <p id="funnel-val-agendamentos" class="font-bold text-gray-800 text-xs mt-0.5">46</p>
+                  <p id="funnel-ind-agendamentos" class="text-green-500 font-bold text-[9px] leading-none">▲ 6,1%</p>
+                </div>
+                <div class="hover:scale-105 transition-transform duration-200">
+                  <p class="text-gray-400 font-medium leading-none">Vendas</p>
+                  <p id="funnel-val-vendas" class="font-bold text-gray-800 text-xs mt-0.5">42</p>
+                  <p id="funnel-ind-vendas" class="text-green-500 font-bold text-[9px] leading-none">▲ 8,0%</p>
+                </div>
+              </div>
+              
+              <!-- Representação Visual do Funil (Otimizada e Ampliada) -->
+              <div class="flex-grow flex flex-col items-center gap-2 max-w-[200px]">
+                <div id="funnel-bar-1" class="funnel-step bg-pink-100 w-full h-[46px] flex items-center justify-center text-brand-primary shadow-sm cursor-pointer" title="Impressões">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                    <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                  </svg>
+                </div>
+                <div id="funnel-bar-2" class="funnel-step bg-pink-200 w-[85%] h-[46px] flex items-center justify-center text-brand-primary shadow-sm cursor-pointer" title="Cliques">
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M17.418 3.623l-4.276 4.277a2 2 0 101.414 1.414l4.277-4.276a.5.5 0 00-.715-.715zM7 8a5 5 0 1010 0A5 5 0 007 8z"></path>
+                    <path d="M2.3 18l1.3-1.3c1.1-1.1 2.9-1.1 4 0l1.4 1.4c1.1 1.1 1.1 2.9 0 4l-1.3 1.3L2.3 18z"></path>
+                  </svg>
+                </div>
+                <div id="funnel-bar-3" class="funnel-step bg-pink-300 w-[70%] h-[46px] flex items-center justify-center text-brand-primary shadow-sm cursor-pointer" title="Leads">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                  </svg>
+                </div>
+                <div id="funnel-bar-4" class="funnel-step bg-pink-400 w-[55%] h-[46px] flex items-center justify-center text-brand-primary shadow-sm cursor-pointer" title="Agendamentos">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                  </svg>
+                </div>
+                <div id="funnel-bar-5" class="funnel-step bg-pink-500 w-[40%] h-[46px] flex items-center justify-center text-white shadow-sm cursor-pointer" title="Vendas">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                  </svg>
+                </div>
+              </div>
+              
+              <!-- Funil Taxa Direita (Conversão Relativa) -->
+              <div class="flex flex-col justify-around h-full py-1 text-[9px] w-24 shrink-0 border-l border-gray-50 pl-2">
+                <div>
+                  <p class="text-gray-400 font-medium leading-none">CTR (Cliques/Imp.)</p>
+                  <p id="funnel-tx-ctr" class="font-bold text-gray-800 text-xs mt-0.5">6,96%</p>
+                  <p id="funnel-tx-ctr-ind" class="text-green-500 font-medium text-[8px] leading-none">▲ 1,1%</p>
+                </div>
+                <div>
+                  <p class="text-gray-400 font-medium leading-none">Conversão Leads</p>
+                  <p id="funnel-tx-leads" class="font-bold text-gray-800 text-xs mt-0.5">0,30%</p>
+                  <p id="funnel-tx-leads-ind" class="text-green-500 font-medium text-[8px] leading-none">▲ 0,7%</p>
+                </div>
+                <div>
+                  <p class="text-gray-400 font-medium leading-none">Tx. Agendamento</p>
+                  <p id="funnel-tx-agendamentos" class="font-bold text-gray-800 text-xs mt-0.5">52,87%</p>
+                  <p id="funnel-tx-agendamentos-ind" class="text-green-500 font-medium text-[8px] leading-none">▲ 2,2%</p>
+                </div>
+                <div>
+                  <p class="text-gray-400 font-medium leading-none">Tx. Fechamento</p>
+                  <p id="funnel-tx-vendas" class="font-bold text-gray-800 text-xs mt-0.5">91,30%</p>
+                  <p id="funnel-tx-vendas-ind" class="text-red-500 font-medium text-[8px] leading-none">▼ -4,1%</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conteúdo 2: Origem dos Leads (Alternativo) -->
+            <div id="tab-content-origin" class="hidden flex-grow flex flex-col justify-center gap-4 min-h-0">
+              <div class="text-center">
+                <h4 class="text-[10px] uppercase tracking-wider font-bold text-gray-400 mb-2">Volume total de leads</h4>
+                <div id="origin-lead-total" class="text-3xl font-extrabold text-brand-primary mb-4">145 Leads</div>
+              </div>
+              
+              <div class="space-y-3 max-w-[260px] mx-auto w-full text-xs">
+                <div>
+                  <div class="flex justify-between text-gray-600 font-medium mb-0.5">
+                    <span>Anúncios do Google</span>
+                    <span id="origin-pct-google" class="font-bold text-gray-800">65%</span>
+                  </div>
+                  <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                    <div id="origin-bar-google" class="bg-brand-primary h-full rounded-full transition-all duration-1000" style="width: 65%"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-gray-600 font-medium mb-0.5">
+                    <span>Meta ADS</span>
+                    <span id="origin-pct-meta" class="font-bold text-gray-800">20%</span>
+                  </div>
+                  <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                    <div id="origin-bar-meta" class="bg-pink-300 h-full rounded-full transition-all duration-1000" style="width: 20%"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-gray-600 font-medium mb-0.5">
+                    <span>Indicação</span>
+                    <span id="origin-pct-ind" class="font-bold text-gray-800">8%</span>
+                  </div>
+                  <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                    <div id="origin-bar-ind" class="bg-pink-200 h-full rounded-full transition-all duration-1000" style="width: 8%"></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="flex justify-between text-gray-600 font-medium mb-0.5">
+                    <span>Outros</span>
+                    <span id="origin-pct-outros" class="font-bold text-gray-800">7%</span>
+                  </div>
+                  <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                    <div id="origin-bar-outros" class="bg-gray-300 h-full rounded-full transition-all duration-1000" style="width: 7%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conteúdo 3: Cidades (Tabela Premium) -->
+            <div id="tab-content-cities" class="hidden flex-grow flex flex-col justify-between min-h-0 w-full">
+              <div class="overflow-y-auto flex-grow custom-scrollbar pr-1 min-h-0 mt-2">
+                <table class="w-full text-xs">
+                  <thead>
+                    <tr class="text-gray-400 border-b border-gray-100 text-left sticky top-0 bg-white pb-3 text-[10px] uppercase font-bold tracking-wider">
+                      <th class="pb-2 font-semibold">Núcleo / Cidade</th>
+                      <th class="pb-2 font-semibold text-right pr-6">Beneficiários</th>
+                      <th class="pb-2 font-semibold text-right">Crescimento</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabela-cidades-body" class="divide-y divide-gray-50">
+                    <!-- Inserido dinamicamente via Javascript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+          
+        </div> <!-- FIM LINHA DOS GRÁFICOS -->
+        
+      </div> <!-- FIM COLUNA ESQUERDA -->
+      
+      <!-- COLUNA DIREITA: Tabela de Investimentos (Span vertical completo para proporção perfeita) -->
+      <div class="col-span-12 xl:col-span-3 flex flex-col h-full min-h-0">
+        
+        <div class="bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex flex-col flex-grow h-full min-h-0 justify-between">
+          <div class="flex flex-col flex-grow min-h-0">
+            <div class="flex items-center justify-between mb-2 shrink-0">
+              <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
+                <h2 class="text-md font-bold text-gray-800 tracking-tight">Investimentos do Mês</h2>
+              </div>
+            </div>
+            
+            <div class="text-right mb-2 shrink-0">
+              <p class="text-[9px] uppercase tracking-wider text-gray-400 font-bold">Total</p>
+              <p id="tabela-investimentos-total" class="text-2xl font-bold text-brand-primary transition-all duration-300">R$ 11.915,32</p>
+            </div>
+            
+            <!-- Filtros de Investimento -->
+            <div class="flex gap-1.5 mb-3 overflow-x-auto pb-2 scrollbar-hide shrink-0">
+              <button id="filter-btn-all" onclick="filterInvestments('Todos', this)" class="px-3 py-1.5 bg-brand-primary text-white text-[9px] rounded-lg font-bold shadow-sm transition-all duration-200">
+                Todos
+              </button>
+              <button id="filter-btn-mkt" onclick="filterInvestments('Marketing', this)" class="px-3 py-1.5 border border-pink-100 text-gray-600 hover:border-pink-200 text-[9px] rounded-lg font-bold transition-all duration-200">
+                Marketing
+              </button>
+              <button id="filter-btn-ads" onclick="filterInvestments('Ads', this)" class="px-3 py-1.5 border border-pink-100 text-gray-600 hover:border-pink-200 text-[9px] rounded-lg font-bold transition-all duration-200">
+                Ads
+              </button>
+              <button id="filter-btn-off" onclick="filterInvestments('Offline', this)" class="px-3 py-1.5 border border-pink-100 text-gray-600 hover:border-pink-200 text-[9px] rounded-lg font-bold transition-all duration-200">
+                Offline
+              </button>
+            </div>
+            
+            <!-- Tabela com scroll inteligente e min-h-0 para nunca estourar a tela -->
+            <div class="overflow-y-auto flex-grow custom-scrollbar pr-1 min-h-0">
+              <table class="w-full text-[10px]">
+                <thead>
+                  <tr class="text-gray-400 border-b border-gray-100 text-left sticky top-0 bg-white pb-2">
+                    <th class="pb-2 font-semibold">Mês</th>
+                    <th class="pb-2 font-semibold">Métrica</th>
+                    <th class="pb-2 font-semibold text-right">Valor</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-investimentos-body" class="divide-y divide-gray-50">
+                  <!-- Inserido dinamicamente via Javascript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+          
+          <!-- Footer Timestamp integrado ao Card de Investimentos -->
+          <div class="flex items-center gap-2 text-gray-400 text-[10px] border-t border-gray-100 pt-3 mt-4 shrink-0">
+            <svg class="w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+            </svg>
+            <span>Última atualização: <span id="footer-timestamp">05/05/2026 08:30</span></span>
+          </div>
+          
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+  <!-- END: Main Content -->
+
+  <!-- BEGIN: Javascript Logic -->
+  <script>
+    // 1. DADOS DE MODELO DO DASHBOARD (ABRIL, MAIO E JUNHO DE 2026)
+    const dashboardData = {
+      abril: {
+        timestamp: "05/04/2026 18:45",
+        beneficiarios: {
+          total: "10.289",
+          percentText: "1,5%",
+          percentType: "up", // "up" ou "down"
+          ativos: "10.289",
+          novos: "35",
+          cancelados: "15",
+          pfPercent: 5,
+          pfVal: "515",
+          pjPercent: 95,
+          pjVal: "9.774"
+        },
+        leads: {
+          total: "132",
+          percentText: "8,5%",
+          percentType: "up",
+          origem: { google: "60%", meta: "22%", indicacao: "10%", outros: "8%" },
+          origemInt: { google: 60, meta: 22, indicacao: 10, outros: 8 }
+        },
+        conversoes: {
+          taxa: "11,8%",
+          percentText: "0,5 p.p.",
+          percentType: "up",
+          vendas: "15",
+          leads: "132",
+          meta: "12%"
+        },
+        investimento: {
+          total: "R$ 12,1 mil",
+          percentText: "-1,8%",
+          percentType: "down",
+          atual: "R$ 11.500,00",
+          orcamento: "R$ 12.100,00",
+          progressoPercent: "95,0%"
+        },
+        roi: { total: "3,8x", diff: "+0,2x", diffType: "up", cac: "R$ 295,00", ltv: "R$ 1.120,00", fator: "3,8x", progress: 76 },
+        nps: { total: "76", diff: "+1 pt", diffType: "up", status: "Excelência", statusColor: "text-green-500", respostas: "310", proDet: "5% / 81%", progress: 81 },
+        investimentosTabela: [
+          { categoria: "Ads", metric: "Meta anúncios do Facebook/Instagram", valor: "R$ 2.800,00", valorInt: 2800 },
+          { categoria: "Ads", metric: "Anúncios do Google", valor: "R$ 3.700,00", valorInt: 3700 },
+          { categoria: "Marketing", metric: "RD Conversas", valor: "R$ 1.200,00", valorInt: 1200 },
+          { categoria: "Marketing", metric: "RD CRM", valor: "R$ 950,00", valorInt: 950 },
+          { categoria: "Offline", metric: "Rádio Passos / Rádio Vida", valor: "R$ 613,32", valorInt: 613.32 },
+          { categoria: "Marketing", metric: "Outros custos e ferramentas", valor: "R$ 1.100,00", valorInt: 1100 },
+          { categoria: "Marketing", metric: "E-mail Marketing", valor: "R$ 250,00", valorInt: 250 },
+          { categoria: "Offline", metric: "Impressos e materiais", valor: "R$ 350,00", valorInt: 350 },
+          { categoria: "Offline", metric: "Eventos e patrocínios", valor: "R$ 300,00", valorInt: 300 },
+          { categoria: "Marketing", metric: "Assessoria de imprensa", valor: "R$ 236,68", valorInt: 236.68 }
+        ],
+        anuncios: {
+          "Google Ads": {
+            semanal: [10, 55, 74, 68, 80, 55, 48],
+            views: "295.120",
+            groups: "18.150",
+            groupsChange: "▼ 5",
+            invested: "R$ 15.220,00",
+            leads: "48",
+            conversions: "210",
+            schedRate: "39,80%"
+          },
+          "Meta ADS": {
+            semanal: [32, 45, 58, 62, 70, 48, 39],
+            views: "185.000",
+            groups: "9.200",
+            groupsChange: "▲ 1",
+            invested: "R$ 8.900,00",
+            leads: "52",
+            conversions: "144",
+            schedRate: "42,10%"
+          },
+          "Instagram": {
+            semanal: [22, 38, 48, 55, 72, 50, 41],
+            views: "142.300",
+            groups: "6.800",
+            groupsChange: "▬ 0",
+            invested: "R$ 6.100,00",
+            leads: "38",
+            conversions: "95",
+            schedRate: "35,40%"
+          }
+        },
+        funil: {
+          impressoes: "395.200", impressoesChange: "▲ 2,1%", impressoesChangeType: "up",
+          cliques: "26.540", cliquesChange: "▼ -1,2%", cliquesChangeType: "down",
+          leads: "81", leadsChange: "▼ -5,4%", leadsChangeType: "down",
+          agendamentos: "41", agendamentosChange: "▲ 4,3%", agendamentosChangeType: "up",
+          vendas: "37", vendasChange: "▲ 5,0%", vendasChangeType: "up",
+          txCtr: "6,71%", txCtrChange: "▲ 0,8%", txCtrChangeType: "up",
+          txLeads: "0,31%", txLeadsChange: "▲ 0,5%", txLeadsChangeType: "up",
+          txAgendamentos: "50,62%", txAgendamentosChange: "▲ 1,5%", txAgendamentosChangeType: "up",
+          txVendas: "90,24%", txVendasChange: "▼ -2,1%", txVendasChangeType: "down"
+        },
+        cidades: [
+          { nome: "Passos", beneficiarios: "7.980", crescimento: "+ 10,2%" },
+          { nome: "Itaú de Minas", beneficiarios: "6.610", crescimento: "+ 8,5%" },
+          { nome: "São Seb. Paraíso", beneficiarios: "5.750", crescimento: "+ 12,1%" },
+          { nome: "Cássia", beneficiarios: "4.720", crescimento: "+ 6,3%" },
+          { nome: "Alpinópolis", beneficiarios: "4.110", crescimento: "+ 15,2%" }
+        ]
+      },
+      maio: {
+        timestamp: "05/05/2026 08:30",
+        beneficiarios: {
+          total: "10.289",
+          percentText: "2,1%",
+          percentType: "up",
+          ativos: "10.289",
+          novos: "42",
+          cancelados: "18",
+          pfPercent: 5,
+          pfVal: "515",
+          pjPercent: 95,
+          pjVal: "9.774"
+        },
+        leads: {
+          total: "145",
+          percentText: "14,7%",
+          percentType: "up",
+          origem: { google: "65%", meta: "20%", indicacao: "8%", outros: "7%" },
+          origemInt: { google: 65, meta: 20, indicacao: 8, outros: 7 }
+        },
+        conversoes: {
+          taxa: "12,4%",
+          percentText: "1,8 p.p.",
+          percentType: "up",
+          vendas: "18",
+          leads: "145",
+          meta: "12%"
+        },
+        investimento: {
+          total: "R$ 12,5 mil",
+          percentText: "-5,2%",
+          percentType: "down",
+          atual: "R$ 11.915,32",
+          orcamento: "R$ 13.000,00",
+          progressoPercent: "91,7%"
+        },
+        roi: { total: "4,2x", diff: "+0,4x", diffType: "up", cac: "R$ 283,69", ltv: "R$ 1.190,00", fator: "4,2x", progress: 84 },
+        nps: { total: "78", diff: "+2 pts", diffType: "up", status: "Excelência", statusColor: "text-green-500", respostas: "342", proDet: "4% / 82%", progress: 82 },
+        investimentosTabela: [
+          { categoria: "Ads", metric: "Meta anúncios do Facebook/Instagram", valor: "R$ 3.000,00", valorInt: 3000 },
+          { categoria: "Ads", metric: "Anúncios do Google", valor: "R$ 3.950,00", valorInt: 3950 },
+          { categoria: "Marketing", metric: "RD Conversas", valor: "R$ 1.200,00", valorInt: 1200 },
+          { categoria: "Marketing", metric: "Marketing de P&D", valor: "R$ 1.000,00", valorInt: 1000 },
+          { categoria: "Marketing", metric: "RD CRM", valor: "R$ 950,00", valorInt: 950 },
+          { categoria: "Offline", metric: "Rádio Passos / Rádio Vida", valor: "R$ 613,32", valorInt: 613.32 },
+          { categoria: "Marketing", metric: "Outros custos e ferramentas", valor: "R$ 1.200,00", valorInt: 1200 },
+          { categoria: "Marketing", metric: "E-mail Marketing", valor: "R$ 250,00", valorInt: 250 },
+          { categoria: "Offline", metric: "Impressos e materiais", valor: "R$ 350,00", valorInt: 350 },
+          { categoria: "Offline", metric: "Eventos e patrocínios", valor: "R$ 400,00", valorInt: 400 },
+          { categoria: "Marketing", metric: "Assessoria de imprensa", valor: "R$ 200,00", valorInt: 200 },
+          { categoria: "Marketing", metric: "SEO e conteúdo", valor: "R$ 300,00", valorInt: 300 },
+          { categoria: "Marketing", metric: "Software e licenças", valor: "R$ 200,00", valorInt: 200 },
+          { categoria: "Marketing", metric: "Capacitação e treinamentos", valor: "R$ 150,00", valorInt: 150 },
+          { categoria: "Marketing", metric: "Comissões e parcerias", valor: "R$ 150,00", valorInt: 150 }
+        ],
+        anuncios: {
+          "Google Ads": {
+            semanal: [12, 69, 84, 75, 88, 61, 57],
+            views: "312.850",
+            groups: "19.842",
+            groupsChange: "▼ 2",
+            invested: "R$ 17.171,72",
+            leads: "58",
+            conversions: "245",
+            schedRate: "41,20%"
+          },
+          "Meta ADS": {
+            semanal: [40, 52, 68, 71, 79, 58, 45],
+            views: "210.400",
+            groups: "11.100",
+            groupsChange: "▲ 4",
+            invested: "R$ 9.850,00",
+            leads: "64",
+            conversions: "172",
+            schedRate: "43,80%"
+          },
+          "Instagram": {
+            semanal: [28, 42, 55, 68, 85, 60, 48],
+            views: "165.200",
+            groups: "7.950",
+            groupsChange: "▲ 2",
+            invested: "R$ 7.200,00",
+            leads: "42",
+            conversions: "118",
+            schedRate: "38,10%"
+          }
+        },
+        funil: {
+          impressoes: "414.792", impressoesChange: "▲ 4,3%", impressoesChangeType: "up",
+          cliques: "28.875", cliquesChange: "▼ -2,1%", cliquesChangeType: "down",
+          leads: "87", leadsChange: "▼ -8,7%", leadsChangeType: "down",
+          agendamentos: "46", agendamentosChange: "▲ 6,1%", agendamentosChangeType: "up",
+          vendas: "42", vendasChange: "▲ 8,0%", vendasChangeType: "up",
+          txCtr: "6,96%", txCtrChange: "▲ 1,1%", txCtrChangeType: "up",
+          txLeads: "0,30%", txLeadsChange: "▲ 0,7%", txLeadsChangeType: "up",
+          txAgendamentos: "52,87%", txAgendamentosChange: "▲ 2,2%", txAgendamentosChangeType: "up",
+          txVendas: "91,30%", txVendasChange: "▼ -4,1%", txVendasChangeType: "down"
+        },
+        cidades: [
+          { nome: "Passos", beneficiarios: "8.125", crescimento: "+ 12,4%" },
+          { nome: "Itaú de Minas", beneficiarios: "6.732", crescimento: "+ 9,8%" },
+          { nome: "São Seb. Paraíso", beneficiarios: "5.921", crescimento: "+ 14,2%" },
+          { nome: "Cássia", beneficiarios: "4.812", crescimento: "+ 7,1%" },
+          { nome: "Alpinópolis", beneficiarios: "4.256", crescimento: "+ 18,7%" }
+        ]
+      },
+      junho: {
+        timestamp: "05/06/2026 10:15",
+        beneficiarios: {
+          total: "10.320",
+          percentText: "2,8%",
+          percentType: "up",
+          ativos: "10.320",
+          novos: "55",
+          cancelados: "24",
+          pfPercent: 5,
+          pfVal: "516",
+          pjPercent: 95,
+          pjVal: "9.804"
+        },
+        leads: {
+          total: "160",
+          percentText: "21,0%",
+          percentType: "up",
+          origem: { google: "68%", meta: "18%", indicacao: "9%", outros: "5%" },
+          origemInt: { google: 68, meta: 18, indicacao: 9, outros: 5 }
+        },
+        conversoes: {
+          taxa: "13,1%",
+          percentText: "2,5 p.p.",
+          percentType: "up",
+          vendas: "21",
+          leads: "160",
+          meta: "12%"
+        },
+        investimento: {
+          total: "R$ 14,0 mil",
+          percentText: "8,0%",
+          percentType: "up",
+          atual: "R$ 12.800,00",
+          orcamento: "R$ 14.000,00",
+          progressoPercent: "91,4%"
+        },
+        roi: { total: "4,5x", diff: "+0,3x", diffType: "up", cac: "R$ 272,00", ltv: "R$ 1.220,00", fator: "4,5x", progress: 90 },
+        nps: { total: "80", diff: "+2 pts", diffType: "up", status: "Excelência", statusColor: "text-green-500", respostas: "385", proDet: "3% / 83%", progress: 83 },
+        investimentosTabela: [
+          { categoria: "Ads", metric: "Meta anúncios do Facebook/Instagram", valor: "R$ 3.200,00", valorInt: 3200 },
+          { categoria: "Ads", metric: "Anúncios do Google", valor: "R$ 4.200,00", valorInt: 4200 },
+          { categoria: "Marketing", metric: "RD Conversas", valor: "R$ 1.300,00", valorInt: 1300 },
+          { categoria: "Marketing", metric: "Marketing de P&D", valor: "R$ 1.100,00", valorInt: 1100 },
+          { categoria: "Marketing", metric: "RD CRM", valor: "R$ 1.000,00", valorInt: 1000 },
+          { categoria: "Offline", metric: "Rádio Passos / Rádio Vida", valor: "R$ 613,32", valorInt: 613.32 },
+          { categoria: "Marketing", metric: "Outros custos e ferramentas", valor: "R$ 1.386,68", valorInt: 1386.68 }
+        ],
+        anuncios: {
+          "Google Ads": {
+            semanal: [15, 78, 92, 85, 96, 68, 62],
+            views: "345.800",
+            groups: "21.400",
+            groupsChange: "▲ 4",
+            invested: "R$ 19.450,00",
+            leads: "68",
+            conversions: "282",
+            schedRate: "42,50%"
+          },
+          "Meta ADS": {
+            semanal: [48, 60, 75, 82, 88, 65, 52],
+            views: "235.000",
+            groups: "12.800",
+            groupsChange: "▲ 6",
+            invested: "R$ 11.200,00",
+            leads: "76",
+            conversions: "198",
+            schedRate: "45,20%"
+          },
+          "Instagram": {
+            semanal: [35, 50, 68, 79, 98, 72, 58],
+            views: "185.000",
+            groups: "8.900",
+            groupsChange: "▲ 3",
+            invested: "R$ 8.500,00",
+            leads: "50",
+            conversions: "135",
+            schedRate: "40,30%"
+          }
+        },
+        funil: {
+          impressoes: "438.500", impressoesChange: "▲ 5,7%", impressoesChangeType: "up",
+          cliques: "31.200", cliquesChange: "▲ 8,0%", cliquesChangeType: "up",
+          leads: "96", leadsChange: "▲ 10,3%", leadsChangeType: "up",
+          agendamentos: "52", agendamentosChange: "▲ 13,0%", agendamentosChangeType: "up",
+          vendas: "48", vendasChange: "▲ 14,2%", vendasChangeType: "up",
+          txCtr: "7,11%", txCtrChange: "▲ 1,5%", txCtrChangeType: "up",
+          txLeads: "0,31%", txLeadsChange: "▲ 0,3%", txLeadsChangeType: "up",
+          txAgendamentos: "54,17%", txAgendamentosChange: "▲ 2,4%", txAgendamentosChangeType: "up",
+          txVendas: "92,31%", txVendasChange: "▲ 1,1%", txVendasChangeType: "up"
+        },
+        cidades: [
+          { nome: "Passos", beneficiarios: "8.310", crescimento: "+ 14,1%" },
+          { nome: "Itaú de Minas", beneficiarios: "6.850", crescimento: "+ 11,2%" },
+          { nome: "São Seb. Paraíso", beneficiarios: "6.110", crescimento: "+ 15,8%" },
+          { nome: "Cássia", beneficiarios: "4.930", crescimento: "+ 8,2%" },
+          { nome: "Alpinópolis", beneficiarios: "4.420", crescimento: "+ 20,1%" }
+        ]
+      }
+    };
+
+    // 2. VARIÁVEIS DE ESTADO DO SISTEMA
+    let currentMonthKey = 'maio'; // 'abril', 'maio' ou 'junho'
+    let currentAdPlatform = 'Google Ads'; // 'Instagram', 'Meta ADS', 'Google Ads'
+    let currentInvestmentFilter = 'Todos'; // 'Todos', 'Marketing', 'Ads', 'Offline'
+    let adChart = null; // Instância global do Chart.js
+
+    // 3. INICIALIZAÇÃO DO SISTEMA
+    document.addEventListener("DOMContentLoaded", function() {
+      // Configura dados iniciais de Maio
+      updateDashboardData();
+      
+      // Inicializa o gráfico do Chart.js
+      initAdChart();
+      
+      // Aplica efeitos nos fatias do funil
+      setupFunnelInteractions();
+
+      // Inicialização do recolhimento da barra lateral (Sidebar)
+      const sidebar = document.getElementById("sidebar");
+      const btnToggleSidebar = document.getElementById("btn-toggle-sidebar");
+      
+      // Carrega estado persistido do localStorage
+      if (localStorage.getItem("sidebar-collapsed") === "true") {
+        sidebar.classList.add("collapsed");
+        btnToggleSidebar.setAttribute("aria-label", "Expandir barra lateral");
+      }
+      
+      btnToggleSidebar.addEventListener("click", function() {
+        sidebar.classList.toggle("collapsed");
+        const isCollapsed = sidebar.classList.contains("collapsed");
+        localStorage.setItem("sidebar-collapsed", isCollapsed);
+        
+        if (isCollapsed) {
+          btnToggleSidebar.setAttribute("aria-label", "Expandir barra lateral");
+        } else {
+          btnToggleSidebar.setAttribute("aria-label", "Recolher barra lateral");
+        }
+        
+        // Força o redimensionamento do gráfico após o término da transição CSS (300ms)
+        setTimeout(() => {
+          if (adChart) {
+            adChart.resize();
+          }
+        }, 305);
+      });
+
+      // Inicialização do Carrossel de Cards de KPI
+      const kpiScrollContainer = document.getElementById("kpi-scroll-container");
+      if (kpiScrollContainer) {
+        kpiScrollContainer.addEventListener("scroll", updateKPIArrows);
+        window.addEventListener("resize", updateKPIArrows);
+        // Pequena folga para renderização completa do DOM
+        setTimeout(updateKPIArrows, 150);
+      }
+    });
+
+    // 4. ATUALIZAR TODOS OS DADOS NO DOM
+    function updateDashboardData() {
+      const data = dashboardData[currentMonthKey];
+      
+      // Update Footer Timestamp
+      document.getElementById("footer-timestamp").textContent = data.timestamp;
+
+      // --- BENEFICIÁRIOS ---
+      document.getElementById("kpi-beneficiarios-total").textContent = data.beneficiarios.total;
+      document.getElementById("kpi-beneficiarios-ativos").textContent = data.beneficiarios.total;
+      document.getElementById("kpi-beneficiarios-novos").textContent = data.beneficiarios.novos;
+      document.getElementById("kpi-beneficiarios-cancelados").textContent = data.beneficiarios.cancelados;
+      document.getElementById("kpi-beneficiarios-comparacao").textContent = "Nomes: " + data.beneficiarios.novos;
+      
+      const benPercentEl = document.getElementById("kpi-beneficiarios-percent");
+      benPercentEl.innerHTML = getPercentSVG(data.beneficiarios.percentType) + `<span>${data.beneficiarios.percentText}</span> <span class="text-gray-400 font-normal ml-1">em relação ao anterior</span>`;
+      setPercentColorClass(benPercentEl, data.beneficiarios.percentType);
+
+      // Gráfico Donut/Rosca
+      document.getElementById("donut-segment").setAttribute("stroke-dasharray", `${data.beneficiarios.pfPercent}, 100`);
+      document.getElementById("donut-percent").textContent = `${data.beneficiarios.pfPercent}%`;
+      document.getElementById("donut-label-pf").textContent = `PF ${data.beneficiarios.pfPercent}% (${data.beneficiarios.pfVal})`;
+      document.getElementById("donut-label-pj").textContent = `PJ ${data.beneficiarios.pjPercent}% (${data.beneficiarios.pjVal})`;
+
+      // --- LEADS ---
+      document.getElementById("kpi-leads-total").textContent = data.leads.total;
+      document.getElementById("kpi-leads-origin-google").textContent = data.leads.origem.google;
+      document.getElementById("kpi-leads-origin-meta").textContent = data.leads.origem.meta;
+      document.getElementById("kpi-leads-origin-ind").textContent = data.leads.origem.indicacao;
+      document.getElementById("kpi-leads-origin-outros").textContent = data.leads.origem.outros;
+      
+      const leadsPercentEl = document.getElementById("kpi-leads-percent");
+      leadsPercentEl.innerHTML = getPercentSVG(data.leads.percentType) + `<span>${data.leads.percentText}</span> <span class="text-gray-400 font-normal ml-1">vs. período anterior</span>`;
+      setPercentColorClass(leadsPercentEl, data.leads.percentType);
+
+      // --- CONVERSÕES ---
+      document.getElementById("kpi-conversoes-taxa").textContent = data.conversoes.taxa;
+      document.getElementById("kpi-conversoes-vendas").textContent = data.conversoes.vendas;
+      document.getElementById("kpi-conversoes-leads").textContent = data.conversoes.leads;
+      document.getElementById("kpi-conversoes-taxa-final").textContent = data.conversoes.taxa;
+      document.getElementById("kpi-conversoes-meta").textContent = data.conversoes.meta;
+
+      const convPercentEl = document.getElementById("kpi-conversoes-percent");
+      convPercentEl.innerHTML = getPercentSVG(data.conversoes.percentType) + `<span>${data.conversoes.percentText}</span> <span class="text-gray-400 font-normal ml-1">vs. período anterior</span>`;
+      setPercentColorClass(convPercentEl, data.conversoes.percentType);
+
+      // --- INVESTIMENTO ---
+      document.getElementById("kpi-investimento-total").textContent = data.investimento.total;
+      document.getElementById("kpi-investimento-atual").textContent = data.investimento.atual;
+      document.getElementById("kpi-investimento-orcamento").textContent = data.investimento.orcamento;
+      document.getElementById("kpi-investimento-progresso-percent").textContent = data.investimento.progressoPercent;
+      document.getElementById("kpi-investimento-progresso-bar").style.width = data.investimento.progressoPercent;
+
+      const invPercentEl = document.getElementById("kpi-investimento-percent");
+      invPercentEl.innerHTML = getPercentSVG(data.investimento.percentType) + `<span>${data.investimento.percentText}</span> <span class="text-gray-400 font-normal ml-1">vs. período anterior</span>`;
+      setPercentColorClass(invPercentEl, data.investimento.percentType);
+
+      // --- RETORNO (ROI) ---
+      document.getElementById("kpi-roi-total").textContent = data.roi.total;
+      document.getElementById("kpi-roi-cac").textContent = data.roi.cac;
+      document.getElementById("kpi-roi-ltv").textContent = data.roi.ltv;
+      document.getElementById("kpi-roi-fator").textContent = data.roi.fator;
+      document.getElementById("kpi-roi-progresso-percent").textContent = data.roi.progress + "%";
+      document.getElementById("kpi-roi-progresso-bar").style.width = data.roi.progress + "%";
+      
+      const roiPercentEl = document.getElementById("kpi-roi-percent");
+      roiPercentEl.innerHTML = getPercentSVG(data.roi.diffType) + `<span>${data.roi.diff}</span> <span class="text-gray-400 font-normal ml-1">vs. anterior</span>`;
+      setPercentColorClass(roiPercentEl, data.roi.diffType);
+
+      // --- SATISFAÇÃO (NPS) ---
+      document.getElementById("kpi-nps-total").textContent = data.nps.total;
+      document.getElementById("kpi-nps-status").textContent = data.nps.status;
+      document.getElementById("kpi-nps-status").className = `font-bold ${data.nps.statusColor}`;
+      document.getElementById("kpi-nps-respostas").textContent = data.nps.respostas;
+      document.getElementById("kpi-nps-pro-det").textContent = data.nps.proDet;
+      document.getElementById("kpi-nps-progresso-percent").textContent = data.nps.progress + "%";
+      document.getElementById("kpi-nps-progresso-bar").style.width = data.nps.progress + "%";
+      
+      const npsPercentEl = document.getElementById("kpi-nps-percent");
+      npsPercentEl.innerHTML = getPercentSVG(data.nps.diffType) + `<span>${data.nps.diff}</span> <span class="text-gray-400 font-normal ml-1">vs. anterior</span>`;
+      setPercentColorClass(npsPercentEl, data.nps.diffType);
+
+      // --- TABELA DE INVESTIMENTOS ---
+      renderInvestmentsTable();
+
+      // --- GRÁFICO E DETALHES DE ANÚNCIOS ---
+      updateAdSectionData();
+
+      // --- FUNIL DE CONVERSÃO ---
+      updateFunnelData();
+
+      // --- ORIGEM DOS LEADS ---
+      updateOriginTabData();
+
+      // --- CIDADES ---
+      updateCitiesData();
+    }
+
+    // 5. AJUDANTES VISUAIS (SVG E CORES DE PERCENTUAL)
+    function getPercentSVG(type) {
+      if (type === 'up') {
+        return `<svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"></path></svg>`;
+      } else {
+        return `<svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"></path></svg>`;
+      }
+    }
+
+    function setPercentColorClass(element, type) {
+      if (type === 'up') {
+        element.classList.remove("text-red-500");
+        element.classList.add("text-green-500");
+      } else {
+        element.classList.remove("text-green-500");
+        element.classList.add("text-red-500");
+      }
+    }
+
+    // 6. SELETOR DE PERÍODO (MESES)
+    function selectMonthByIndex(index) {
+      const months = ['abril', 'maio', 'junho'];
+      currentMonthKey = months[index];
+      
+      // Atualiza visual dos botões
+      const btnPrev = document.getElementById("btn-month-prev");
+      const btnCurrent = document.getElementById("btn-month-current");
+      const btnNext = document.getElementById("btn-month-next");
+
+      // Reset dos estilos para estilo simples
+      btnPrev.className = "px-3 py-1.5 hover:bg-gray-50 rounded-lg text-xs text-gray-500 font-medium transition-all duration-200";
+      btnCurrent.className = "px-3 py-1.5 hover:bg-gray-50 rounded-lg text-xs text-gray-500 font-medium transition-all duration-200";
+      btnNext.className = "px-3 py-1.5 hover:bg-gray-50 rounded-lg text-xs text-gray-500 font-medium transition-all duration-200";
+
+      if (index === 0) {
+        btnPrev.className = "px-4 py-2 bg-pink-100 text-brand-primary rounded-lg font-semibold text-xs flex items-center gap-2 transition-all duration-300 shadow-sm";
+      } else if (index === 1) {
+        btnCurrent.className = "px-4 py-2 bg-pink-100 text-brand-primary rounded-lg font-semibold text-xs flex items-center gap-2 transition-all duration-300 shadow-sm";
+      } else {
+        btnNext.className = "px-4 py-2 bg-pink-100 text-brand-primary rounded-lg font-semibold text-xs flex items-center gap-2 transition-all duration-300 shadow-sm";
+      }
+
+      updateDashboardData();
+      updateChartInstance();
+    }
+
+    function navigateMonth(direction) {
+      const months = ['abril', 'maio', 'junho'];
+      let index = months.indexOf(currentMonthKey);
+      index += direction;
+      if (index >= 0 && index < months.length) {
+        selectMonthByIndex(index);
+      }
+    }
+
+    // 7. RENDERIZAR TABELA DE INVESTIMENTOS COM FILTRO
+    function renderInvestmentsTable() {
+      const data = dashboardData[currentMonthKey];
+      const tableBody = document.getElementById("tabela-investimentos-body");
+      tableBody.innerHTML = "";
+      
+      let totalFiltrado = 0;
+      const labelMes = currentMonthKey === 'abril' ? 'Abril/2026' : currentMonthKey === 'maio' ? 'Maio/2026' : 'Junho/2026';
+
+      data.investimentosTabela.forEach(item => {
+        // Aplica o filtro de categoria
+        if (currentInvestmentFilter === 'Todos' || item.categoria === currentInvestmentFilter) {
+          totalFiltrado += item.valorInt;
+          
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-gray-50 transition-colors duration-150";
+          tr.innerHTML = `
+            <td class="py-1 font-medium text-gray-400">${labelMes}</td>
+            <td class="py-1 text-gray-800 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full ${getTagColorClass(item.categoria)}"></span>
+              ${item.metric}
+            </td>
+            <td class="py-1 text-right font-bold text-gray-900">${item.valor}</td>
+          `;
+          tableBody.appendChild(tr);
+        }
+      });
+
+      // Atualiza o total filtrado com formatação de moeda brasileira
+      document.getElementById("tabela-investimentos-total").textContent = totalFiltrado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function getTagColorClass(categoria) {
+      switch (categoria) {
+        case 'Marketing': return 'bg-purple-500';
+        case 'Ads': return 'bg-pink-500';
+        case 'Offline': return 'bg-yellow-500';
+        default: return 'bg-gray-400';
+      }
+    }
+
+    // FILTRO DA TABELA DE INVESTIMENTO
+    function filterInvestments(category, buttonEl) {
+      currentInvestmentFilter = category;
+      
+      // Reseta classes de todos os botões de filtro
+      const filterButtons = [
+        document.getElementById("filter-btn-all"),
+        document.getElementById("filter-btn-mkt"),
+        document.getElementById("filter-btn-ads"),
+        document.getElementById("filter-btn-off")
+      ];
+
+      filterButtons.forEach(btn => {
+        if (btn) {
+          btn.className = "px-3 py-1.5 border border-pink-100 text-gray-600 hover:border-pink-200 text-[9px] rounded-lg font-bold transition-all duration-200";
+        }
+      });
+
+      // Ativa o botão selecionado
+      buttonEl.className = "px-3 py-1.5 bg-brand-primary text-white text-[9px] rounded-lg font-bold shadow-sm transition-all duration-200";
+
+      renderInvestmentsTable();
+    }
+
+    // ALTERNAR ÁREA DO DASHBOARD (FILTRO DOS GRIDS DE KPI)
+    function changeDashboardArea(area) {
+      // 1. Reseta classes dos botões das abas
+      const btnGeral = document.getElementById("tab-area-geral");
+      const btnMarketing = document.getElementById("tab-area-marketing");
+      const btnAnalise = document.getElementById("tab-area-analise");
+      
+      const resetClass = "px-4 py-1.5 text-xs text-gray-600 hover:text-brand-primary rounded-lg transition-all duration-200 font-semibold";
+      const activeClass = "px-4 py-1.5 text-xs bg-brand-primary text-white rounded-lg transition-all duration-300 font-semibold shadow-sm";
+      
+      if (btnGeral) btnGeral.className = resetClass;
+      if (btnMarketing) btnMarketing.className = resetClass;
+      if (btnAnalise) btnAnalise.className = resetClass;
+      
+      // 2. Referências aos elementos DOM
+      const cardBeneficiarios = document.getElementById("card-kpi-beneficiarios");
+      const cardLeads = document.getElementById("card-kpi-leads");
+      const cardConversoes = document.getElementById("card-kpi-conversoes");
+      const cardInvestimento = document.getElementById("card-kpi-investimento");
+      const cardRoi = document.getElementById("card-kpi-roi");
+      const cardNps = document.getElementById("card-kpi-nps");
+      const gridContainer = document.getElementById("kpi-grid-container");
+      const scrollContainer = document.getElementById("kpi-scroll-container");
+      const headerTitle = document.getElementById("header-title");
+      const btnPrev = document.getElementById("btn-prev-kpi");
+      const btnNext = document.getElementById("btn-next-kpi");
+      
+      // 3. Aplica regras da área selecionada
+      if (area === 'marketing') {
+        if (btnMarketing) btnMarketing.className = activeClass;
+        if (headerTitle) headerTitle.textContent = "Desempenho de Marketing";
+        
+        // Exibe: Leads, Conversões, Investimento, ROI (Esconde: Beneficiários, NPS)
+        if (cardBeneficiarios) cardBeneficiarios.classList.add("hidden");
+        if (cardLeads) cardLeads.classList.remove("hidden");
+        if (cardConversoes) cardConversoes.classList.remove("hidden");
+        if (cardInvestimento) cardInvestimento.classList.remove("hidden");
+        if (cardRoi) cardRoi.classList.remove("hidden");
+        if (cardNps) cardNps.classList.add("hidden");
+        
+        // Esconde as setas do carrossel e desativa scroll
+        if (btnPrev) btnPrev.style.display = 'none';
+        if (btnNext) btnNext.style.display = 'none';
+        if (scrollContainer) {
+          scrollContainer.style.overflowX = 'visible';
+          scrollContainer.scrollLeft = 0;
+        }
+        
+        // Altera o Grid para 4 colunas em telas lg
+        if (gridContainer) gridContainer.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0 transition-all duration-300";
+      } else if (area === 'analise') {
+        if (btnAnalise) btnAnalise.className = activeClass;
+        if (headerTitle) headerTitle.textContent = "Análise de Crescimento & Conversão";
+        
+        // Exibe: Beneficiários, Leads, Conversões, NPS (Esconde: Investimento, ROI)
+        if (cardBeneficiarios) cardBeneficiarios.classList.remove("hidden");
+        if (cardLeads) cardLeads.classList.remove("hidden");
+        if (cardConversoes) cardConversoes.classList.remove("hidden");
+        if (cardInvestimento) cardInvestimento.classList.add("hidden");
+        if (cardRoi) cardRoi.classList.add("hidden");
+        if (cardNps) cardNps.classList.remove("hidden");
+        
+        // Esconde as setas do carrossel e desativa scroll
+        if (btnPrev) btnPrev.style.display = 'none';
+        if (btnNext) btnNext.style.display = 'none';
+        if (scrollContainer) {
+          scrollContainer.style.overflowX = 'visible';
+          scrollContainer.scrollLeft = 0;
+        }
+        
+        // Altera o Grid para 4 colunas em telas lg
+        if (gridContainer) gridContainer.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0 transition-all duration-300";
+      } else {
+        // Geral
+        if (btnGeral) btnGeral.className = activeClass;
+        if (headerTitle) headerTitle.textContent = "Visão geral";
+        
+        // Exibe todos os 6 cards
+        if (cardBeneficiarios) cardBeneficiarios.classList.remove("hidden");
+        if (cardLeads) cardLeads.classList.remove("hidden");
+        if (cardConversoes) cardConversoes.classList.remove("hidden");
+        if (cardInvestimento) cardInvestimento.classList.remove("hidden");
+        if (cardRoi) cardRoi.classList.remove("hidden");
+        if (cardNps) cardNps.classList.remove("hidden");
+        
+        // Reativa setas do carrossel e scroll horizontal
+        if (btnPrev) btnPrev.style.display = 'flex';
+        if (btnNext) btnNext.style.display = 'flex';
+        if (scrollContainer) scrollContainer.style.overflowX = 'auto';
+        
+        // Altera o Grid para carrossel horizontal deslizante
+        if (gridContainer) gridContainer.className = "grid grid-flow-col auto-cols-[100%] sm:auto-cols-[calc(50%-8px)] lg:auto-cols-[calc(25%-12px)] gap-4 shrink-0 transition-all duration-300";
+        
+        // Atualiza as setas após o reflow
+        setTimeout(updateKPIArrows, 100);
+      }
+    }
+
+    // CARROSSEL DE CARDS DE KPI (SETAS DE SCROLL)
+    function scrollKPICards(direction) {
+      const container = document.getElementById("kpi-scroll-container");
+      const card = document.getElementById("card-kpi-beneficiarios");
+      if (!container || !card) return;
+      
+      const cardWidth = card.offsetWidth;
+      const gap = 16; // gap-4 é 16px
+      const scrollAmount = (cardWidth + gap) * direction;
+      
+      container.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+      
+      // Pequeno timeout para atualizar o estado das setas após o scroll terminar
+      setTimeout(updateKPIArrows, 350);
+    }
+    
+    function updateKPIArrows() {
+      const container = document.getElementById("kpi-scroll-container");
+      const btnPrev = document.getElementById("btn-prev-kpi");
+      const btnNext = document.getElementById("btn-next-kpi");
+      if (!container || !btnPrev || !btnNext) return;
+      
+      const scrollLeft = container.scrollLeft;
+      const maxScrollLeft = container.scrollWidth - container.clientWidth;
+      
+      // Controla se a seta anterior está habilitada
+      if (scrollLeft <= 5) {
+        btnPrev.disabled = true;
+        btnPrev.style.pointerEvents = 'none';
+        btnPrev.style.opacity = '0';
+      } else {
+        btnPrev.disabled = false;
+        btnPrev.style.pointerEvents = 'auto';
+        btnPrev.style.opacity = '1';
+      }
+      
+      // Controla se a seta próxima está habilitada
+      if (scrollLeft >= maxScrollLeft - 5 || maxScrollLeft <= 0) {
+        btnNext.disabled = true;
+        btnNext.style.pointerEvents = 'none';
+        btnNext.style.opacity = '0';
+      } else {
+        btnNext.disabled = false;
+        btnNext.style.pointerEvents = 'auto';
+        btnNext.style.opacity = '1';
+      }
+    }
+
+    // 8. RENDERIZAR E ATUALIZAR GRÁFICOS (CHART.JS)
+    function initAdChart() {
+      const ctx = document.getElementById('adChart').getContext('2d');
+      const data = dashboardData[currentMonthKey].anuncios[currentAdPlatform].semanal;
+
+      // Cria gradiente vertical para o fundo das barras
+      const barGradient = ctx.createLinearGradient(0, 0, 0, 160);
+      barGradient.addColorStop(0, '#E91E63'); // Rosa secundário
+      barGradient.addColorStop(1, '#D81B60'); // Rosa primário
+
+      adChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom', 'Seg'],
+          datasets: [{
+            label: 'Pistas geradas',
+            data: data,
+            backgroundColor: barGradient,
+            hoverBackgroundColor: '#FF4081',
+            borderRadius: 6,
+            borderSkipped: false,
+            maxBarThickness: 16
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: '#1A0A14',
+              titleColor: '#FF4081',
+              bodyColor: '#FFF',
+              borderWidth: 1,
+              borderColor: 'rgba(255, 255, 255, 0.1)',
+              padding: 8,
+              cornerRadius: 8,
+              displayColors: false,
+              callbacks: {
+                label: function(context) {
+                  return `Pistas: ${context.raw}`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              grid: {
+                color: 'rgba(255, 255, 255, 0.05)',
+                drawBorder: false
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.4)',
+                font: {
+                  size: 9,
+                  family: 'Inter'
+                }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.4)',
+                font: {
+                  size: 9,
+                  family: 'Inter'
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function updateChartInstance() {
+      if (adChart) {
+        const newData = dashboardData[currentMonthKey].anuncios[currentAdPlatform].semanal;
+        adChart.data.datasets[0].data = newData;
+        adChart.update();
+      }
+    }
+
+    // ALTERNAR PLATAFORMA DE ANÚNCIO
+    function changeAdPlatform(platform) {
+      currentAdPlatform = platform;
+      
+      // Atualiza visual dos botões
+      const btnInsta = document.getElementById("ad-btn-instagram");
+      const btnMeta = document.getElementById("ad-btn-meta");
+      const btnGoogle = document.getElementById("ad-btn-google");
+
+      // Reset classes
+      const resetClass = "px-3 py-1.5 text-[9px] rounded-lg text-gray-400 hover:text-white transition-all duration-200 font-semibold";
+      btnInsta.className = resetClass;
+      btnMeta.className = resetClass;
+      btnGoogle.className = resetClass;
+
+      // Set active class
+      const activeClass = "px-3 py-1.5 text-[9px] bg-brand-primary text-white rounded-lg transition-all duration-300 font-semibold shadow-sm";
+      if (platform === 'Instagram') {
+        btnInsta.className = activeClass;
+      } else if (platform === 'Meta ADS') {
+        btnMeta.className = activeClass;
+      } else {
+        btnGoogle.className = activeClass;
+      }
+
+      // Atualiza subtítulo do gráfico
+      document.getElementById("ad-chart-subtitle").textContent = `Desempenho semanal em ${platform} (Pistas geradas por dia)`;
+
+      // Atualiza as métricas
+      updateAdSectionData();
+      
+      // Atualiza o gráfico do Chart.js
+      updateChartInstance();
+    }
+
+    function updateAdSectionData() {
+      const data = dashboardData[currentMonthKey].anuncios[currentAdPlatform];
+      const labelMes = currentMonthKey === 'abril' ? '04/2026' : currentMonthKey === 'maio' ? '05/2026' : '06/2026';
+
+      document.getElementById("ad-metric-views").textContent = data.views;
+      document.getElementById("ad-metric-groups").innerHTML = `${data.groups} <span class="${data.groupsChange.includes('▲') ? 'text-green-500' : data.groupsChange.includes('▼') ? 'text-red-500' : 'text-gray-400'} text-[10px] ml-1 font-semibold">${data.groupsChange}</span>`;
+      document.getElementById("ad-metric-invested").textContent = data.invested;
+      document.getElementById("ad-metric-leads").textContent = data.leads;
+      document.getElementById("ad-metric-conversions").textContent = data.conversions;
+      document.getElementById("ad-metric-sched-rate").textContent = data.schedRate;
+
+      document.getElementById("ad-chart-footer").textContent = `Fonte: Envio de Dados (${labelMes})`;
+    }
+
+    // 9. FUNIL DE CONVERSÃO DADOS E INTERATIVIDADE
+    function updateFunnelData() {
+      const data = dashboardData[currentMonthKey].funil;
+
+      // Valores absolutos (esquerda)
+      document.getElementById("funnel-val-impressoes").textContent = data.impressoes;
+      const indImp = document.getElementById("funnel-ind-impressoes");
+      indImp.textContent = data.impressoesChange;
+      setPercentColorClass(indImp, data.impressoesChangeType);
+
+      document.getElementById("funnel-val-cliques").textContent = data.cliques;
+      const indCli = document.getElementById("funnel-ind-cliques");
+      indCli.textContent = data.cliquesChange;
+      setPercentColorClass(indCli, data.cliquesChangeType);
+
+      document.getElementById("funnel-val-leads").textContent = data.leads;
+      const indLeads = document.getElementById("funnel-ind-leads");
+      indLeads.textContent = data.leadsChange;
+      setPercentColorClass(indLeads, data.leadsChangeType);
+
+      document.getElementById("funnel-val-agendamentos").textContent = data.agendamentos;
+      const indAg = document.getElementById("funnel-ind-agendamentos");
+      indAg.textContent = data.agendamentosChange;
+      setPercentColorClass(indAg, data.agendamentosChangeType);
+
+      document.getElementById("funnel-val-vendas").textContent = data.vendas;
+      const indVendas = document.getElementById("funnel-ind-vendas");
+      indVendas.textContent = data.vendasChange;
+      setPercentColorClass(indVendas, data.vendasChangeType);
+
+      // Taxas de conversão (direita)
+      document.getElementById("funnel-tx-ctr").textContent = data.txCtr;
+      const txCtrInd = document.getElementById("funnel-tx-ctr-ind");
+      txCtrInd.textContent = data.txCtrChange;
+      setPercentColorClass(txCtrInd, data.txCtrChangeType);
+
+      document.getElementById("funnel-tx-leads").textContent = data.txLeads;
+      const txLeadsInd = document.getElementById("funnel-tx-leads-ind");
+      txLeadsInd.textContent = data.txLeadsChange;
+      setPercentColorClass(txLeadsInd, data.txLeadsChangeType);
+
+      document.getElementById("funnel-tx-agendamentos").textContent = data.txAgendamentos;
+      const txAgInd = document.getElementById("funnel-tx-agendamentos-ind");
+      txAgInd.textContent = data.txAgendamentosChange;
+      setPercentColorClass(txAgInd, data.txAgendamentosChangeType);
+
+      document.getElementById("funnel-tx-vendas").textContent = data.txVendas;
+      const txVendasInd = document.getElementById("funnel-tx-vendas-ind");
+      txVendasInd.textContent = data.txVendasChange;
+      setPercentColorClass(txVendasInd, data.txVendasChangeType);
+    }
+
+    // ALTERNAR ABAS NO FUNIL DE CONVERSÃO
+    function toggleFunnelTab(tab) {
+      const funnelBtn = document.getElementById("funnel-tab-btn");
+      const originBtn = document.getElementById("origin-tab-btn");
+      const citiesBtn = document.getElementById("cities-tab-btn");
+      const funnelContent = document.getElementById("tab-content-funnel");
+      const originContent = document.getElementById("tab-content-origin");
+      const citiesContent = document.getElementById("tab-content-cities");
+
+      const activeClass = "px-3 py-1 bg-brand-primary text-white text-xs font-bold rounded-lg shadow-sm transition-all duration-300";
+      const inactiveClass = "px-3 py-1 text-gray-600 text-xs font-bold rounded-lg transition-all duration-200 hover:bg-gray-100";
+
+      if (funnelBtn) funnelBtn.className = inactiveClass;
+      if (originBtn) originBtn.className = inactiveClass;
+      if (citiesBtn) citiesBtn.className = inactiveClass;
+
+      if (funnelContent) funnelContent.classList.add("hidden");
+      if (originContent) originContent.classList.add("hidden");
+      if (citiesContent) citiesContent.classList.add("hidden");
+
+      if (tab === 'funnel') {
+        if (funnelBtn) funnelBtn.className = activeClass;
+        if (funnelContent) funnelContent.classList.remove("hidden");
+      } else if (tab === 'origin') {
+        if (originBtn) originBtn.className = activeClass;
+        if (originContent) originContent.classList.remove("hidden");
+        
+        // Dispara animações das barras de progresso ao abrir
+        setTimeout(() => {
+          updateOriginTabData();
+        }, 100);
+      } else if (tab === 'cities') {
+        if (citiesBtn) citiesBtn.className = activeClass;
+        if (citiesContent) citiesContent.classList.remove("hidden");
+        
+        // Renderiza os dados das cidades do mês atual
+        updateCitiesData();
+      }
+    }
+
+    function updateOriginTabData() {
+      const data = dashboardData[currentMonthKey];
+      
+      document.getElementById("origin-lead-total").textContent = `${data.leads.total} Leads`;
+      
+      document.getElementById("origin-pct-google").textContent = data.leads.origem.google;
+      document.getElementById("origin-bar-google").style.width = data.leads.origem.google;
+
+      document.getElementById("origin-pct-meta").textContent = data.leads.origem.meta;
+      document.getElementById("origin-bar-meta").style.width = data.leads.origem.meta;
+
+      document.getElementById("origin-pct-ind").textContent = data.leads.origem.indicacao;
+      document.getElementById("origin-bar-ind").style.width = data.leads.origem.indicacao;
+
+      document.getElementById("origin-pct-outros").textContent = data.leads.origem.outros;
+      document.getElementById("origin-bar-outros").style.width = data.leads.origem.outros;
+    }
+
+    function updateCitiesData() {
+      const data = dashboardData[currentMonthKey];
+      const tableBody = document.getElementById("tabela-cidades-body");
+      if (!tableBody) return;
+      tableBody.innerHTML = "";
+
+      data.cidades.forEach(cidade => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-gray-50/50 transition-colors duration-150";
+        tr.innerHTML = `
+          <td class="py-3 font-bold text-gray-800 text-[13px]">${cidade.nome}</td>
+          <td class="py-3 text-right pr-6 font-bold text-gray-800 text-[13px]">${cidade.beneficiarios}</td>
+          <td class="py-3 text-right">
+            <span class="inline-block px-2.5 py-0.5 bg-green-50 text-green-600 font-bold text-[11px] rounded-full border border-green-100">${cidade.crescimento}</span>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    // interações suaves de Destaque nas Fatias do Funil
+    function setupFunnelInteractions() {
+      const barIds = ['funnel-bar-1', 'funnel-bar-2', 'funnel-bar-3', 'funnel-bar-4', 'funnel-bar-5'];
+      
+      barIds.forEach((id, index) => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.addEventListener('mouseenter', () => {
+            // Efeito visual - escurecer levemente as outras fatias para destacar a atual
+            barIds.forEach(otherId => {
+              if (otherId !== id) {
+                document.getElementById(otherId).style.opacity = '0.5';
+              }
+            });
+          });
+
+          el.addEventListener('mouseleave', () => {
+            barIds.forEach(otherId => {
+              document.getElementById(otherId).style.opacity = '1';
+            });
+          });
+        }
+      });
+    }
+  </script>
+  <!-- END: Javascript Logic -->
+
+</body>
+</html>
