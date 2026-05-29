@@ -1,6 +1,6 @@
 import { MonthlySummary } from './dashboard';
 
-export type ReportType = 'executive' | 'efficiency' | 'campaigns' | 'churn';
+export type ReportType = 'executive' | 'commercial' | 'churn' | 'financial' | 'satisfaction';
 
 export interface ReportFilter {
   startMonth: string; // Formato 'YYYY-MM'

@@ -3,6 +3,7 @@ import { FileText, Download, TrendingUp, Printer, Calendar, DollarSign, Users, A
 import { useDashboard } from '../hooks/useDashboard';
 import { TrendCharts } from '../components/charts/TrendCharts';
 import { exportarPDF } from '../utils/pdfExporter';
+import { ReportType } from '../types/reports';
 
 export const Reports: React.FC = () => {
   const { 
@@ -10,7 +11,8 @@ export const Reports: React.FC = () => {
     setReportFilter, 
     consolidatedReport, 
     availableMonths,
-    selectedMonth
+    selectedMonth,
+    allDashboardData
   } = useDashboard();
 
   // Estado local para controlar se exibe colunas detalhadas na tabela do relatório
@@ -64,6 +66,82 @@ export const Reports: React.FC = () => {
   // Função para formatar número inteiro pt-BR
   const formatarNumero = (valor: number): string => {
     return new Intl.NumberFormat('pt-BR').format(valor);
+  };
+
+  // Retorna o título do cabeçalho timbrado com base no tipo de relatório
+  const obterTituloRelatorio = () => {
+    switch (reportFilter.reportType) {
+      case 'commercial': return 'Relatório de Desempenho Comercial';
+      case 'churn': return 'Relatório de Evolução e Churn';
+      case 'financial': return 'Relatório de Eficiência Financeira e LTV';
+      case 'satisfaction': return 'Relatório de Satisfação e NPS';
+      default: return 'Relatório Executivo de Captação';
+    }
+  };
+
+  // Retorna os KPIs correspondentes ao tipo de relatório selecionado
+  const obterKpisDinamicos = () => {
+    const type = reportFilter.reportType || 'executive';
+    
+    // Cálculos de NPS e LTV acumulados para os cards
+    let totalNps = 0;
+    let totalLtv = 0;
+    let monthsCount = 0;
+    
+    consolidatedReport.rows.forEach(row => {
+      const monthData = allDashboardData[row.month];
+      if (monthData) {
+        totalNps += monthData.summary.nps || 0;
+        totalLtv += monthData.summary.ltv || 1200;
+        monthsCount++;
+      }
+    });
+    
+    const mediaNps = monthsCount > 0 ? Math.round(totalNps / monthsCount) : 78;
+    const mediaLtv = monthsCount > 0 ? Math.round(totalLtv / monthsCount) : 1250;
+    const activeBenefs = consolidatedReport.rows[consolidatedReport.rows.length - 1]?.activeBeneficiaries || 10450;
+    const canceledBenefs = consolidatedReport.rows.reduce((acc, curr) => acc + curr.canceledBeneficiaries, 0);
+    const marketingTotal = consolidatedReport.rows.reduce((acc, curr) => acc + curr.marketingSpend, 0);
+    const salesTotal = consolidatedReport.rows.reduce((acc, curr) => acc + curr.salesSpend, 0);
+
+    switch (type) {
+      case 'commercial':
+        return [
+          { label: 'Novos Beneficiários', value: formatarNumero(consolidatedReport.totals.totalNewBeneficiaries), icon: <Users className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Leads Totais', value: formatarNumero(consolidatedReport.totals.totalLeads), icon: <TrendingUp className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Conversões', value: formatarNumero(consolidatedReport.totals.totalConversions), icon: <Award className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Taxa de Conversão', value: `${consolidatedReport.totals.averageConversionRate.toFixed(1).replace('.', ',')}%`, icon: <TrendingUp className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+        ];
+      case 'churn':
+        return [
+          { label: 'Beneficiários Ativos', value: formatarNumero(activeBenefs), icon: <Users className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Novos Beneficiários', value: formatarNumero(consolidatedReport.totals.totalNewBeneficiaries), icon: <Users className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Cancelamentos', value: formatarNumero(canceledBenefs), icon: <Users className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Churn Rate Médio', value: `${consolidatedReport.totals.averageChurnRate.toFixed(2).replace('.', ',')}%`, icon: <TrendingUp className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+        ];
+      case 'financial':
+        return [
+          { label: 'Total Investido', value: formatarMoeda(consolidatedReport.totals.totalSpend), icon: <DollarSign className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Marketing Spend', value: formatarMoeda(marketingTotal), icon: <DollarSign className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Sales Spend', value: formatarMoeda(salesTotal), icon: <DollarSign className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'CAC Médio', value: formatarMoeda(consolidatedReport.totals.averageCac), icon: <Award className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+        ];
+      case 'satisfaction':
+        return [
+          { label: 'NPS Médio', value: `${mediaNps} pts`, icon: <Award className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'LTV Médio', value: formatarMoeda(mediaLtv), icon: <DollarSign className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Conversões', value: formatarNumero(consolidatedReport.totals.totalConversions), icon: <Users className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Churn Rate Médio', value: `${consolidatedReport.totals.averageChurnRate.toFixed(2).replace('.', ',')}%`, icon: <TrendingUp className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+        ];
+      case 'executive':
+      default:
+        return [
+          { label: 'Novos Beneficiários', value: formatarNumero(consolidatedReport.totals.totalNewBeneficiaries), icon: <Users className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Total Investido', value: formatarMoeda(consolidatedReport.totals.totalSpend), icon: <DollarSign className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'CAC Médio', value: formatarMoeda(consolidatedReport.totals.averageCac), icon: <Award className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+          { label: 'Taxa de Conversão', value: `${consolidatedReport.totals.averageConversionRate.toFixed(1).replace('.', ',')}%`, icon: <TrendingUp className="w-3.5 h-3.5 text-pink-700 print:text-black" /> },
+        ];
+    }
   };
 
   // Lógica de exportação real para CSV detalhado com canais
@@ -241,7 +319,7 @@ export const Reports: React.FC = () => {
               </div>
               <div className="text-left">
                 <h2 className="text-base sm:text-lg font-bold text-gray-900 font-sans tracking-wide">Uniodonto Passos</h2>
-                <p className="text-[10px] sm:text-xs text-pink-700 font-bold uppercase tracking-widest leading-none print:text-pink-800">Relatório Executivo de Captação</p>
+                <p className="text-[10px] sm:text-xs text-pink-700 font-bold uppercase tracking-widest leading-none print:text-pink-800">{obterTituloRelatorio()}</p>
               </div>
             </div>
             
@@ -253,38 +331,16 @@ export const Reports: React.FC = () => {
 
           {/* Seção 1: Métricas Consolidadas do Topo do Relatório */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 select-none">
-            <div className="bg-gray-50/50 p-3.5 rounded-2xl border border-gray-100 flex flex-col justify-between hover:border-pink-200 transition-colors print:bg-white print:border-gray-200">
-              <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider flex items-center gap-1">
-                <Users className="w-3 h-3 text-pink-700 print:text-black" /> Novos Beneficiários
-              </span>
-              <span className="text-xl font-bold text-gray-900 mt-1">
-                {formatarNumero(consolidatedReport.totals.totalNewBeneficiaries)}
-              </span>
-            </div>
-            <div className="bg-gray-50/50 p-3.5 rounded-2xl border border-gray-100 flex flex-col justify-between hover:border-pink-200 transition-colors print:bg-white print:border-gray-200">
-              <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider flex items-center gap-1">
-                <DollarSign className="w-3 h-3 text-pink-700 print:text-black" /> Total Investido
-              </span>
-              <span className="text-xl font-bold text-gray-900 mt-1">
-                {formatarMoeda(consolidatedReport.totals.totalSpend)}
-              </span>
-            </div>
-            <div className="bg-gray-50/50 p-3.5 rounded-2xl border border-gray-100 flex flex-col justify-between hover:border-pink-200 transition-colors print:bg-white print:border-gray-200">
-              <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider flex items-center gap-1">
-                <Award className="w-3 h-3 text-pink-700 print:text-black" /> CAC Médio
-              </span>
-              <span className="text-xl font-bold text-pink-700 mt-1 print:text-black">
-                {formatarMoeda(consolidatedReport.totals.averageCac)}
-              </span>
-            </div>
-            <div className="bg-gray-50/50 p-3.5 rounded-2xl border border-gray-100 flex flex-col justify-between hover:border-pink-200 transition-colors print:bg-white print:border-gray-200">
-              <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider flex items-center gap-1">
-                <TrendingUp className="w-3 h-3 text-pink-700 print:text-black" /> Taxa de Conversão
-              </span>
-              <span className="text-xl font-bold text-gray-900 mt-1">
-                {consolidatedReport.totals.averageConversionRate.toFixed(1).replace('.', ',')}%
-              </span>
-            </div>
+            {obterKpisDinamicos().map((kpi, idx) => (
+              <div key={idx} className="bg-gray-50/50 p-3.5 rounded-2xl border border-gray-100 flex flex-col justify-between hover:border-pink-200 transition-colors print:bg-white print:border-gray-200">
+                <span className="text-[9px] uppercase font-bold text-gray-400 tracking-wider flex items-center gap-1">
+                  {kpi.icon} {kpi.label}
+                </span>
+                <span className={`text-xl font-bold mt-1 ${kpi.label.includes('CAC') || kpi.label.includes('NPS') ? 'text-pink-700 print:text-black' : 'text-gray-900'}`}>
+                  {kpi.value}
+                </span>
+              </div>
+            ))}
           </div>
 
           {/* NOVO: Gráficos de Linha de Tendência de CAC e Churn */}
@@ -292,79 +348,245 @@ export const Reports: React.FC = () => {
 
           {/* Tabela de Dados Consolidados */}
           <div className="flex-grow overflow-x-auto min-h-0 print:overflow-visible -mx-4 px-4 md:mx-0 md:px-0">
-            <table className={`text-left text-xs border-collapse ${showChannelDetails && reportFilter.channel === 'all' ? 'min-w-[1000px]' : 'min-w-[650px]'} w-full`}>
+            <table className={`text-left text-xs border-collapse ${(showChannelDetails && reportFilter.channel === 'all' && (reportFilter.reportType || 'executive') === 'executive') ? 'min-w-[1000px]' : 'min-w-[650px]'} w-full`}>
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50 text-[10px] uppercase font-bold text-gray-500 select-none print:bg-transparent">
                   <th className="py-3 px-3">Mês</th>
-                  <th className="py-3 px-3 text-right">Novos Benef.</th>
-                  <th className="py-3 px-3 text-right">Leads</th>
-                  <th className="py-3 px-3 text-right">Conv.</th>
-                  <th className="py-3 px-3 text-right">Tx. Conv.</th>
                   
-                  {/* Colunas Opcionais de Detalhamento por Canal */}
-                  {showChannelDetails && reportFilter.channel === 'all' && (
+                  {(reportFilter.reportType || 'executive') === 'executive' && (
                     <>
-                      <th className="py-3 px-3 text-right">Google Ads</th>
-                      <th className="py-3 px-3 text-right">Meta Ads</th>
-                      <th className="py-3 px-3 text-right">Offline</th>
+                      <th className="py-3 px-3 text-right">Novos Benef.</th>
+                      <th className="py-3 px-3 text-right">Leads</th>
+                      <th className="py-3 px-3 text-right">Conv.</th>
+                      <th className="py-3 px-3 text-right">Tx. Conv.</th>
+                      {showChannelDetails && reportFilter.channel === 'all' && (
+                        <>
+                          <th className="py-3 px-3 text-right">Google Ads</th>
+                          <th className="py-3 px-3 text-right">Meta Ads</th>
+                          <th className="py-3 px-3 text-right">Offline</th>
+                        </>
+                      )}
+                      <th className="py-3 px-3 text-right">Total Investido</th>
+                      <th className="py-3 px-3 text-right">CAC</th>
+                      <th className="py-3 px-3 text-right">Churn</th>
                     </>
                   )}
 
-                  <th className="py-3 px-3 text-right">Total Investido</th>
-                  <th className="py-3 px-3 text-right">CAC</th>
-                  <th className="py-3 px-3 text-right">Churn</th>
+                  {reportFilter.reportType === 'commercial' && (
+                    <>
+                      <th className="py-3 px-3 text-right">Novos Benef.</th>
+                      <th className="py-3 px-3 text-right">Leads</th>
+                      <th className="py-3 px-3 text-right">Conversões</th>
+                      <th className="py-3 px-3 text-right">Tx. Conversão</th>
+                      <th className="py-3 px-3 text-right">CAC</th>
+                    </>
+                  )}
+
+                  {reportFilter.reportType === 'churn' && (
+                    <>
+                      <th className="py-3 px-3 text-right">Benef. Ativos</th>
+                      <th className="py-3 px-3 text-right">Novos Benef.</th>
+                      <th className="py-3 px-3 text-right">Cancelados</th>
+                      <th className="py-3 px-3 text-right">Taxa de Churn</th>
+                    </>
+                  )}
+
+                  {reportFilter.reportType === 'financial' && (
+                    <>
+                      <th className="py-3 px-3 text-right">Mkt Spend</th>
+                      <th className="py-3 px-3 text-right">Sales Spend</th>
+                      <th className="py-3 px-3 text-right">Total Investido</th>
+                      <th className="py-3 px-3 text-right">CAC</th>
+                      <th className="py-3 px-3 text-right">CPL</th>
+                    </>
+                  )}
+
+                  {reportFilter.reportType === 'satisfaction' && (
+                    <>
+                      <th className="py-3 px-3 text-right">NPS</th>
+                      <th className="py-3 px-3 text-right">LTV</th>
+                      <th className="py-3 px-3 text-right">Conversões</th>
+                      <th className="py-3 px-3 text-right">Taxa de Churn</th>
+                    </>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50 text-gray-700">
-                {consolidatedReport.rows.map((row) => (
-                  <tr key={row.month} className="hover:bg-gray-50/30 transition-colors">
-                    <td className="py-2.5 px-3 font-semibold text-gray-800">{row.monthLabel}</td>
-                    <td className="py-2.5 px-3 text-right">{formatarNumero(row.newBeneficiaries)}</td>
-                    <td className="py-2.5 px-3 text-right">{formatarNumero(row.leads)}</td>
-                    <td className="py-2.5 px-3 text-right">{formatarNumero(row.conversions)}</td>
-                    <td className="py-2.5 px-3 text-right">{row.conversionRate.toFixed(1).replace('.', ',')}%</td>
-                    
-                    {/* Exibe valores individuais dos canais se o checkbox estiver ativo */}
-                    {showChannelDetails && reportFilter.channel === 'all' && (
-                      <>
-                        <td className="py-2.5 px-3 text-right text-gray-500">{formatarMoeda(row.googleAdsSpend)}</td>
-                        <td className="py-2.5 px-3 text-right text-gray-500">{formatarMoeda(row.metaAdsSpend)}</td>
-                        <td className="py-2.5 px-3 text-right text-gray-500">{formatarMoeda(row.offlineSpend)}</td>
-                      </>
-                    )}
+                {consolidatedReport.rows.map((row) => {
+                  const monthData = allDashboardData[row.month];
+                  const nps = monthData ? (monthData.summary.nps ?? 78) : 78;
+                  const ltv = monthData ? (monthData.summary.ltv || 1200) : 1200;
+                  
+                  return (
+                    <tr key={row.month} className="hover:bg-gray-50/30 transition-colors">
+                      <td className="py-2.5 px-3 font-semibold text-gray-800">{row.monthLabel}</td>
+                      
+                      {(reportFilter.reportType || 'executive') === 'executive' && (
+                        <>
+                          <td className="py-2.5 px-3 text-right">{formatarNumero(row.newBeneficiaries)}</td>
+                          <td className="py-2.5 px-3 text-right">{formatarNumero(row.leads)}</td>
+                          <td className="py-2.5 px-3 text-right">{formatarNumero(row.conversions)}</td>
+                          <td className="py-2.5 px-3 text-right">{row.conversionRate.toFixed(1).replace('.', ',')}%</td>
+                          {showChannelDetails && reportFilter.channel === 'all' && (
+                            <>
+                              <td className="py-2.5 px-3 text-right text-gray-500">{formatarMoeda(row.googleAdsSpend)}</td>
+                              <td className="py-2.5 px-3 text-right text-gray-500">{formatarMoeda(row.metaAdsSpend)}</td>
+                              <td className="py-2.5 px-3 text-right text-gray-500">{formatarMoeda(row.offlineSpend)}</td>
+                            </>
+                          )}
+                          <td className="py-2.5 px-3 text-right font-medium">{formatarMoeda(row.totalSpend)}</td>
+                          <td className="py-2.5 px-3 text-right font-semibold text-pink-700 print:text-black">{formatarMoeda(row.cac)}</td>
+                          <td className="py-2.5 px-3 text-right text-gray-400">
+                            {row.churnRate > 0 ? `${row.churnRate.toFixed(2).replace('.', ',')}%` : '▬'}
+                          </td>
+                        </>
+                      )}
 
-                    <td className="py-2.5 px-3 text-right font-medium">{formatarMoeda(row.totalSpend)}</td>
-                    <td className="py-2.5 px-3 text-right font-semibold text-pink-700 print:text-black">{formatarMoeda(row.cac)}</td>
-                    <td className="py-2.5 px-3 text-right text-gray-400">
-                      {row.churnRate > 0 ? `${row.churnRate.toFixed(2).replace('.', ',')}%` : '▬'}
-                    </td>
-                  </tr>
-                ))}
+                      {reportFilter.reportType === 'commercial' && (
+                        <>
+                          <td className="py-2.5 px-3 text-right">{formatarNumero(row.newBeneficiaries)}</td>
+                          <td className="py-2.5 px-3 text-right">{formatarNumero(row.leads)}</td>
+                          <td className="py-2.5 px-3 text-right">{formatarNumero(row.conversions)}</td>
+                          <td className="py-2.5 px-3 text-right">{row.conversionRate.toFixed(1).replace('.', ',')}%</td>
+                          <td className="py-2.5 px-3 text-right font-semibold text-pink-700 print:text-black">{formatarMoeda(row.cac)}</td>
+                        </>
+                      )}
+
+                      {reportFilter.reportType === 'churn' && (
+                        <>
+                          <td className="py-2.5 px-3 text-right">{formatarNumero(row.activeBeneficiaries)}</td>
+                          <td className="py-2.5 px-3 text-right">{formatarNumero(row.newBeneficiaries)}</td>
+                          <td className="py-2.5 px-3 text-right">{formatarNumero(row.canceledBeneficiaries)}</td>
+                          <td className="py-2.5 px-3 text-right text-gray-400">
+                            {row.churnRate > 0 ? `${row.churnRate.toFixed(2).replace('.', ',')}%` : '▬'}
+                          </td>
+                        </>
+                      )}
+
+                      {reportFilter.reportType === 'financial' && (
+                        <>
+                          <td className="py-2.5 px-3 text-right text-gray-500">{formatarMoeda(row.marketingSpend)}</td>
+                          <td className="py-2.5 px-3 text-right text-gray-500">{formatarMoeda(row.salesSpend)}</td>
+                          <td className="py-2.5 px-3 text-right font-medium">{formatarMoeda(row.totalSpend)}</td>
+                          <td className="py-2.5 px-3 text-right font-semibold text-pink-700 print:text-black">{formatarMoeda(row.cac)}</td>
+                          <td className="py-2.5 px-3 text-right text-gray-500">{formatarMoeda(row.cpl)}</td>
+                        </>
+                      )}
+
+                      {reportFilter.reportType === 'satisfaction' && (
+                        <>
+                          <td className="py-2.5 px-3 text-right font-semibold text-pink-700 print:text-black">{nps} pts</td>
+                          <td className="py-2.5 px-3 text-right font-semibold text-gray-800">{formatarMoeda(ltv)}</td>
+                          <td className="py-2.5 px-3 text-right">{formatarNumero(row.conversions)}</td>
+                          <td className="py-2.5 px-3 text-right text-gray-400">
+                            {row.churnRate > 0 ? `${row.churnRate.toFixed(2).replace('.', ',')}%` : '▬'}
+                          </td>
+                        </>
+                      )}
+                    </tr>
+                  );
+                })}
                 
                 {/* Linha Consolidada de Totais */}
                 <tr className="border-t-2 border-gray-100 font-bold bg-pink-50/10 text-gray-900 select-none print:bg-transparent">
                   <td className="py-3 px-3 text-pink-700 uppercase tracking-wide print:text-black">Total/Média</td>
-                  <td className="py-3 px-3 text-right">{formatarNumero(consolidatedReport.totals.totalNewBeneficiaries)}</td>
-                  <td className="py-3 px-3 text-right">{formatarNumero(consolidatedReport.totals.totalLeads)}</td>
-                  <td className="py-3 px-3 text-right">{formatarNumero(consolidatedReport.totals.totalConversions)}</td>
-                  <td className="py-3 px-3 text-right">{consolidatedReport.totals.averageConversionRate.toFixed(1).replace('.', ',')}%</td>
                   
-                  {/* Totais das Colunas de Detalhamento */}
-                  {showChannelDetails && reportFilter.channel === 'all' && (
+                  {(reportFilter.reportType || 'executive') === 'executive' && (
                     <>
-                      <td className="py-3 px-3 text-right text-pink-700/80 print:text-black">{formatarMoeda(consolidatedReport.totals.totalGoogleAdsSpend)}</td>
-                      <td className="py-3 px-3 text-right text-pink-700/80 print:text-black">{formatarMoeda(consolidatedReport.totals.totalMetaAdsSpend)}</td>
-                      <td className="py-3 px-3 text-right text-pink-700/80 print:text-black">{formatarMoeda(consolidatedReport.totals.totalOfflineSpend)}</td>
+                      <td className="py-3 px-3 text-right">{formatarNumero(consolidatedReport.totals.totalNewBeneficiaries)}</td>
+                      <td className="py-3 px-3 text-right">{formatarNumero(consolidatedReport.totals.totalLeads)}</td>
+                      <td className="py-3 px-3 text-right">{formatarNumero(consolidatedReport.totals.totalConversions)}</td>
+                      <td className="py-3 px-3 text-right">{consolidatedReport.totals.averageConversionRate.toFixed(1).replace('.', ',')}%</td>
+                      {showChannelDetails && reportFilter.channel === 'all' && (
+                        <>
+                          <td className="py-3 px-3 text-right text-pink-700/80 print:text-black">{formatarMoeda(consolidatedReport.totals.totalGoogleAdsSpend)}</td>
+                          <td className="py-3 px-3 text-right text-pink-700/80 print:text-black">{formatarMoeda(consolidatedReport.totals.totalMetaAdsSpend)}</td>
+                          <td className="py-3 px-3 text-right text-pink-700/80 print:text-black">{formatarMoeda(consolidatedReport.totals.totalOfflineSpend)}</td>
+                        </>
+                      )}
+                      <td className="py-3 px-3 text-right text-pink-700 print:text-black">{formatarMoeda(consolidatedReport.totals.totalSpend)}</td>
+                      <td className="py-3 px-3 text-right text-pink-700 font-extrabold print:text-black">{formatarMoeda(consolidatedReport.totals.averageCac)}</td>
+                      <td className="py-3 px-3 text-right text-gray-400">
+                        {consolidatedReport.totals.averageChurnRate > 0 
+                          ? `${consolidatedReport.totals.averageChurnRate.toFixed(2).replace('.', ',')}%` 
+                          : '▬'}
+                      </td>
                     </>
                   )}
 
-                  <td className="py-3 px-3 text-right text-pink-700 print:text-black">{formatarMoeda(consolidatedReport.totals.totalSpend)}</td>
-                  <td className="py-3 px-3 text-right text-pink-700 font-extrabold print:text-black">{formatarMoeda(consolidatedReport.totals.averageCac)}</td>
-                  <td className="py-3 px-3 text-right text-gray-400">
-                    {consolidatedReport.totals.averageChurnRate > 0 
-                      ? `${consolidatedReport.totals.averageChurnRate.toFixed(2).replace('.', ',')}%` 
-                      : '▬'}
-                  </td>
+                  {reportFilter.reportType === 'commercial' && (
+                    <>
+                      <td className="py-3 px-3 text-right">{formatarNumero(consolidatedReport.totals.totalNewBeneficiaries)}</td>
+                      <td className="py-3 px-3 text-right">{formatarNumero(consolidatedReport.totals.totalLeads)}</td>
+                      <td className="py-3 px-3 text-right">{formatarNumero(consolidatedReport.totals.totalConversions)}</td>
+                      <td className="py-3 px-3 text-right">{consolidatedReport.totals.averageConversionRate.toFixed(1).replace('.', ',')}%</td>
+                      <td className="py-3 px-3 text-right text-pink-700 font-extrabold print:text-black">{formatarMoeda(consolidatedReport.totals.averageCac)}</td>
+                    </>
+                  )}
+
+                  {reportFilter.reportType === 'churn' && (
+                    <>
+                      <td className="py-3 px-3 text-right">
+                        {formatarNumero(consolidatedReport.rows[consolidatedReport.rows.length - 1]?.activeBeneficiaries || 10450)}
+                      </td>
+                      <td className="py-3 px-3 text-right">{formatarNumero(consolidatedReport.totals.totalNewBeneficiaries)}</td>
+                      <td className="py-3 px-3 text-right">
+                        {formatarNumero(consolidatedReport.rows.reduce((acc, curr) => acc + curr.canceledBeneficiaries, 0))}
+                      </td>
+                      <td className="py-3 px-3 text-right text-gray-400">
+                        {consolidatedReport.totals.averageChurnRate > 0 
+                          ? `${consolidatedReport.totals.averageChurnRate.toFixed(2).replace('.', ',')}%` 
+                          : '▬'}
+                      </td>
+                    </>
+                  )}
+
+                  {reportFilter.reportType === 'financial' && (
+                    <>
+                      <td className="py-3 px-3 text-right text-pink-700/80 print:text-black">
+                        {formatarMoeda(consolidatedReport.rows.reduce((acc, curr) => acc + curr.marketingSpend, 0))}
+                      </td>
+                      <td className="py-3 px-3 text-right text-pink-700/80 print:text-black">
+                        {formatarMoeda(consolidatedReport.rows.reduce((acc, curr) => acc + curr.salesSpend, 0))}
+                      </td>
+                      <td className="py-3 px-3 text-right text-pink-700 print:text-black">{formatarMoeda(consolidatedReport.totals.totalSpend)}</td>
+                      <td className="py-3 px-3 text-right text-pink-700 font-extrabold print:text-black">{formatarMoeda(consolidatedReport.totals.averageCac)}</td>
+                      <td className="py-3 px-3 text-right text-pink-700/80 print:text-black">{formatarMoeda(consolidatedReport.totals.averageCpl)}</td>
+                    </>
+                  )}
+
+                  {reportFilter.reportType === 'satisfaction' && (
+                    <>
+                      <td className="py-3 px-3 text-right text-pink-700 font-extrabold print:text-black">
+                        {(() => {
+                          let totalNps = 0;
+                          let count = 0;
+                          consolidatedReport.rows.forEach(r => {
+                            const md = allDashboardData[r.month];
+                            if (md) { totalNps += md.summary.nps || 0; count++; }
+                          });
+                          return count > 0 ? Math.round(totalNps / count) : 78;
+                        })()} pts
+                      </td>
+                      <td className="py-3 px-3 text-right text-pink-700 font-extrabold print:text-black">
+                        {(() => {
+                          let totalLtv = 0;
+                          let count = 0;
+                          consolidatedReport.rows.forEach(r => {
+                            const md = allDashboardData[r.month];
+                            if (md) { totalLtv += md.summary.ltv || 1200; count++; }
+                          });
+                          return formatarMoeda(count > 0 ? Math.round(totalLtv / count) : 1250);
+                        })()}
+                      </td>
+                      <td className="py-3 px-3 text-right">{formatarNumero(consolidatedReport.totals.totalConversions)}</td>
+                      <td className="py-3 px-3 text-right text-gray-400">
+                        {consolidatedReport.totals.averageChurnRate > 0 
+                          ? `${consolidatedReport.totals.averageChurnRate.toFixed(2).replace('.', ',')}%` 
+                          : '▬'}
+                      </td>
+                    </>
+                  )}
                 </tr>
               </tbody>
             </table>
@@ -424,6 +646,22 @@ export const Reports: React.FC = () => {
                   {availableMonths.map(m => (
                     <option key={m.value} value={m.value}>{m.label}</option>
                   ))}
+                </select>
+              </div>
+
+              {/* Dropdown de Tipo de Relatório */}
+              <div>
+                <label className="block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1">Tipo de Relatório</label>
+                <select 
+                  value={reportFilter.reportType || 'executive'}
+                  onChange={(e) => setReportFilter({ ...reportFilter, reportType: e.target.value as ReportType })}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 focus:outline-none focus:border-pink-200 text-gray-700 font-semibold cursor-pointer"
+                >
+                  <option value="executive">Consolidado Executivo</option>
+                  <option value="commercial">Desempenho Comercial</option>
+                  <option value="churn">Evolução & Churn</option>
+                  <option value="financial">Financeiro & LTV</option>
+                  <option value="satisfaction">Satisfação & NPS</option>
                 </select>
               </div>
 
@@ -553,6 +791,21 @@ export const Reports: React.FC = () => {
               </div>
 
               <div>
+                <label className="block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1">Tipo de Relatório</label>
+                <select 
+                  value={reportFilter.reportType || 'executive'}
+                  onChange={(e) => setReportFilter({ ...reportFilter, reportType: e.target.value as ReportType })}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold cursor-pointer"
+                >
+                  <option value="executive">Consolidado Executivo</option>
+                  <option value="commercial">Desempenho Comercial</option>
+                  <option value="churn">Evolução & Churn</option>
+                  <option value="financial">Financeiro & LTV</option>
+                  <option value="satisfaction">Satisfação & NPS</option>
+                </select>
+              </div>
+
+              <div>
                 <label className="block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1">Canal Comercial</label>
                 <select 
                   value={reportFilter.channel || 'all'}
@@ -641,7 +894,7 @@ export const Reports: React.FC = () => {
             <div className="flex items-center justify-between mb-3 border-b border-gray-50 pb-2.5">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-pink-700" />
-                <h2 className="text-[15px] font-bold text-gray-800">Prévia do Relatório</h2>
+                <h2 className="text-[15px] font-bold text-gray-800">{obterTituloRelatorio()}</h2>
               </div>
               <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-0.5 rounded-full">
                 Pronto para exportar
@@ -659,22 +912,12 @@ export const Reports: React.FC = () => {
                   {reportFilter.channel === 'all' ? 'Todos os Canais' : reportFilter.channel === 'google' ? 'Google Ads' : reportFilter.channel === 'meta' ? 'Meta Ads' : 'Offline'}
                 </span>
               </div>
-              <div className="flex justify-between border-b border-slate-50 py-1 text-left">
-                <span className="text-gray-400 font-medium">Investimento</span>
-                <span className="font-bold text-gray-700">{formatarMoeda(consolidatedReport.totals.totalSpend)}</span>
-              </div>
-              <div className="flex justify-between border-b border-slate-50 py-1 text-left">
-                <span className="text-gray-400 font-medium">Leads</span>
-                <span className="font-bold text-gray-700">{formatarNumero(consolidatedReport.totals.totalLeads)}</span>
-              </div>
-              <div className="flex justify-between border-b border-slate-50 py-1 text-left">
-                <span className="text-gray-400 font-medium">Conversões</span>
-                <span className="font-bold text-gray-700">{formatarNumero(consolidatedReport.totals.totalConversions)}</span>
-              </div>
-              <div className="flex justify-between py-1 text-left">
-                <span className="text-gray-400 font-medium">CAC Médio</span>
-                <span className="font-bold text-pink-700">{formatarMoeda(consolidatedReport.totals.averageCac)}</span>
-              </div>
+              {obterKpisDinamicos().map((kpi, idx) => (
+                <div key={idx} className="flex justify-between border-b border-slate-50 last:border-0 py-1 text-left">
+                  <span className="text-gray-400 font-medium">{kpi.label}</span>
+                  <span className={`font-bold ${kpi.label.includes('CAC') || kpi.label.includes('NPS') ? 'text-pink-700' : 'text-gray-700'}`}>{kpi.value}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
