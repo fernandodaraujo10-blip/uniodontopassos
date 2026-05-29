@@ -5,10 +5,18 @@ import KPICardGrid from '../components/cards/KPICardGrid';
 import AdPerformanceChart from '../components/charts/AdPerformanceChart';
 import ConversionFunnelTabs from '../components/charts/ConversionFunnelTabs';
 import InvestmentTable from '../components/tables/InvestmentTable';
-import MobileInvestmentList from '../components/tables/MobileInvestmentList';
 import { DashboardArea } from '../components/filters/FilterTabs';
 import { useDashboard } from '../hooks/useDashboard';
 import { adaptModernToLegacy } from '../utils/dashboardAdapter';
+
+// Componentes exclusivos Mobile
+import MobileDashboardHeader from '../components/mobile/MobileDashboardHeader';
+import MobileDashboardTabs from '../components/mobile/MobileDashboardTabs';
+import MobileKpiStrip from '../components/mobile/MobileKpiStrip';
+import MobileBeneficiariesCard from '../components/mobile/MobileBeneficiariesCard';
+import MobileAdsPerformanceCard from '../components/mobile/MobileAdsPerformanceCard';
+import MobileInvestmentsPreviewCard from '../components/mobile/MobileInvestmentsPreviewCard';
+import MobileFunnelCard from '../components/mobile/MobileFunnelCard';
 
 interface DashboardProps {
   setCurrentPage?: (page: string) => void;
@@ -85,34 +93,41 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
       {/* ═══════════════════════════════════════════════
           LAYOUT MOBILE (< md): coluna única empilhada
           ═══════════════════════════════════════════════ */}
-      <div className="flex flex-col md:hidden px-4 pt-4 pb-4 gap-4">
+      <div className="flex flex-col md:hidden px-4 pt-4 pb-28 gap-4">
         {/* Header compacto mobile */}
-        <Header
+        <MobileDashboardHeader
           title={getHeaderTitle()}
-          currentArea={currentArea}
-          onChangeArea={setCurrentArea}
           currentMonthKey={selectedMonth}
           onChangeMonth={setSelectedMonth}
         />
 
-        {/* KPIs */}
-        <KPICardGrid data={activeMonthData} area={currentArea} />
-
-        {/* Gráfico de Desempenho de Anúncios */}
-        <AdPerformanceChart
-          anunciosData={activeMonthData.anuncios}
-          monthLabel={currentMonthData?.summary.monthLabel || ''}
+        {/* Tabs superiores */}
+        <MobileDashboardTabs
+          currentArea={currentArea}
+          onChangeArea={setCurrentArea}
         />
 
-        {/* Investimentos como lista de cards no mobile */}
-        <MobileInvestmentList
+        {/* KPIs rápidos */}
+        <MobileKpiStrip data={activeMonthData} />
+
+        {/* Bloco de Beneficiários e Anúncios lado a lado no mobile largo ou empilhados */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+          <MobileBeneficiariesCard data={activeMonthData.beneficiarios} />
+          <MobileAdsPerformanceCard 
+            anunciosData={activeMonthData.anuncios} 
+            monthLabel={currentMonthData?.summary.monthLabel || ''} 
+          />
+        </div>
+
+        {/* Investimentos do Mês */}
+        <MobileInvestmentsPreviewCard
           investimentos={activeMonthData.investimentosTabela}
           timestamp={activeMonthData.timestamp}
           monthLabel={currentMonthData?.summary.monthLabel || ''}
         />
 
-        {/* Funil / Origem dos Leads */}
-        <ConversionFunnelTabs
+        {/* Funil de Conversão */}
+        <MobileFunnelCard
           funnelData={activeMonthData.funil}
           leadsData={activeMonthData.leads}
           cidadesData={activeMonthData.cidades}
