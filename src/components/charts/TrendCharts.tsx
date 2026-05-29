@@ -31,10 +31,20 @@ interface TrendChartsProps {
 }
 
 export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allDashboardData }) => {
+  const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains('dark'));
+
+  React.useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains('dark'));
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
   const labels = rows.map(r => r.monthLabel.split('/')[0]); // Ex: "Janeiro" ao invés de "Janeiro/2026"
   const type = reportType || 'executive';
 
-  // Lógica para retornar conjuntos de dados dos dois gráficos dependendo do tipo do relatório
+  // Lógica para retornar conjuntos de dados dos três gráficos dependendo do tipo do relatório
   const obterDadosGraficos = () => {
     switch (type) {
       case 'commercial':
@@ -58,6 +68,16 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
             prefix: '',
             suffix: '',
             isCurrency: false
+          },
+          g3: {
+            title: 'Taxa de Conversão Comercial',
+            badge: 'Eficiência Funil',
+            color: '#2563EB',
+            data: rows.map(r => r.conversionRate),
+            label: 'Taxa de Conversão',
+            prefix: '',
+            suffix: '%',
+            isCurrency: false
           }
         };
       case 'churn':
@@ -73,6 +93,16 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
             isCurrency: false
           },
           g2: {
+            title: 'Cancelamentos Mensais',
+            badge: 'Evasão Absoluta',
+            color: '#64748B',
+            data: rows.map(r => r.canceledBeneficiaries),
+            label: 'Cancelamentos',
+            prefix: '',
+            suffix: '',
+            isCurrency: false
+          },
+          g3: {
             title: 'Taxa de Evasão (Churn Rate)',
             badge: '% Mensal',
             color: '#D81B60',
@@ -104,6 +134,16 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
             prefix: 'R$ ',
             suffix: '',
             isCurrency: true
+          },
+          g3: {
+            title: 'Custo Médio por Lead (CPL)',
+            badge: 'Custo Unitário',
+            color: '#D97706',
+            data: rows.map(r => r.cpl),
+            label: 'CPL',
+            prefix: 'R$ ',
+            suffix: '',
+            isCurrency: true
           }
         };
       case 'satisfaction':
@@ -114,6 +154,12 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
         const ltvValues = rows.map(r => {
           const md = allDashboardData ? allDashboardData[r.month] : null;
           return md ? (md.summary.ltv || 1200) : 1200;
+        });
+        const ratioValues = rows.map(r => {
+          const md = allDashboardData ? allDashboardData[r.month] : null;
+          const ltv = md ? (md.summary.ltv || 1200) : 1200;
+          const cac = r.cac || 99;
+          return Number((ltv / cac).toFixed(1));
         });
         return {
           g1: {
@@ -135,6 +181,16 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
             prefix: 'R$ ',
             suffix: '',
             isCurrency: true
+          },
+          g3: {
+            title: 'Multiplicador LTV / CAC',
+            badge: 'Retorno ROI',
+            color: '#10B981',
+            data: ratioValues,
+            label: 'LTV/CAC',
+            prefix: '',
+            suffix: 'x',
+            isCurrency: false
           }
         };
       case 'executive':
@@ -156,6 +212,16 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
             color: '#D81B60',
             data: rows.map(r => r.cac),
             label: 'CAC',
+            prefix: 'R$ ',
+            suffix: '',
+            isCurrency: true
+          },
+          g3: {
+            title: 'Investimento Geral Consolidado',
+            badge: 'Total Investido',
+            color: '#475569',
+            data: rows.map(r => r.totalSpend),
+            label: 'Investimento',
             prefix: 'R$ ',
             suffix: '',
             isCurrency: true
@@ -207,9 +273,11 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
         display: false,
       },
       tooltip: {
-        backgroundColor: '#1E293B',
-        titleColor: '#F8FAFC',
-        bodyColor: '#F1F5F9',
+        backgroundColor: isDark ? '#0F172A' : '#1E293B',
+        titleColor: isDark ? '#F1F5F9' : '#F8FAFC',
+        bodyColor: isDark ? '#E2E8F0' : '#F1F5F9',
+        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+        borderWidth: isDark ? 1 : 0,
         padding: 6,
         cornerRadius: 6,
         displayColors: false,
@@ -227,10 +295,10 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
     scales: {
       y: {
         grid: {
-          color: 'rgba(0, 0, 0, 0.04)',
+          color: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.04)',
         },
         ticks: {
-          color: '#64748B',
+          color: isDark ? '#94A3B8' : '#64748B',
           font: {
             size: 8,
             family: 'Inter',
@@ -251,7 +319,7 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
           display: false,
         },
         ticks: {
-          color: '#64748B',
+          color: isDark ? '#94A3B8' : '#64748B',
           font: {
             size: 8.5,
             family: 'Inter',
@@ -263,14 +331,14 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
   });
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 select-none print:grid-cols-2 print:gap-4 print:mb-4">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 select-none print:grid-cols-3 print:gap-4 print:mb-4">
       {/* Card do Gráfico 1 */}
-      <div className="bg-slate-50/40 border border-gray-100 rounded-2xl p-4 flex flex-col justify-between h-[150px] transition-colors hover:border-pink-200 print:bg-white print:border-gray-200/80 print:p-3 print:h-[135px]">
+      <div className="bg-slate-50/40 dark:bg-slate-900/40 border border-gray-100 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-[150px] transition-colors hover:border-pink-200 dark:hover:border-pink-900/50 print:bg-white print:border-gray-200/80 print:p-3 print:h-[135px]">
         <div className="flex items-center justify-between shrink-0 mb-1.5">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">
+          <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-slate-400 tracking-wider">
             {config.g1.title}
           </span>
-          <span className="text-[10px] font-bold text-pink-700 bg-pink-50 px-2.5 py-0.5 rounded-full print:bg-transparent print:border print:border-pink-200 print:p-0.5">
+          <span className="text-[10px] font-bold text-pink-700 dark:text-pink-400 bg-pink-50 dark:bg-pink-950/30 px-2.5 py-0.5 rounded-full print:bg-transparent print:border print:border-pink-200 print:p-0.5">
             {config.g1.badge}
           </span>
         </div>
@@ -280,17 +348,32 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
       </div>
 
       {/* Card do Gráfico 2 */}
-      <div className="bg-slate-50/40 border border-gray-100 rounded-2xl p-4 flex flex-col justify-between h-[150px] transition-colors hover:border-slate-200 print:bg-white print:border-gray-200/80 print:p-3 print:h-[135px]">
+      <div className="bg-slate-50/40 dark:bg-slate-900/40 border border-gray-100 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-[150px] transition-colors hover:border-slate-200 dark:hover:border-slate-700 print:bg-white print:border-gray-200/80 print:p-3 print:h-[135px]">
         <div className="flex items-center justify-between shrink-0 mb-1.5">
-          <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">
+          <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-slate-400 tracking-wider">
             {config.g2.title}
           </span>
-          <span className="text-[10px] font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full print:bg-transparent print:border print:border-slate-200 print:p-0.5">
+          <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/60 px-2.5 py-0.5 rounded-full print:bg-transparent print:border print:border-slate-200 print:p-0.5">
             {config.g2.badge}
           </span>
         </div>
         <div className="relative flex-grow min-h-0 w-full h-[100px] print:h-[90px]">
           <Line data={getChartConfig(config.g2)} options={getOptions(config.g2.prefix, config.g2.suffix, config.g2.isCurrency)} />
+        </div>
+      </div>
+
+      {/* Card do Gráfico 3 */}
+      <div className="bg-slate-50/40 dark:bg-slate-900/40 border border-gray-100 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-[150px] transition-colors hover:border-slate-200 dark:hover:border-slate-700 print:bg-white print:border-gray-200/80 print:p-3 print:h-[135px]">
+        <div className="flex items-center justify-between shrink-0 mb-1.5">
+          <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-slate-400 tracking-wider">
+            {config.g3.title}
+          </span>
+          <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-0.5 rounded-full print:bg-transparent print:border print:border-emerald-200 print:p-0.5">
+            {config.g3.badge}
+          </span>
+        </div>
+        <div className="relative flex-grow min-h-0 w-full h-[100px] print:h-[90px]">
+          <Line data={getChartConfig(config.g3)} options={getOptions(config.g3.prefix, config.g3.suffix, config.g3.isCurrency)} />
         </div>
       </div>
     </div>

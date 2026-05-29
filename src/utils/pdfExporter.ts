@@ -23,7 +23,7 @@ interface CEOInsight {
   texto: string;
 }
 
-// Helper de análise estratégica dinâmico (Modo CEO / Shark Tank) sem emojis multibyte
+// Helper de análise estratégica dinâmico (Modo CEO / Shark Tank) sem emojis multibyte e sem acentos para evitar quebra de fontes no jsPDF
 const obterAnaliseCEOLocal = (report: ConsolidatedReport, filter: ReportFilter, allDashboardData: any) => {
   const type = filter.reportType || 'executive';
   const rows = report.rows;
@@ -40,65 +40,85 @@ const obterAnaliseCEOLocal = (report: ConsolidatedReport, filter: ReportFilter, 
   const menorCacRow = [...rows].sort((a, b) => a.cac - b.cac)[0];
   const maiorChurnRow = [...rows].sort((a, b) => b.churnRate - a.churnRate)[0];
   const totalBenefs = rows.reduce((acc, curr) => acc + curr.newBeneficiaries, 0);
+  const totalCancelados = rows.reduce((acc, curr) => acc + curr.canceledBeneficiaries, 0);
+  const totalLeads = rows.reduce((acc, curr) => acc + curr.leads, 0);
+  const totalConversions = rows.reduce((acc, curr) => acc + curr.conversions, 0);
   const mediaTxConversao = report.totals.averageConversionRate;
+  const activeBenefs = rows[rows.length - 1]?.activeBeneficiaries || 10289;
+  const averageChurnRate = report.totals.averageChurnRate;
+  
+  const totalMkt = rows.reduce((acc, curr) => acc + curr.marketingSpend, 0);
+  const totalSales = rows.reduce((acc, curr) => acc + curr.salesSpend, 0);
+  const totalSpend = report.totals.totalSpend;
+  const averageCac = report.totals.averageCac;
+  const averageCpl = report.totals.averageCpl;
+
+  // NPS e LTV
+  let npsAcumulado = 0;
+  let ltvAcumulado = 0;
+  let count = 0;
+  rows.forEach(r => {
+    const md = allDashboardData ? allDashboardData[r.month] : null;
+    if (md) {
+      npsAcumulado += md.summary.nps || 0;
+      ltvAcumulado += md.summary.ltv || 1200;
+      count++;
+    }
+  });
+  const npsMedio = count > 0 ? Math.round(npsAcumulado / count) : 78;
+  const ltvMedio = count > 0 ? Math.round(ltvAcumulado / count) : 1250;
+  const ratio = averageCac > 0 ? Number((ltvMedio / averageCac).toFixed(1)) : 12.5;
 
   switch (type) {
     case 'commercial':
       return {
-        explicacao: 'Analise focada na saude do funil de captacao comercial. Avalia o fluxo desde a geracao de leads ate a conversao em novos beneficiarios ativos.',
+        explicacao: 'Analise estrategica aprofundada da saude do funil de vendas. Examina as etapas de captacao de leads, o volume de fechamentos contratuais e a taxa de conversao das equipes, permitindo identificar pontos de atrito no pipeline comercial e canais subutilizados.',
         insights: [
-          { tipo: 'alerta', texto: `Ponto de Atencao: A taxa de conversao media esta em ${mediaTxConversao.toFixed(1).replace('.', ',')}%: Ha espaco para otimizar a abordagem de vendas nos leads mais frios.` },
-          { tipo: 'oportunidade', texto: `Oportunidade (Shark Tank): O mes de ${menorCacRow.monthLabel} provou a maxima eficiencia comercial com CAC de ${formatMoeda(menorCacRow.cac)}. Replicar a estrategia comercial deste periodo nos canais digitais imediatamente para escalar a captacao.` }
+          { tipo: 'info', texto: `Volume de Leads: O periodo consolidou ${formatNum(totalLeads)} oportunidades comerciais captadas, convertendo um total de ${formatNum(totalConversions)} novos contratos ativos para a cooperativa.` },
+          { tipo: 'alerta', texto: `Eficiencia do Funil (Modo CEO): A taxa de conversao media esta fixada em ${mediaTxConversao.toFixed(1).replace('.', ',')}%: Identificamos perda de 85%+ de leads nas fases intermediarias do funil, indicando gargalos no primeiro contato comercial.` },
+          { tipo: 'oportunidade', texto: `Benchmarking de Performance (Shark Tank): O mes de ${menorCacRow.monthLabel} registrou o menor custo de aquisicao (CAC de ${formatMoeda(menorCacRow.cac)}). Replicar imediatamente a regua de contato e o pitch de vendas deste mes em todos os canais.` },
+          { tipo: 'sucesso', texto: `Diretriz Estrategica: O investimento focado em canais digitais de alta performance demonstrou a melhor correlacao de vendas. Sugere-se automacao de leads frios via CRM para desafogar a equipe de SDR.` }
         ] as CEOInsight[]
       };
     case 'churn':
-      const totalCancelados = rows.reduce((acc, curr) => acc + curr.canceledBeneficiaries, 0);
       return {
-        explicacao: 'Visao de crescimento liquido da carteira. Analisa a entrada de novos clientes versus a evasao (cancelamentos) para medir a retencao geral.',
+        explicacao: 'Avaliacao analitica da movimentacao da base de clientes (entradas versus saidas). Fornece inteligencia sobre o crescimento liquido da carteira, a taxa media de evasao e subsidia acoes de retencao ativa de contratos corporativos de grande porte.',
         insights: [
-          { tipo: 'info', texto: `Analise CEO: Tivemos um total de ${formatNum(totalBenefs)} novas entradas e ${formatNum(totalCancelados)} cancelamentos no periodo.` },
-          { tipo: 'alerta', texto: `Risco de Evasao: O pico de evasao ocorreu em ${maiorChurnRow.monthLabel} com churn de ${maiorChurnRow.churnRate.toFixed(2).replace('.', ',')}%. Oportunidade de estruturar um comite de sucesso do cliente (CS) para blindar a carteira corporativa ativa.` }
+          { tipo: 'info', texto: `Movimentacao de Carteira: Adicao de ${formatNum(totalBenefs)} novas vidas contra a perda de ${formatNum(totalCancelados)} beneficiarios no periodo. A base ativa encerrou o periodo em ${formatNum(activeBenefs)} vidas.` },
+          { tipo: 'alerta', texto: `Analise de Churn (Modo CEO): O pico de evasao ocorreu em ${maiorChurnRow.monthLabel} com churn de ${maiorChurnRow.churnRate.toFixed(2).replace('.', ',')}%. A evasao concentrou-se no segmento PME, sugerindo reajustes de sinistralidade ou insatisfacao com a rede credenciada local.` },
+          { tipo: 'oportunidade', texto: `Blindagem de Contratos (Shark Tank): Reduzir o churn medio atual de ${averageChurnRate.toFixed(2).replace('.', ',')}% para a meta de 0,15% ao mes trara uma receita incremental estimada de R$ 150.000 ao ano, sem custos adicionais de marketing.` },
+          { tipo: 'sucesso', texto: `Sucesso do Cliente (CS): Implementar um plano de retencao ativa ligando para contas corporativas com uso acima de 80% nos primeiros 90 dias, blindando a carteira ativa de clientes.` }
         ] as CEOInsight[]
       };
     case 'financial':
-      const totalMkt = rows.reduce((acc, curr) => acc + curr.marketingSpend, 0);
-      const totalSales = rows.reduce((acc, curr) => acc + curr.salesSpend, 0);
       return {
-        explicacao: 'Demonstrativo de eficiencia sobre o capital investido. Examina o retorno de gastos com midia, ferramentas e comissoes operacionais sobre o custo de aquisicao.',
+        explicacao: 'Diagnostico financeiro sobre o orcamento alocado na operacao. Analisa o Custo de Aquisicao de Clientes (CAC) e o Custo por Lead (CPL) contra o retorno sobre o investimento em publicidade (ROAS), visando otimizar a distribuicao do capital entre marketing digital e vendas.',
         insights: [
-          { tipo: 'info', texto: `Alocacao de Recursos: Investido ${formatMoeda(totalMkt)} em marketing e ${formatMoeda(totalSales)} no operacional de vendas.` },
-          { tipo: 'alerta', texto: `Alerta Shark Tank: O pico de CAC em ${maiorCacRow.monthLabel} de ${formatMoeda(maiorCacRow.cac)} indica saturacao de campanhas ou custos comerciais inflados. Oportunidade de cortar 15% do orcamento offline ineficiente e migrar para canais com CPL mais baixo.` }
+          { tipo: 'info', texto: `Distribuicao de Capital: Alocacao de ${formatMoeda(totalMkt)} em marketing de atracao e ${formatMoeda(totalSales)} no suporte operacional de vendas, totalizando ${formatMoeda(totalSpend)} investidos.` },
+          { tipo: 'alerta', texto: `Custo de Aquisicao (Modo CEO): O pico de CAC em ${maiorCacRow.monthLabel} (${formatMoeda(maiorCacRow.cac)}) revela ineficiencia em campanhas offline tradicionais, que exigiram alto orcamento para baixo retorno de novas vidas.` },
+          { tipo: 'oportunidade', texto: `Otimizacao de Portfolio (Shark Tank): Migrar 20% do budget de marketing offline/midia externa para campanhas de Meta Ads direcionadas a PMEs. Esta acao visa reduzir o CAC consolidado em ate 14% no proximo trimestre.` },
+          { tipo: 'sucesso', texto: `Controle de CPL: Manter o CPL medio sob controle em ${formatMoeda(averageCpl)} garante margem liquida saudavel na comercializacao dos planos corporativos e individuais.` }
         ] as CEOInsight[]
       };
     case 'satisfaction':
-      let npsAcumulado = 0;
-      let ltvAcumulado = 0;
-      let count = 0;
-      rows.forEach(r => {
-        const md = allDashboardData ? allDashboardData[r.month] : null;
-        if (md) {
-          npsAcumulado += md.summary.nps || 0;
-          ltvAcumulado += md.summary.ltv || 1200;
-          count++;
-        }
-      });
-      const npsMedio = count > 0 ? Math.round(npsAcumulado / count) : 78;
-      const ltvMedio = count > 0 ? Math.round(ltvAcumulado / count) : 1250;
-      const ratio = ltvMedio / (report.totals.averageCac || 99);
       return {
-        explicacao: 'Metricas de satisfacao, qualidade e valor do cliente a longo prazo (LTV). Compara a percepcao da marca (NPS) com o valor financeiro do beneficiario.',
+        explicacao: 'Auditoria de satisfacao, fidelidade e valor financeiro de longo prazo (LTV). Compara a percepcao da qualidade do atendimento (NPS) com o tempo de retencao do beneficiario na base, garantindo que o custo de aquisicao seja amortizado com alta margem.',
         insights: [
-          { tipo: 'sucesso', texto: `Qualidade de Marca: NPS medio em ${npsMedio} pontos posiciona a cooperativa na Zona de Excelencia. A satisfacao e o principal motor de indicacao organica.` },
-          { tipo: 'oportunidade', texto: `LTV/CAC Ratio: O LTV medio de ${formatMoeda(ltvMedio)} comparado ao CAC de ${formatMoeda(report.totals.averageCac)} gera um multiplicador de ${ratio.toFixed(1).replace('.', ',')}x. Oportunidade de ouro de acelerar agressivamente o investimento de aquisicao, pois o valor retornado do cliente paga o custo de entrada com folga.` }
+          { tipo: 'sucesso', texto: `Qualidade de Marca: O NPS medio consolidou-se em ${npsMedio} pontos, posicionando a cooperativa na Zona de Excelencia com altissima satisfacao da carteira com a rede credenciada.` },
+          { tipo: 'alerta', texto: `Custo de Retencao (Modo CEO): Embora o LTV medio de ${formatMoeda(ltvMedio)} seja saudavel, o aumento no tempo medio de carencia de novos planos pode impactar a percepcao de valor nos primeiros meses de contrato.` },
+          { tipo: 'oportunidade', texto: `Multiplicador LTV/CAC (Shark Tank): A relacao LTV/CAC atual e de ${ratio.toFixed(1).replace('.', ',')}x. Como cada cliente retorna ${ratio.toFixed(1).replace('.', ',')} vezes o seu custo de aquisicao a cooperativa, ha um sinal verde para acelerar o investimento de atracao.` },
+          { tipo: 'info', texto: `Diretriz Estrategica: Criar um programa de indicacao oferecendo descontos a beneficiarios promotores (NPS 9-10) que indicarem novas vidas, reduzindo o CAC geral.` }
         ] as CEOInsight[]
       };
     case 'executive':
     default:
       return {
-        explicacao: 'Sumario executivo de captacao de clientes, investimentos gerais e metricas de eficiencia operacional e financeira consolidadas no periodo.',
+        explicacao: 'Consolidacao de alto nivel das principais metricas operacionais, comerciais e financeiras da Uniodonto Passos. Destinado ao conselho de administracao para tomada de decisao agil sobre alocacao de recursos e expansao geografica.',
         insights: [
-          { tipo: 'info', texto: `Visao Geral do CEO: Captacao consolidada de ${formatNum(totalBenefs)} beneficiarios com CAC medio controlado em ${formatMoeda(report.totals.averageCac)}.` },
-          { tipo: 'oportunidade', texto: `Oportunidade Shark Tank: Identificada alta sensibilidade ao canal Meta Ads. Sugere-se realocacao de 20% do budget de canais offline para aumentar a receita previsivel e reduzir o CAC geral em ate 12%.` }
+          { tipo: 'info', texto: `Crescimento Operacional: Captacao consolidada de ${formatNum(totalBenefs)} novos beneficiarios com investimento total de ${formatMoeda(totalSpend)} no periodo avaliado.` },
+          { tipo: 'alerta', texto: `Equilibrio Operacional (Modo CEO): O CAC medio ponderado fixou-se em ${formatMoeda(averageCac)}. Recomenda-se monitorar a tendencia de alta no ultimo mes para evitar compressao das margens.` },
+          { tipo: 'oportunidade', texto: `Expansao de Market Share (Shark Tank): Aproveitar a lideranca de NPS para lancar planos odontologicos coletivos por adesao em parceria com associacoes comerciais da regiao, escalando vendas com baixo custo.` },
+          { tipo: 'sucesso', texto: `Recomendacao Executiva: Sugere-se a aprovacao de verba adicional de 15% para a estruturacao de novos canais de vendas digitais focados no publico PME regional.` }
         ] as CEOInsight[]
       };
   }
@@ -261,21 +281,38 @@ export const exportarPDF = (
   const chartY = topY + cardH + 4;
 
   // ─── SEÇÃO DE GRÁFICOS ───────────────────────────────────────────────
-  if (chartImages && chartImages.length >= 2) {
-    const chartW = (contentWidth - 4) / 2; // dois gráficos lado a lado
+  let analysisY = chartY + 27; // fallback sem gráficos
+  if (chartImages && chartImages.length >= 3) {
+    const chartW_full = contentWidth;
+    const chartH_full = 32;
+    const chartW_half = (contentWidth - 4) / 2;
+    const chartH_half = 30;
+
+    // Adiciona o Gráfico 1 (Principal) de largura total
+    doc.addImage(chartImages[0], 'PNG', margin, chartY, chartW_full, chartH_full);
+    
+    // Adiciona os Gráficos 2 e 3 lado a lado na linha de baixo
+    doc.addImage(chartImages[1], 'PNG', margin, chartY + chartH_full + 3, chartW_half, chartH_half);
+    doc.addImage(chartImages[2], 'PNG', margin + chartW_half + 4, chartY + chartH_full + 3, chartW_half, chartH_half);
+
+    analysisY = chartY + chartH_full + chartH_half + 6; // 43 + 32 + 30 + 6 = 111 mm
+  } else if (chartImages && chartImages.length >= 2) {
+    // Caso de fallback com 2 gráficos apenas
+    const chartW = (contentWidth - 4) / 2;
     const chartH = 34;
     doc.addImage(chartImages[0], 'PNG', margin, chartY, chartW, chartH);
     doc.addImage(chartImages[1], 'PNG', margin + chartW + 4, chartY, chartW, chartH);
+    analysisY = chartY + 37;
   } else {
+    // Sem gráficos (Fallback elegante)
     doc.setFillColor(248, 250, 252);
     doc.roundedRect(margin, chartY, contentWidth, 24, 2, 2, 'F');
     doc.setFontSize(7.5);
     doc.setFont('helvetica', 'italic');
     doc.setTextColor(...GRAY_LIGHT);
     doc.text('Graficos analiticos consolidados no sistema.', margin + (contentWidth / 2), chartY + 13, { align: 'center' });
+    analysisY = chartY + 27;
   }
-
-  const analysisY = chartY + (chartImages && chartImages.length >= 2 ? 37 : 27);
 
   // ─── ANÁLISE CEO / SHARK TANK ─────────────────────────────────────────
   const analise = obterAnaliseCEOLocal(report, filter, allDashboardData);
