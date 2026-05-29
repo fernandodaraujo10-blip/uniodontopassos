@@ -207,11 +207,11 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
   const [showApiKey, setShowApiKey] = useState(false);
 
   return (
-    <div className="flex-grow overflow-hidden p-5 bg-[#F8F9FA] flex flex-col h-full max-h-screen page-transition text-slate-800">
-      <header className="mb-5 shrink-0 flex justify-between items-center select-none">
+    <div className="flex-grow overflow-y-auto p-4 md:p-5 pb-20 md:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition text-slate-800">
+      <header className="mb-4 md:mb-5 shrink-0 flex justify-between items-center select-none">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Configurações Gerais</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="text-xl md:text-3xl font-bold text-gray-800">Configurações Gerais</h1>
+          <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
             Gerencie os usuários do dashboard, parametrize dados da cooperativa e configure segurança e alertas.
           </p>
         </div>
@@ -225,10 +225,58 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
       )}
 
       {/* Grid Principal Layout Settings */}
-      <div className="flex-grow flex gap-6 overflow-hidden min-h-0">
+      <div className="flex-grow flex flex-col md:flex-row gap-6 overflow-hidden min-h-0">
         
-        {/* Menu Lateral de Abas de Configurações */}
-        <aside className="w-64 bg-white border border-gray-100 rounded-3xl p-5 card-shadow flex flex-col gap-2 shrink-0 select-none">
+        {/* Menu de Abas Mobile (Scroll Horizontal) */}
+        <div className="flex md:hidden overflow-x-auto scrollbar-hide py-1 mb-1 flex-row gap-2 shrink-0 select-none -mx-4 px-4">
+          <button
+            onClick={() => setActiveTab('usuarios')}
+            className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+              activeTab === 'usuarios'
+                ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
+                : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
+            }`}
+          >
+            <Users className="w-3.5 h-3.5 shrink-0" />
+            <span>Usuários</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('perfil')}
+            className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+              activeTab === 'perfil'
+                ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
+                : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
+            }`}
+          >
+            <Building2 className="w-3.5 h-3.5 shrink-0" />
+            <span>Cooperativa</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('seguranca')}
+            className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+              activeTab === 'seguranca'
+                ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
+                : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
+            }`}
+          >
+            <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+            <span>Segurança & API</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('notificacoes')}
+            className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+              activeTab === 'notificacoes'
+                ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
+                : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
+            }`}
+          >
+            <BellRing className="w-3.5 h-3.5 shrink-0" />
+            <span>Notificações</span>
+          </button>
+        </div>
+
+        {/* Menu Lateral de Abas de Configurações - Desktop */}
+        <aside className="w-64 bg-white border border-gray-100 rounded-3xl p-5 card-shadow flex-col gap-2 shrink-0 select-none hidden md:flex">
           <h3 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 px-3">Opções do Painel</h3>
           <button
             onClick={() => setActiveTab('usuarios')}
@@ -277,44 +325,45 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
         </aside>
 
         {/* Conteúdo Dinâmico da Aba Selecionada */}
-        <main className="flex-grow bg-white border border-gray-100 rounded-3xl p-6 card-shadow flex flex-col overflow-hidden min-h-0">
+        <main className="flex-grow bg-white border border-gray-100 rounded-2xl md:rounded-3xl p-4 md:p-6 card-shadow flex flex-col overflow-hidden min-h-0">
           
           {/* TAB 1: GERENCIAMENTO DE USUÁRIOS */}
           {activeTab === 'usuarios' && (
             <div className="flex flex-col h-full overflow-hidden animate-fadeIn">
               {/* Header do CRUD */}
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-5 shrink-0 select-none">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 shrink-0 select-none">
                 <div>
-                  <h2 className="text-md font-extrabold text-slate-800">Contas e Membros Ativos</h2>
-                  <p className="text-xs text-gray-400">Configure quem possui acesso de visualização ou administração técnica</p>
+                  <h2 className="text-sm sm:text-md font-extrabold text-slate-800">Contas e Membros Ativos</h2>
+                  <p className="text-[11px] sm:text-xs text-gray-400">Configure quem possui acesso de visualização ou administração técnica</p>
                 </div>
                 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                   {/* Barra de Pesquisa */}
-                  <div className="relative w-60">
+                  <div className="relative w-full sm:w-60">
                     <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       placeholder="Pesquisar usuários..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 border border-slate-200 rounded-2xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-500"
+                      className="w-full pl-9 pr-3 py-2.5 sm:py-2 border border-slate-200 rounded-2xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-500"
                     />
                   </div>
 
                   {/* Adicionar Usuário */}
                   <button
                     onClick={handleOpenAddModal}
-                    className="py-2 px-4 bg-gradient-to-r from-pink-700 to-pink-500 text-white font-bold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md hover:scale-102 active:scale-98 transition-all"
+                    className="py-2.5 sm:py-2 px-4 bg-gradient-to-r from-pink-700 to-pink-500 text-white font-bold rounded-2xl text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:scale-102 active:scale-98 transition-all"
                   >
-                    <Plus className="w-4 h-4" /> Novo Usuário
+                    <Plus className="w-4 h-4 animate-pulse" /> Novo Usuário
                   </button>
                 </div>
               </div>
 
               {/* Grid / Tabela de Usuários */}
               <div className="flex-grow overflow-y-auto border border-slate-100 rounded-2xl bg-slate-50/50">
-                <table className="w-full text-xs text-slate-600 min-w-[600px] border-collapse">
+                {/* Versão Desktop (Tabela) */}
+                <table className="w-full text-xs text-slate-600 min-w-[600px] border-collapse hidden md:table">
                   <thead>
                     <tr className="border-b border-slate-100 text-left font-bold text-slate-400 text-[10px] uppercase select-none">
                       <th className="p-4 w-2/5">Membro</th>
@@ -396,6 +445,65 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
                     )}
                   </tbody>
                 </table>
+
+                {/* Versão Mobile (Cards) */}
+                <div className="block md:hidden space-y-3 p-3">
+                  {filteredUsers.map((user) => (
+                    <div key={user.id} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${user.avatarColor} flex items-center justify-center font-extrabold text-[13px] text-white shadow-sm shrink-0`}>
+                          {getInitials(user.name)}
+                        </div>
+                        <div className="flex flex-col min-w-0 text-left">
+                          <span className="font-bold text-gray-800 text-sm truncate">{user.name}</span>
+                          <span className="text-gray-400 font-medium text-[11px] flex items-center gap-1 truncate mt-0.5">
+                            <Mail className="w-3.5 h-3.5 shrink-0 text-slate-400" /> {user.email}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 items-center justify-between border-t border-slate-100/60 pt-3 mt-1">
+                        <div className="flex flex-wrap gap-2">
+                          <span className="font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full text-[10px] flex items-center gap-1">
+                            <Briefcase className="w-3 h-3 text-slate-400" />
+                            {user.role}
+                          </span>
+                          {user.status === 'ativo' ? (
+                            <span className="bg-emerald-50 text-emerald-600 font-extrabold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-1">
+                              <UserCheck className="w-3 h-3" /> Ativo
+                            </span>
+                          ) : (
+                            <span className="bg-slate-100 text-slate-400 font-extrabold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-slate-200 flex items-center gap-1">
+                              <UserX className="w-3 h-3" /> Inativo
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleOpenEditModal(user)}
+                            className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors flex items-center justify-center cursor-pointer"
+                            title="Editar Usuário"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(user.id, user.name)}
+                            className="w-8 h-8 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 hover:bg-rose-100 transition-colors flex items-center justify-center cursor-pointer"
+                            title="Excluir Usuário"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {filteredUsers.length === 0 && (
+                    <div className="p-8 text-center text-slate-400 font-medium">
+                      Nenhum usuário encontrado correspondente à pesquisa.
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           )}

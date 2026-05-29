@@ -89,7 +89,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen w-screen bg-[#F8F9FA] flex flex-col items-center justify-center p-4 relative overflow-hidden select-none select-none-all">
+    <div className="min-h-screen w-screen bg-[#F8F9FA] flex flex-col items-center justify-center p-4 pb-safe relative overflow-hidden select-none select-none-all">
       {/* Círculos Premium de Fundo para Efeito Flutuante (Oculto em celular pequeno para performance) */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-gradient-to-tr from-pink-300/20 to-rose-400/10 blur-3xl pointer-events-none hidden md:block"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-gradient-to-br from-purple-300/20 to-pink-400/15 blur-3xl pointer-events-none hidden md:block"></div>

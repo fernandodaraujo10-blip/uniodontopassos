@@ -107,7 +107,7 @@ export const Reports: React.FC = () => {
   };
 
   return (
-    <div className="flex-grow overflow-hidden p-5 bg-[#F8F9FA] flex flex-col h-full max-h-screen page-transition print:p-0 print:bg-white print:max-w-full">
+    <div className="flex-grow overflow-y-auto p-4 md:p-5 pb-24 md:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition print:p-0 print:bg-white print:max-w-full">
       {/* Estilos CSS Embutidos para Impressão Premium A4 de Alto Contraste */}
       <style>{`
         @media print {
@@ -175,32 +175,32 @@ export const Reports: React.FC = () => {
         }
       `}</style>
 
-      <header className="mb-6 shrink-0 print:hidden">
-        <h1 className="text-3xl font-bold text-gray-800">Relatórios Analíticos</h1>
-        <p className="text-sm text-gray-500 mt-1">
+      <header className="mb-4 md:mb-6 shrink-0 print:hidden select-none">
+        <h1 className="text-xl md:text-3xl font-bold text-gray-800">Relatórios Analíticos</h1>
+        <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
           Gere e exporte relatórios consolidados de investimentos, captação comercial e CAC de forma modular.
         </p>
       </header>
 
       {/* Grid de Conteúdo Principal */}
-      <div className="grid grid-cols-12 gap-6 flex-grow overflow-y-auto pr-1 print:overflow-visible print:block print:p-0">
+      <div className="flex flex-col xl:grid xl:grid-cols-12 gap-6 flex-grow overflow-y-auto pr-1 print:overflow-visible print:block print:p-0">
         
         {/* Lado Esquerdo: Prévia do Relatório Executivo A4 */}
-        <div className="col-span-12 xl:col-span-9 bg-white rounded-3xl border border-gray-100 card-shadow p-8 flex flex-col min-h-0 print:border-none print:shadow-none print:p-0 print:rounded-none">
+        <div className="w-full xl:col-span-9 bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-8 flex flex-col min-h-0 print:border-none print:shadow-none print:p-0 print:rounded-none">
           
           {/* Cabeçalho do Relatório Timbrado */}
-          <div className="flex items-center justify-between border-b border-pink-700/20 pb-4 mb-6 print:border-pink-800">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-pink-700/20 pb-4 mb-6 print:border-pink-800">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-pink-700 to-pink-900 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md print:from-black print:to-black">
                 U
               </div>
-              <div>
-                <h2 className="text-lg font-bold text-gray-900 font-sans tracking-wide">Uniodonto Passos</h2>
-                <p className="text-xs text-pink-700 font-bold uppercase tracking-widest leading-none print:text-pink-800">Relatório Executivo de Captação</p>
+              <div className="text-left">
+                <h2 className="text-base sm:text-lg font-bold text-gray-900 font-sans tracking-wide">Uniodonto Passos</h2>
+                <p className="text-[10px] sm:text-xs text-pink-700 font-bold uppercase tracking-widest leading-none print:text-pink-800">Relatório Executivo de Captação</p>
               </div>
             </div>
             
-            <div className="text-right text-[10px] text-gray-400 font-medium">
+            <div className="text-left sm:text-right text-[9px] sm:text-[10px] text-gray-400 font-medium leading-relaxed">
               <p>Gerado em: {new Date().toLocaleDateString('pt-BR')} às {new Date().toLocaleTimeString('pt-BR')}</p>
               <p>Período: {reportFilter.startMonth} a {reportFilter.endMonth} {reportFilter.channel && reportFilter.channel !== 'all' ? `• Canal: ${reportFilter.channel.toUpperCase()}` : ''}</p>
             </div>
@@ -246,8 +246,8 @@ export const Reports: React.FC = () => {
           <TrendCharts rows={consolidatedReport.rows} />
 
           {/* Tabela de Dados Consolidados */}
-          <div className="flex-grow overflow-x-auto min-h-0 print:overflow-visible">
-            <table className="w-full text-left text-xs border-collapse">
+          <div className="flex-grow overflow-x-auto min-h-0 print:overflow-visible -mx-4 px-4 md:mx-0 md:px-0">
+            <table className={`text-left text-xs border-collapse ${showChannelDetails && reportFilter.channel === 'all' ? 'min-w-[1000px]' : 'min-w-[650px]'} w-full`}>
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50 text-[10px] uppercase font-bold text-gray-500 select-none print:bg-transparent">
                   <th className="py-3 px-3">Mês</th>
@@ -332,8 +332,8 @@ export const Reports: React.FC = () => {
         </div>
 
         {/* Lado Direito: Filtros e Configurações Globais (Sidebar Oculta na Impressão) */}
-        <div className="col-span-12 xl:col-span-3 space-y-6 print:hidden">
-          <div className="bg-white rounded-3xl border border-gray-100 card-shadow p-6">
+        <div className="w-full xl:col-span-3 space-y-6 print:hidden">
+          <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-6">
             <div className="flex items-center gap-2 mb-4 border-b border-gray-50 pb-3 select-none">
               <Calendar className="w-5 h-5 text-pink-700" />
               <h2 className="text-md font-bold text-gray-800">Configurações de Filtro</h2>
@@ -366,7 +366,7 @@ export const Reports: React.FC = () => {
                 </select>
               </div>
 
-              {/* NOVO: Dropdown de Filtro de Canal Comercial */}
+              {/* Dropdown de Filtro de Canal Comercial */}
               <div>
                 <label className="block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1">Canal Comercial</label>
                 <select 
@@ -381,7 +381,7 @@ export const Reports: React.FC = () => {
                 </select>
               </div>
 
-              {/* NOVO: Checkbox para detalhamento de canais na tabela */}
+              {/* Checkbox para detalhamento de canais na tabela */}
               {reportFilter.channel === 'all' && (
                 <div className="flex items-center gap-2 mt-4 pt-3 border-t border-gray-50">
                   <input 
@@ -399,7 +399,7 @@ export const Reports: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl border border-gray-100 card-shadow p-6 select-none">
+          <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-6 select-none">
             <div className="flex items-center gap-2 mb-4 border-b border-gray-50 pb-3">
               <FileText className="w-5 h-5 text-pink-700" />
               <h2 className="text-md font-bold text-gray-800">Ações de Exportação</h2>
