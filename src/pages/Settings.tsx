@@ -634,10 +634,10 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                               <img
                                 src={user.photo}
                                 alt={user.name}
-                                className="w-10 h-10 rounded-full object-cover shadow-sm flex-shrink-0 border border-slate-100"
+                                className="w-12 h-12 rounded-full object-cover shadow-sm flex-shrink-0 border border-slate-100"
                               />
                             ) : (
-                              <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${user.avatarColor} flex items-center justify-center font-extrabold text-[13px] text-white shadow-sm flex-shrink-0 select-none`}>
+                              <div className={`w-12 h-12 rounded-full bg-gradient-to-tr ${user.avatarColor} flex items-center justify-center font-extrabold text-sm text-white shadow-sm flex-shrink-0 select-none`}>
                                 {getInitials(user.name)}
                               </div>
                             )}
@@ -711,10 +711,10 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                           <img
                             src={user.photo}
                             alt={user.name}
-                            className="w-10 h-10 rounded-full object-cover shadow-sm shrink-0 border border-slate-100"
+                            className="w-12 h-12 rounded-full object-cover shadow-sm shrink-0 border border-slate-100"
                           />
                         ) : (
-                          <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${user.avatarColor} flex items-center justify-center font-extrabold text-[13px] text-white shadow-sm shrink-0`}>
+                          <div className={`w-12 h-12 rounded-full bg-gradient-to-tr ${user.avatarColor} flex items-center justify-center font-extrabold text-sm text-white shadow-sm shrink-0`}>
                             {getInitials(user.name)}
                           </div>
                         )}

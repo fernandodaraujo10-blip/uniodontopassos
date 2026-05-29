@@ -110,11 +110,12 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         
         {/* Header do Login */}
         <div className="flex flex-col items-center mb-6 sm:mb-8 text-center">
-          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-pink-100/50 mb-4 animate-scaleUp border border-pink-100/30 p-1.5 overflow-hidden flex-shrink-0">
+          <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-pink-100/50 mb-4 animate-scaleUp border border-pink-100/30 p-0 overflow-hidden flex-shrink-0">
             <img 
               src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2Fd0f81783-5f53-4f56-bc45-03098f2a4603.png?alt=media&token=873ddab7-97ac-475e-add2-6c718530df68" 
               alt="Uniodonto Logo" 
               className="w-full h-full object-contain"
+              style={{ transform: 'scale(1.8)' }}
             />
           </div>
           <h2 className="text-gray-800 font-black text-lg sm:text-xl tracking-tight leading-tight">

@@ -153,11 +153,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
 
         {/* Header da Sidebar */}
         <div className={`p-6 flex items-center ${isCollapsed ? 'justify-center px-0' : 'space-x-3'}`}>
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md transition-transform duration-300 hover:scale-105 flex-shrink-0 p-1.5 overflow-hidden">
+          <div className={`bg-white rounded-full flex items-center justify-center shadow-md transition-all duration-300 hover:scale-105 flex-shrink-0 p-0 overflow-hidden ${isCollapsed ? 'w-12 h-12' : 'w-16 h-16'}`}>
             <img 
               src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2Fd0f81783-5f53-4f56-bc45-03098f2a4603.png?alt=media&token=873ddab7-97ac-475e-add2-6c718530df68" 
               alt="Uniodonto Logo" 
               className="w-full h-full object-contain"
+              style={{ transform: 'scale(1.8)' }}
             />
           </div>
           {!isCollapsed && (
