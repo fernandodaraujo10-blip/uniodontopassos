@@ -101,7 +101,7 @@ export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area }) => {
       {showPrevArrow && (
         <button
           onClick={() => scroll('left')}
-          className="absolute -left-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-md transition-all duration-300 hover:scale-110 hover:bg-pink-50 text-pink-700 cursor-pointer"
+          className="absolute left-0 md:-left-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-md transition-all duration-300 hover:scale-110 hover:bg-pink-50 text-pink-700 cursor-pointer"
           aria-label="Rolar para esquerda"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -127,7 +127,7 @@ export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area }) => {
       {showNextArrow && (
         <button
           onClick={() => scroll('right')}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-md transition-all duration-300 hover:scale-110 hover:bg-pink-50 text-pink-700 cursor-pointer"
+          className="absolute right-0 md:-right-3 top-1/2 -translate-y-1/2 z-40 w-8 h-8 bg-white border border-gray-100 rounded-full flex items-center justify-center shadow-md transition-all duration-300 hover:scale-110 hover:bg-pink-50 text-pink-700 cursor-pointer"
           aria-label="Rolar para direita"
         >
           <ChevronRight className="w-5 h-5" />

@@ -175,7 +175,7 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
       </div>
       
       {/* Gráfico Canvas */}
-      <div className="relative flex-grow min-h-0 w-full flex items-center justify-center py-2 h-[160px]">
+      <div className="relative flex-grow min-h-0 w-full flex items-center justify-center py-2 h-[120px] md:h-[160px]">
         <Bar data={data} options={options} />
       </div>
       

@@ -61,7 +61,7 @@ export const Dashboard: React.FC = () => {
       {/* ═══════════════════════════════════════════════
           LAYOUT MOBILE (< md): coluna única empilhada
           ═══════════════════════════════════════════════ */}
-      <div className="block md:hidden px-4 pt-4 pb-4 flex flex-col gap-4">
+      <div className="flex flex-col md:hidden px-4 pt-4 pb-4 gap-4">
         {/* Header compacto mobile */}
         <Header
           title={getHeaderTitle()}
@@ -98,7 +98,7 @@ export const Dashboard: React.FC = () => {
       {/* ═══════════════════════════════════════════════
           LAYOUT DESKTOP (md+): grid de 12 colunas
           ═══════════════════════════════════════════════ */}
-      <div className="hidden md:flex flex-col p-5 h-full max-h-screen gap-0">
+      <div className="hidden md:flex flex-col p-5 h-full max-h-screen gap-4">
         {/* Top Header Bar */}
         <Header
           title={getHeaderTitle()}

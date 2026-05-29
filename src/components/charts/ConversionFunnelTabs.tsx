@@ -73,7 +73,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
 
       {/* Conteúdo 1: Funil de Conversão */}
       {activeTab === 'funnel' && (
-        <div className="flex-grow flex items-center justify-between gap-1 md:gap-2 min-h-0 animate-fade-in-tab overflow-hidden">
+        <div className="flex-grow flex items-center justify-between gap-1 md:gap-2 min-h-0 animate-fade-in-tab overflow-hidden" style={{ minHeight: '200px' }}>
           
           {/* Funil Métrica Esquerda (Absoluto) */}
           <div className="flex flex-col justify-between h-full py-1 text-[10px] w-16 md:w-20 shrink-0 select-none">
@@ -111,7 +111,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
               onMouseEnter={() => setHoveredStep(1)}
               onMouseLeave={() => setHoveredStep(null)}
               style={{ opacity: hoveredStep === null || hoveredStep === 1 ? 1 : 0.5 }}
-              className="funnel-step bg-pink-50 w-full h-[46px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer"
+              className="funnel-step bg-pink-50 w-full h-9 md:h-[46px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer"
               title="Impressões"
             >
               <Eye className="w-5 h-5" />
@@ -122,7 +122,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
               onMouseEnter={() => setHoveredStep(2)}
               onMouseLeave={() => setHoveredStep(null)}
               style={{ opacity: hoveredStep === null || hoveredStep === 2 ? 1 : 0.5 }}
-              className="funnel-step bg-pink-100 w-[85%] h-[46px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer"
+              className="funnel-step bg-pink-100 w-[85%] h-9 md:h-[46px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer"
               title="Cliques"
             >
               <MousePointerClick className="w-5 h-5" />
@@ -133,7 +133,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
               onMouseEnter={() => setHoveredStep(3)}
               onMouseLeave={() => setHoveredStep(null)}
               style={{ opacity: hoveredStep === null || hoveredStep === 3 ? 1 : 0.5 }}
-              className="funnel-step bg-pink-200 w-[70%] h-[46px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer"
+              className="funnel-step bg-pink-200 w-[70%] h-9 md:h-[46px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer"
               title="Leads"
             >
               <Users className="w-5 h-5" />
@@ -144,7 +144,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
               onMouseEnter={() => setHoveredStep(4)}
               onMouseLeave={() => setHoveredStep(null)}
               style={{ opacity: hoveredStep === null || hoveredStep === 4 ? 1 : 0.5 }}
-              className="funnel-step bg-pink-300 w-[55%] h-[46px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer"
+              className="funnel-step bg-pink-300 w-[55%] h-9 md:h-[46px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer"
               title="Agendamentos"
             >
               <Calendar className="w-5 h-5" />
@@ -155,7 +155,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
               onMouseEnter={() => setHoveredStep(5)}
               onMouseLeave={() => setHoveredStep(null)}
               style={{ opacity: hoveredStep === null || hoveredStep === 5 ? 1 : 0.5 }}
-              className="funnel-step bg-pink-400 w-[40%] h-[46px] flex items-center justify-center text-white shadow-sm cursor-pointer"
+              className="funnel-step bg-pink-400 w-[40%] h-9 md:h-[46px] flex items-center justify-center text-white shadow-sm cursor-pointer"
               title="Vendas"
             >
               <ShoppingCart className="w-5 h-5" />

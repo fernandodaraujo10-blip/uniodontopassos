@@ -61,7 +61,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 setCurrentPage(item.id);
               }
             }}
-            className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-all duration-200 cursor-pointer select-none focus:outline-none
+          className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-all duration-200 cursor-pointer select-none focus:outline-none
               ${active
                 ? 'text-pink-700'
                 : item.id === 'sair'
