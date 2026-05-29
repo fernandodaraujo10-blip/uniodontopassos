@@ -80,6 +80,18 @@ Este documento é a lista oficial de acompanhamento e auditoria de todas as atua
 
 ---
 
+### 📦 Oitava Implementação — Reestruturação da Tela Inicial Mobile (Compacta e Executiva)
+- [x] **Header Compacto Mobile:** Criado o componente [MobileDashboardHeader.tsx](file:///c:/Users/Public/APPs/00-Rascunhos/Dashboard/01.2-App-Dashboard/src/components/mobile/MobileDashboardHeader.tsx) com título reativo e pill seletor de mês com chevrons e texto rosa.
+- [x] **Abas Superiores de Filtro:** Criado o componente [MobileDashboardTabs.tsx](file:///c:/Users/Public/APPs/00-Rascunhos/Dashboard/01.2-App-Dashboard/src/components/mobile/MobileDashboardTabs.tsx) com transição de abas (Geral, Marketing, Análise) com fundo magenta e texto branco quando ativo.
+- [x] **Faixa de KPIs Rápidos:** Criado o componente [MobileKpiStrip.tsx](file:///c:/Users/Public/APPs/00-Rascunhos/Dashboard/01.2-App-Dashboard/src/components/mobile/MobileKpiStrip.tsx) exibindo Beneficiários, Leads, Conversão e Investimentos organizados em grade responsiva compacta de 2x2.
+- [x] **Card Total de Beneficiários:** Criado o componente [MobileBeneficiariesCard.tsx](file:///c:/Users/Public/APPs/00-Rascunhos/Dashboard/01.2-App-Dashboard/src/components/mobile/MobileBeneficiariesCard.tsx) exibindo valor acumulado, estatísticas de novos e cancelados e donut circular PF vs PJ de 59%.
+- [x] **Card Desempenho de Anúncios:** Criado o componente [MobileAdsPerformanceCard.tsx](file:///c:/Users/Public/APPs/00-Rascunhos/Dashboard/01.2-App-Dashboard/src/components/mobile/MobileAdsPerformanceCard.tsx) em modo escuro elegante com seletor de canais, gráfico de barras verticais e grade de 6 métricas essenciais.
+- [x] **Card Investimentos do Mês:** Criado o componente [MobileInvestmentsPreviewCard.tsx](file:///c:/Users/Public/APPs/00-Rascunhos/Dashboard/01.2-App-Dashboard/src/components/mobile/MobileInvestmentsPreviewCard.tsx) exibindo total, filtros por tags e lista de investimentos com chips coloridos de categorias e botão compacto "Ver todos >".
+- [x] **Card Funil de Conversão:** Criado o componente [MobileFunnelCard.tsx](file:///c:/Users/Public/APPs/00-Rascunhos/Dashboard/01.2-App-Dashboard/src/components/mobile/MobileFunnelCard.tsx) com trapézios empilhados em pirâmide invertida, exibindo volumes e taxas nas laterais em layout responsivo de 3 colunas compactas.
+- [x] **Ajuste Fino de Layout e Sincronização:** Sincronizados todos os componentes em [Dashboard.tsx](file:///c:/Users/Public/APPs/00-Rascunhos/Dashboard/01.2-App-Dashboard/src/pages/Dashboard.tsx), isolando o layout desktop, eliminando sidebars no mobile, aplicando `pb-28` para evitar sobreposição na bottom navigation e testando a responsividade perfeita de 360px a 430px sem scroll horizontal.
+
+---
+
 ## 📊 Resumo de Qualidade do Projeto
 
 | Área | Status | Cobertura |
