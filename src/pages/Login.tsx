@@ -8,7 +8,7 @@ const defaultMockUsers: User[] = [
   { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-blue-600 to-teal-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
   { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-purple-600 to-indigo-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
   { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-amber-600 to-orange-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
-  { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'inativo', avatarColor: 'from-emerald-600 to-green-400', password: '1234' }
+  { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'inativo', avatarColor: 'from-emerald-600 to-green-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FJanaina.png?alt=media&token=82b39f8c-d63d-4f8a-96e9-681337df67c7' }
 ];
 
 interface LoginProps {
@@ -51,7 +51,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                             !parsed.some(u => u.name === 'FerTaise Tech Admin') || 
                             parsed.some(u => !u.hasOwnProperty('password')) ||
                             parsed.some(u => !u.hasOwnProperty('username')) ||
-                            parsed.some(u => (u.id === '2' || u.id === '3' || u.id === '4') && !u.photo);
+                            parsed.some(u => (u.id === '2' || u.id === '3' || u.id === '4' || u.id === '5') && !u.photo);
           if (isOldData) {
             currentUsers = defaultMockUsers;
             localStorage.setItem('uniodonto_settings_users', JSON.stringify(defaultMockUsers));
