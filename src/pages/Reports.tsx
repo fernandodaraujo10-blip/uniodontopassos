@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Download, TrendingUp, Printer, Calendar, DollarSign, Users, Award, Info } from 'lucide-react';
+import { FileText, Download, TrendingUp, Printer, Calendar, DollarSign, Users, Award, Info, RefreshCw, CheckCircle2, AlertTriangle, Lightbulb } from 'lucide-react';
 import { useDashboard } from '../hooks/useDashboard';
 import { TrendCharts } from '../components/charts/TrendCharts';
 import { exportarPDF } from '../utils/pdfExporter';
 import { ReportType } from '../types/reports';
+
+interface CEOInsight {
+  tipo: 'alerta' | 'oportunidade' | 'info' | 'sucesso';
+  texto: string;
+}
 
 export const Reports: React.FC = () => {
   const { 
@@ -17,6 +22,20 @@ export const Reports: React.FC = () => {
 
   // Estado local para controlar se exibe colunas detalhadas na tabela do relatório
   const [showChannelDetails, setShowChannelDetails] = useState<boolean>(false);
+
+  // Estado para feedback de geração de relatório mobile
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const [generationSuccess, setGenerationSuccess] = useState<boolean>(false);
+
+  const handleGerarRelatorio = () => {
+    setIsGenerating(true);
+    setGenerationSuccess(false);
+    setTimeout(() => {
+      setIsGenerating(false);
+      setGenerationSuccess(true);
+      setTimeout(() => setGenerationSuccess(false), 4000);
+    }, 1500);
+  };
 
   // Estado para controlar se filtra apenas o mês atual do dashboard
   const [isCurrentMonthOnly, setIsCurrentMonthOnly] = useState<boolean>(false);
@@ -144,15 +163,30 @@ export const Reports: React.FC = () => {
     }
   };
 
-  // Retorna análise estratégica (Modo CEO / Shark Tank) com base nos dados do período
-  const obterAnaliseCEO = () => {
+  // Helper para renderizar os ícones correspondentes a cada insight da análise CEO (Evita 100% bugs de codificação no Windows)
+  const renderIconeInsight = (tipo: 'alerta' | 'oportunidade' | 'info' | 'sucesso') => {
+    switch (tipo) {
+      case 'alerta':
+        return <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0 mt-0.5 print:text-black" />;
+      case 'oportunidade':
+        return <Lightbulb className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5 print:text-black" />;
+      case 'sucesso':
+        return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5 print:text-black" />;
+      case 'info':
+      default:
+        return <TrendingUp className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5 print:text-black" />;
+    }
+  };
+
+  // Retorna análise estratégica (Modo CEO / Shark Tank) com base nos dados do período (Tipado e seguro contra UTF-8)
+  const obterAnaliseCEO = (): { explicacao: string; insights: CEOInsight[] } => {
     const type = reportFilter.reportType || 'executive';
     const rows = consolidatedReport.rows;
     
     if (rows.length === 0) {
       return {
         explicacao: 'Este relatório apresenta os principais indicadores operacionais do período.',
-        insights: ['Aguardando dados para consolidação de oportunidades.']
+        insights: [{ tipo: 'info', texto: 'Aguardando dados para consolidação de oportunidades.' }]
       };
     }
 
@@ -168,8 +202,8 @@ export const Reports: React.FC = () => {
         return {
           explicacao: 'Análise focada na saúde do funil de captação comercial. Avalia o fluxo desde a geração de leads até a conversão em novos beneficiários ativos.',
           insights: [
-            `🚨 Ponto de Atenção: A taxa de conversão média está em ${mediaTxConversao.toFixed(1).replace('.', ',')}%: Há espaço para otimizar a abordagem de vendas nos leads mais frios.`,
-            `💡 Oportunidade (Shark Tank): O mês de ${menorCacRow.monthLabel} provou a máxima eficiência comercial com CAC de ${formatarMoeda(menorCacRow.cac)}. Replicar a estratégia comercial deste período nos canais digitais imediatamente para escalar a captação.`
+            { tipo: 'alerta', texto: `Ponto de Atenção: A taxa de conversão média está em ${mediaTxConversao.toFixed(1).replace('.', ',')}%: Há espaço para otimizar a abordagem de vendas nos leads mais frios.` },
+            { tipo: 'oportunidade', texto: `Oportunidade (Shark Tank): O mês de ${menorCacRow.monthLabel} provou a máxima eficiência comercial com CAC de ${formatarMoeda(menorCacRow.cac)}. Replicar a estratégia comercial deste período nos canais digitais imediatamente para escalar a captação.` }
           ]
         };
       case 'churn':
@@ -177,8 +211,8 @@ export const Reports: React.FC = () => {
         return {
           explicacao: 'Visão de crescimento líquido da carteira. Analisa a entrada de novos clientes versus a evasão (cancelamentos) para medir a retenção geral.',
           insights: [
-            `📈 Análise CEO: Tivemos um total de ${formatarNumero(totalBenefs)} novas entradas e ${formatarNumero(totalCancelados)} cancelamentos no período.`,
-            `⚠️ Risco de Evasão: O pico de evasão ocorreu em ${maiorChurnRow.monthLabel} com churn de ${maiorChurnRow.churnRate.toFixed(2).replace('.', ',')}%. Oportunidade de estruturar um comitê de sucesso do cliente (CS) para blindar a carteira corporativa ativa.`
+            { tipo: 'info', texto: `Análise CEO: Tivemos um total de ${formatarNumero(totalBenefs)} novas entradas e ${formatarNumero(totalCancelados)} cancelamentos no período.` },
+            { tipo: 'alerta', texto: `Risco de Evasão: O pico de evasão ocorreu em ${maiorChurnRow.monthLabel} com churn de ${maiorChurnRow.churnRate.toFixed(2).replace('.', ',')}%. Oportunidade de estruturar um comitê de sucesso do cliente (CS) para blindar a carteira corporativa ativa.` }
           ]
         };
       case 'financial':
@@ -187,8 +221,8 @@ export const Reports: React.FC = () => {
         return {
           explicacao: 'Demonstrativo de eficiência sobre o capital investido. Examina o retorno de gastos com mídia, ferramentas e comissões operacionais sobre o custo de aquisição.',
           insights: [
-            `💰 Alocação de Recursos: Investido ${formatarMoeda(totalMkt)} em marketing e ${formatarMoeda(totalSales)} no operacional de vendas.`,
-            `🚨 Alerta Shark Tank: O pico de CAC em ${maiorCacRow.monthLabel} de ${formatarMoeda(maiorCacRow.cac)} indica saturação de campanhas ou custos comerciais inflados. Oportunidade de cortar 15% do orçamento offline ineficiente e migrar para canais com CPL mais baixo.`
+            { tipo: 'info', texto: `Alocação de Recursos: Investido ${formatarMoeda(totalMkt)} em marketing e ${formatarMoeda(totalSales)} no operacional de vendas.` },
+            { tipo: 'alerta', texto: `Alerta Shark Tank: O pico de CAC em ${maiorCacRow.monthLabel} de ${formatarMoeda(maiorCacRow.cac)} indica saturação de campanhas ou custos comerciais inflados. Oportunidade de cortar 15% do orçamento offline ineficiente e migrar para canais com CPL mais baixo.` }
           ]
         };
       case 'satisfaction':
@@ -209,8 +243,8 @@ export const Reports: React.FC = () => {
         return {
           explicacao: 'Métricas de satisfação, qualidade e valor do cliente a longo prazo (LTV). Compara a percepção da marca (NPS) com o valor financeiro do beneficiário.',
           insights: [
-            `⭐️ Qualidade de Marca: NPS médio em ${npsMedio} pontos posiciona a cooperativa na Zona de Excelência. A satisfação é o principal motor de indicação orgânica.`,
-            `📈 LTV/CAC Ratio: O LTV médio de ${formatarMoeda(ltvMedio)} comparado ao CAC de ${formatarMoeda(consolidatedReport.totals.averageCac)} gera um multiplicador de ${ratio.toFixed(1).replace('.', ',')}x. Oportunidade de ouro de acelerar agressivamente o investimento de aquisição, pois o valor retornado do cliente paga o custo de entrada com folga.`
+            { tipo: 'sucesso', texto: `Qualidade de Marca: NPS médio em ${npsMedio} pontos posiciona a cooperativa na Zona de Excelência. A satisfação é o principal motor de indicação orgânica.` },
+            { tipo: 'oportunidade', texto: `LTV/CAC Ratio: O LTV médio de ${formatarMoeda(ltvMedio)} comparado ao CAC de ${formatarMoeda(consolidatedReport.totals.averageCac)} gera um multiplicador de ${ratio.toFixed(1).replace('.', ',')}x. Oportunidade de ouro de acelerar agressivamente o investimento de aquisição, pois o valor retornado do cliente paga o custo de entrada com folga.` }
           ]
         };
       case 'executive':
@@ -218,8 +252,8 @@ export const Reports: React.FC = () => {
         return {
           explicacao: 'Sumário executivo de captação de clientes, investimentos gerais e métricas de eficiência operacional e financeira consolidadas no período.',
           insights: [
-            `🏆 Visão Geral do CEO: Captação consolidada de ${formatarNumero(totalBenefs)} beneficiários com CAC médio controlado em ${formatarMoeda(consolidatedReport.totals.averageCac)}.`,
-            `💡 Oportunidade Shark Tank: Identificada alta sensibilidade ao canal Meta Ads. Sugere-se realocação de 20% do budget de canais offline para aumentar a receita previsível e reduzir o CAC geral em até 12%.`
+            { tipo: 'info', texto: `Visão Geral do CEO: Captação consolidada de ${formatarNumero(totalBenefs)} beneficiários com CAC médio controlado em ${formatarMoeda(consolidatedReport.totals.averageCac)}.` },
+            { tipo: 'oportunidade', texto: `Oportunidade Shark Tank: Identificada alta sensibilidade ao canal Meta Ads. Sugere-se realocação de 20% do budget de canais offline para aumentar a receita previsível e reduzir o CAC geral em até 12%.` }
           ]
         };
     }
@@ -467,8 +501,8 @@ export const Reports: React.FC = () => {
                 <div className="space-y-2">
                   {analise.insights.map((insight, idx) => (
                     <div key={idx} className="text-[11px] text-gray-700 font-semibold leading-relaxed flex items-start gap-1.5">
-                      <span className="text-pink-700 shrink-0 select-none">•</span>
-                      <span>{insight}</span>
+                      {renderIconeInsight(insight.tipo)}
+                      <span>{insight.texto}</span>
                     </div>
                   ))}
                 </div>
@@ -975,13 +1009,28 @@ export const Reports: React.FC = () => {
 
             <div className="space-y-3">
               <button
-                onClick={() => {
-                  alert('Relatório processado e gerado com sucesso!');
-                }}
-                className="w-full h-12 bg-pink-700 text-white font-bold rounded-2xl flex items-center justify-center gap-2 text-sm shadow-md active:scale-98 transition-all duration-200 cursor-pointer"
+                onClick={handleGerarRelatorio}
+                disabled={isGenerating}
+                className="w-full h-12 bg-pink-700 text-white font-bold rounded-2xl flex items-center justify-center gap-2 text-sm shadow-md active:scale-98 transition-all duration-200 cursor-pointer disabled:opacity-75 select-none"
               >
-                <span>Gerar Relatório</span>
+                {isGenerating ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Processando...</span>
+                  </>
+                ) : (
+                  <span>Gerar Relatório</span>
+                )}
               </button>
+
+              {generationSuccess && (
+                <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-2 animate-fadeIn text-left">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <p className="text-[11px] text-emerald-800 font-bold leading-normal font-sans">
+                    Relatório processado e gerado com sucesso!
+                  </p>
+                </div>
+              )}
 
               <div className="flex gap-3">
                 <button
@@ -1064,9 +1113,9 @@ export const Reports: React.FC = () => {
                   </p>
                   <div className="space-y-1.5">
                     {analise.insights.map((insight, idx) => (
-                      <div key={idx} className="text-[11px] text-gray-700 font-semibold leading-relaxed flex items-start gap-1">
-                        <span className="text-pink-700 shrink-0">•</span>
-                        <span>{insight}</span>
+                      <div key={idx} className="text-[11px] text-gray-700 font-semibold leading-relaxed flex items-start gap-1.5">
+                        {renderIconeInsight(insight.tipo)}
+                        <span>{insight.texto}</span>
                       </div>
                     ))}
                   </div>
