@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FileText, Download, TrendingUp, Printer, Calendar, DollarSign, Users, Award } from 'lucide-react';
+import { FileText, Download, TrendingUp, Printer, Calendar, DollarSign, Users, Award, Info } from 'lucide-react';
 import { useDashboard } from '../hooks/useDashboard';
 import { TrendCharts } from '../components/charts/TrendCharts';
 import { exportarPDF } from '../utils/pdfExporter';
@@ -148,7 +148,7 @@ export const Reports: React.FC = () => {
   };
 
   return (
-    <div className="flex-grow overflow-y-auto p-4 md:p-5 pb-24 md:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition print:p-0 print:bg-white print:max-w-full">
+    <div className="flex-grow overflow-y-auto p-4 md:p-5 pb-28 lg:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition print:p-0 print:bg-white print:max-w-full">
       {/* Estilos CSS Embutidos para Impressão Premium A4 de Alto Contraste */}
       <style>{`
         @media print {
@@ -216,18 +216,22 @@ export const Reports: React.FC = () => {
         }
       `}</style>
 
-      <header className="mb-4 md:mb-6 shrink-0 print:hidden select-none">
-        <h1 className="text-xl md:text-3xl font-bold text-gray-800">Relatórios Analíticos</h1>
-        <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
-          Gere e exporte relatórios consolidados de investimentos, captação comercial e CAC de forma modular.
+      <header className="mb-3 lg:mb-6 shrink-0 print:hidden select-none">
+        <h1 className="text-[30px] lg:text-3xl font-bold text-gray-800 leading-tight">
+          <span className="lg:hidden">Relatórios</span>
+          <span className="hidden lg:inline">Relatórios Analíticos</span>
+        </h1>
+        <p className="text-[15px] lg:text-sm text-gray-500 mt-1 leading-relaxed">
+          <span className="lg:hidden">Exporte análises comerciais e de marketing.</span>
+          <span className="hidden lg:inline">Gere e exporte relatórios consolidados de investimentos, captação comercial e CAC de forma modular.</span>
         </p>
       </header>
 
       {/* Grid de Conteúdo Principal */}
       <div className="flex flex-col xl:grid xl:grid-cols-12 gap-6 flex-grow overflow-y-auto pr-1 print:overflow-visible print:block print:p-0">
         
-        {/* Lado Esquerdo: Prévia do Relatório Executivo A4 */}
-        <div className="w-full xl:col-span-9 bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-8 flex flex-col min-h-0 print:border-none print:shadow-none print:p-0 print:rounded-none">
+        {/* Lado Esquerdo: Prévia do Relatório Executivo A4 (Apenas Desktop e Impressão) */}
+        <div className="w-full xl:col-span-9 bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-8 flex-col min-h-0 print:border-none print:shadow-none print:p-0 print:rounded-none hidden lg:flex print:flex">
           
           {/* Cabeçalho do Relatório Timbrado */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-pink-700/20 pb-4 mb-6 print:border-pink-800">
@@ -372,8 +376,8 @@ export const Reports: React.FC = () => {
           </div>
         </div>
 
-        {/* Lado Direito: Filtros e Configurações Globais (Sidebar Oculta na Impressão) */}
-        <div className="w-full xl:col-span-3 space-y-6 print:hidden">
+        {/* Lado Direito: Filtros e Configurações Globais no Desktop (Sidebar Oculta na Impressão e no Mobile) */}
+        <div className="hidden lg:flex lg:flex-col xl:col-span-3 space-y-6 print:hidden">
           <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-6">
             <div className="flex items-center gap-2 mb-4 border-b border-gray-50 pb-3 select-none">
               <Calendar className="w-5 h-5 text-pink-700" />
@@ -490,6 +494,187 @@ export const Reports: React.FC = () => {
               <p className="text-[10px] text-gray-400 mt-2 text-center select-none leading-normal">
                 💡 <b>Dica de PDF:</b> Ao clicar em <i>Salvar como PDF</i> ou <i>Imprimir</i>, a janela do navegador se abrirá. Selecione <b>"Salvar como PDF"</b> no campo <i>Destino</i> para fazer o download digital do relatório A4.
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Layout Mobile Específico (Oculto no Desktop e na Impressão) */}
+        <div className="flex flex-col space-y-4 lg:hidden print:hidden pb-12 w-full">
+          {/* Card de Filtros Compacto */}
+          <div className="bg-white rounded-3xl border border-gray-100 card-shadow p-4">
+            <div className="flex items-center gap-2 mb-3 border-b border-gray-50 pb-2.5 select-none">
+              <Calendar className="w-5 h-5 text-pink-700" />
+              <h2 className="text-[15px] font-bold text-gray-800">Filtros</h2>
+            </div>
+            
+            <div className="space-y-3 text-xs font-semibold text-gray-500">
+              {/* Checkbox Mês Atual */}
+              <div className="flex items-center gap-2 pb-2 border-b border-gray-50">
+                <input 
+                  type="checkbox" 
+                  id="currentMonthOnlyMob"
+                  checked={isCurrentMonthOnly}
+                  onChange={handleCurrentMonthOnlyChange}
+                  className="w-4 h-4 text-pink-700 border-gray-200 rounded focus:ring-pink-500 accent-pink-700 cursor-pointer"
+                />
+                <label htmlFor="currentMonthOnlyMob" className="text-gray-700 font-bold cursor-pointer select-none">
+                  Filtrar apenas Mês Atual
+                </label>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={`block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1 transition-opacity duration-200 ${isCurrentMonthOnly ? 'opacity-50' : ''}`}>Início</label>
+                  <select 
+                    value={reportFilter.startMonth}
+                    onChange={(e) => setReportFilter({ ...reportFilter, startMonth: e.target.value })}
+                    disabled={isCurrentMonthOnly}
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100/50 transition-all duration-200 cursor-pointer"
+                  >
+                    {availableMonths.map(m => (
+                      <option key={m.value} value={m.value}>{m.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={`block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1 transition-opacity duration-200 ${isCurrentMonthOnly ? 'opacity-50' : ''}`}>Fim</label>
+                  <select 
+                    value={reportFilter.endMonth}
+                    onChange={(e) => setReportFilter({ ...reportFilter, endMonth: e.target.value })}
+                    disabled={isCurrentMonthOnly}
+                    className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100/50 transition-all duration-200 cursor-pointer"
+                  >
+                    {availableMonths.map(m => (
+                      <option key={m.value} value={m.value}>{m.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1">Canal Comercial</label>
+                <select 
+                  value={reportFilter.channel || 'all'}
+                  onChange={(e) => setReportFilter({ ...reportFilter, channel: e.target.value as any })}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold cursor-pointer"
+                >
+                  <option value="all">Todos os Canais</option>
+                  <option value="google">Google Ads</option>
+                  <option value="meta">Meta Ads</option>
+                  <option value="offline">Offline (Eventos & Parcerias)</option>
+                </select>
+              </div>
+
+              {reportFilter.channel === 'all' && (
+                <div className="flex items-center gap-2 pt-2 border-t border-gray-50">
+                  <input 
+                    type="checkbox" 
+                    id="showChannelDetailsMob"
+                    checked={showChannelDetails}
+                    onChange={(e) => setShowChannelDetails(e.target.checked)}
+                    className="w-4 h-4 text-pink-700 border-gray-200 rounded focus:ring-pink-500 accent-pink-700 cursor-pointer"
+                  />
+                  <label htmlFor="showChannelDetailsMob" className="text-gray-600 font-bold cursor-pointer select-none">
+                    Detalhar Canais na Tabela
+                  </label>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Card de Ações de Exportação */}
+          <div className="bg-white rounded-3xl border border-gray-100 card-shadow p-4 select-none">
+            <div className="flex items-center gap-2 mb-3 border-b border-gray-50 pb-2.5">
+              <FileText className="w-5 h-5 text-pink-700" />
+              <h2 className="text-[15px] font-bold text-gray-800">Ações de Exportação</h2>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  alert('Relatório processado e gerado com sucesso!');
+                }}
+                className="w-full h-12 bg-pink-700 text-white font-bold rounded-2xl flex items-center justify-center gap-2 text-sm shadow-md active:scale-98 transition-all duration-200 cursor-pointer"
+              >
+                <span>Gerar Relatório</span>
+              </button>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={exportarCSV}
+                  className="w-1/2 h-12 bg-white border border-pink-700/30 text-pink-700 font-bold rounded-2xl flex items-center justify-center gap-2 text-sm hover:bg-pink-50/50 active:scale-98 transition-all duration-200 cursor-pointer"
+                >
+                  <Download className="w-4 h-4 animate-bounce" />
+                  <span>CSV</span>
+                </button>
+
+                <button
+                  onClick={handleDownloadPDF}
+                  className="w-1/2 h-12 bg-white border border-pink-700/30 text-pink-700 font-bold rounded-2xl flex items-center justify-center gap-2 text-sm hover:bg-pink-50/50 active:scale-98 transition-all duration-200 cursor-pointer"
+                >
+                  <FileText className="w-4 h-4 text-pink-700" />
+                  <span>PDF</span>
+                </button>
+              </div>
+
+              <button
+                onClick={handlePrint}
+                className="w-full h-12 bg-white border border-pink-700/30 text-pink-700 font-bold rounded-2xl flex items-center justify-center gap-2 text-sm hover:bg-pink-50/50 active:scale-98 transition-all duration-200 cursor-pointer"
+              >
+                <Printer className="w-4 h-4 text-pink-700" />
+                <span>Imprimir Relatório (A4)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Card Informativo de PDF */}
+          <div className="bg-slate-50 border border-gray-100 rounded-2xl p-3 flex items-start gap-2.5 select-none">
+            <Info className="w-4 h-4 text-pink-700 shrink-0 mt-0.5" />
+            <p className="text-[13px] text-gray-500 font-medium leading-normal text-left">
+              Para salvar em PDF, toque em 'PDF'. A janela do navegador será aberta para concluir o download.
+            </p>
+          </div>
+
+          {/* Card de Prévia do Relatório */}
+          <div className="bg-white rounded-3xl border border-gray-100 card-shadow p-4 select-none">
+            <div className="flex items-center justify-between mb-3 border-b border-gray-50 pb-2.5">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-pink-700" />
+                <h2 className="text-[15px] font-bold text-gray-800">Prévia do Relatório</h2>
+              </div>
+              <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-0.5 rounded-full">
+                Pronto para exportar
+              </span>
+            </div>
+
+            <div className="space-y-2.5 text-xs">
+              <div className="flex justify-between border-b border-slate-50 py-1 text-left">
+                <span className="text-gray-400 font-medium">Período</span>
+                <span className="font-bold text-gray-700">{reportFilter.startMonth} a {reportFilter.endMonth}</span>
+              </div>
+              <div className="flex justify-between border-b border-slate-50 py-1 text-left">
+                <span className="text-gray-400 font-medium">Canal</span>
+                <span className="font-bold text-gray-700">
+                  {reportFilter.channel === 'all' ? 'Todos os Canais' : reportFilter.channel === 'google' ? 'Google Ads' : reportFilter.channel === 'meta' ? 'Meta Ads' : 'Offline'}
+                </span>
+              </div>
+              <div className="flex justify-between border-b border-slate-50 py-1 text-left">
+                <span className="text-gray-400 font-medium">Investimento</span>
+                <span className="font-bold text-gray-700">{formatarMoeda(consolidatedReport.totals.totalSpend)}</span>
+              </div>
+              <div className="flex justify-between border-b border-slate-50 py-1 text-left">
+                <span className="text-gray-400 font-medium">Leads</span>
+                <span className="font-bold text-gray-700">{formatarNumero(consolidatedReport.totals.totalLeads)}</span>
+              </div>
+              <div className="flex justify-between border-b border-slate-50 py-1 text-left">
+                <span className="text-gray-400 font-medium">Conversões</span>
+                <span className="font-bold text-gray-700">{formatarNumero(consolidatedReport.totals.totalConversions)}</span>
+              </div>
+              <div className="flex justify-between py-1 text-left">
+                <span className="text-gray-400 font-medium">CAC Médio</span>
+                <span className="font-bold text-pink-700">{formatarMoeda(consolidatedReport.totals.averageCac)}</span>
+              </div>
             </div>
           </div>
         </div>

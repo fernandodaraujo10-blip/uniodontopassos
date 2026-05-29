@@ -753,37 +753,48 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
     ];
 
     return (
-      <div className="flex flex-col h-full overflow-hidden animate-fadeIn pb-4">
+      <div className="flex flex-col h-full overflow-hidden animate-fadeIn pb-4 w-full">
         {/* Sub-Header Horizontal ( Wizard Premium + Botões de Ações ) */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 select-none shrink-0">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 select-none shrink-0 w-full">
           {/* Step Indicator horizontal limpo */}
-          <div className="flex items-center gap-4 sm:gap-6 bg-white border border-gray-100 shadow-sm rounded-2xl px-4 py-3 overflow-x-auto scrollbar-hide -mx-4 sm:mx-0 w-[calc(100%+2rem)] sm:w-auto shrink-0 select-none">
+          <div className="flex items-center gap-3 sm:gap-6 bg-white border border-gray-100 shadow-sm rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 overflow-x-auto scrollbar-hide -mx-4 sm:mx-0 w-[calc(100%+2rem)] sm:w-auto shrink-0 select-none">
             {steps.map((st, index) => (
               <React.Fragment key={st.id}>
-                <div className="flex items-center gap-2 shrink-0">
-                  <div className={`w-6 h-6 rounded-full font-bold text-[10px] flex items-center justify-center transition-all ${
-                    st.id === 0 
-                      ? 'bg-pink-700 text-white' 
+                <button 
+                  type="button"
+                  onClick={() => setManualStep(st.id)}
+                  className="flex items-center gap-2 shrink-0 focus:outline-none cursor-pointer"
+                >
+                  <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full font-bold text-[9px] sm:text-[10px] flex items-center justify-center transition-all ${
+                    st.id === manualStep 
+                      ? 'bg-pink-700 text-white shadow-sm font-black' 
                       : 'bg-slate-100 text-slate-500'
                   }`}>
                     {st.id + 1}
                   </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-extrabold text-gray-700 leading-tight whitespace-nowrap">{st.title}</span>
+                  <div className="flex flex-col text-left">
+                    <span className={`text-[10px] font-extrabold leading-tight whitespace-nowrap ${
+                      st.id === manualStep ? 'text-pink-700 font-black' : 'text-gray-700'
+                    }`}>
+                      <span className="sm:hidden">
+                        {st.id === 0 ? 'Resumo' : st.id === 1 ? 'Investimentos' : 'Tráfego'}
+                      </span>
+                      <span className="hidden sm:inline">{st.title}</span>
+                    </span>
                     <span className="text-[8px] text-gray-400 whitespace-nowrap hidden sm:block">{st.desc}</span>
                   </div>
-                </div>
+                </button>
                 {index < steps.length - 1 && (
-                  <div className="w-6 sm:w-8 border-t border-dashed border-gray-200 shrink-0"></div>
+                  <div className="w-4 sm:w-8 border-t border-dashed border-gray-200 shrink-0"></div>
                 )}
               </React.Fragment>
             ))}
           </div>
 
           {/* Botões de Ação Superiores + Seletor de Data */}
-          <div className="flex items-center justify-between lg:justify-end gap-3 w-full lg:w-auto">
-            {/* Seletor de Período Cronológico com setas */}
-            <div className="relative flex items-center gap-1 bg-white border border-gray-200 rounded-2xl p-1 shadow-xs">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-end gap-3 w-full lg:w-auto">
+            {/* Seletor de Período Cronológico com setas (Full width no mobile, auto no desktop) */}
+            <div className="relative flex items-center justify-between sm:justify-start gap-1 bg-white border border-gray-200 rounded-2xl p-1 shadow-xs w-full sm:w-auto">
               <button 
                 onClick={handlePrevMonth}
                 disabled={currentIdx === 0}
@@ -793,7 +804,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
               </button>
               <button 
                 onClick={() => setMonthDropdownOpen(!monthDropdownOpen)}
-                className="flex items-center gap-1.5 px-3 py-1 text-xs font-extrabold text-gray-700 hover:bg-slate-50 rounded-xl transition-all cursor-pointer select-none"
+                className="flex-grow sm:flex-grow-0 flex items-center justify-center gap-1.5 px-3 py-1 text-xs font-extrabold text-gray-700 hover:bg-slate-50 rounded-xl transition-all cursor-pointer select-none"
               >
                 <Calendar className="w-4 h-4 text-pink-600 animate-pulse" />
                 <span>{formatMonthLabel(manualMonth)}</span>
@@ -813,7 +824,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                     className="fixed inset-0 z-40 bg-transparent" 
                     onClick={() => setMonthDropdownOpen(false)}
                   />
-                  <div className="absolute top-full right-0 mt-2 z-50 w-72 bg-white border border-gray-100 rounded-3xl shadow-xl p-4 animate-scaleUp text-left select-none">
+                  <div className="absolute top-full left-0 sm:left-auto sm:right-0 mt-2 z-50 w-72 bg-white border border-gray-100 rounded-3xl shadow-xl p-4 animate-scaleUp text-left select-none">
                     {/* Cabeçalho de Ano */}
                     <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
                       <button 
@@ -869,24 +880,68 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
               )}
             </div>
 
-            <button
-              onClick={handleManualSave}
-              className="px-4 py-2 bg-pink-50 hover:bg-pink-100 border border-pink-100 text-pink-700 font-extrabold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
-            >
-              <Save className="w-4 h-4" /> Salvar
-            </button>
-            <button
-              onClick={() => handleTabChange('envio-planilhas')}
-              className="px-4 py-2 bg-pink-50 hover:bg-pink-100 border border-pink-100 text-pink-700 font-extrabold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
-            >
-              <UploadCloud className="w-4 h-4" /> Importar Planilha
-            </button>
-            <button
-              onClick={handleManualSave}
-              className="px-5 py-2 bg-gradient-to-r from-pink-700 to-pink-500 hover:from-pink-800 hover:to-pink-600 text-white font-extrabold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer hover:shadow-md active:scale-98 transition-all"
-            >
-              Próximo <ArrowRight className="w-4 h-4" />
-            </button>
+            {/* Botões de Ação - Desktop (Oculto no Mobile) */}
+            <div className="hidden sm:flex items-center gap-2">
+              <button
+                onClick={handleManualSave}
+                className="px-4 py-2 bg-pink-50 hover:bg-pink-100 border border-pink-100 text-pink-700 font-extrabold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
+              >
+                <Save className="w-4 h-4" /> Salvar
+              </button>
+              <button
+                onClick={() => handleTabChange('envio-planilhas')}
+                className="px-4 py-2 bg-pink-50 hover:bg-pink-100 border border-pink-100 text-pink-700 font-extrabold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer shadow-xs transition-all"
+              >
+                <UploadCloud className="w-4 h-4" /> Importar Planilha
+              </button>
+              <button
+                onClick={() => {
+                  if (manualStep < 2) {
+                    setManualStep(prev => prev + 1);
+                  } else {
+                    handleManualSave();
+                  }
+                }}
+                className="px-5 py-2 bg-gradient-to-r from-pink-700 to-pink-500 hover:from-pink-800 hover:to-pink-600 text-white font-extrabold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer hover:shadow-md active:scale-98 transition-all"
+              >
+                <span>{manualStep === 2 ? 'Concluir' : 'Próximo'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Botões de Ação - Mobile (Oculto no Desktop) */}
+            <div className="flex flex-col gap-2 w-full sm:hidden">
+              {/* Linha 1: Próximo (Primário, Full width, altura 48px) */}
+              <button
+                onClick={() => {
+                  if (manualStep < 2) {
+                    setManualStep(prev => prev + 1);
+                  } else {
+                    handleManualSave();
+                  }
+                }}
+                className="w-full h-12 bg-gradient-to-r from-pink-700 to-pink-500 text-white font-extrabold rounded-2xl text-sm flex items-center justify-center gap-2 shadow-md active:scale-98 cursor-pointer transition-all"
+              >
+                <span>{manualStep === 2 ? 'Concluir & Salvar' : 'Próximo Passo'}</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+
+              {/* Linha 2: Salvar e Importar (Lado a lado, Secundários, altura 48px) */}
+              <div className="flex gap-2 w-full">
+                <button
+                  onClick={handleManualSave}
+                  className="w-1/2 h-12 bg-pink-50 border border-pink-100 text-pink-700 font-extrabold rounded-2xl text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer transition-all"
+                >
+                  <Save className="w-4 h-4" /> Salvar
+                </button>
+                <button
+                  onClick={() => handleTabChange('envio-planilhas')}
+                  className="w-1/2 h-12 bg-pink-50 border border-pink-100 text-pink-700 font-extrabold rounded-2xl text-xs flex items-center justify-center gap-1.5 shadow-xs cursor-pointer transition-all"
+                >
+                  <UploadCloud className="w-4 h-4" /> Importar
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -903,17 +958,24 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
           const hasAny = validatedCount > 0;
 
           return (
-            <div className="mb-4 shrink-0 flex items-center gap-3 bg-white border border-gray-100 rounded-2xl px-4 py-2.5 shadow-xs">
-              {/* Badge de Status */}
-              <div className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide whitespace-nowrap ${
-                allValidated ? 'text-emerald-600' : hasAny ? 'text-pink-700' : 'text-slate-400'
-              }`}>
-                <span>{allValidated ? '✨' : hasAny ? '⚙️' : '📂'}</span>
-                <span>{allValidated ? 'Mês Fechado' : hasAny ? 'Em Andamento' : 'Aguardando'}</span>
+            <div className="mb-4 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border border-gray-100 rounded-2xl p-3 sm:px-4 sm:py-2.5 shadow-xs select-none">
+              <div className="flex items-center justify-between sm:justify-start gap-3 w-full sm:w-auto">
+                {/* Badge de Status */}
+                <div className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide whitespace-nowrap ${
+                  allValidated ? 'text-emerald-600' : hasAny ? 'text-pink-700' : 'text-slate-400'
+                }`}>
+                  <span>{allValidated ? '✨' : hasAny ? '⚙️' : '📂'}</span>
+                  <span>{allValidated ? 'Mês Fechado' : hasAny ? 'Em Andamento' : 'Aguardando'}</span>
+                </div>
+                
+                {/* Percentual (Mobile) */}
+                <span className={`text-[10px] font-black w-9 text-right sm:hidden ${
+                  allValidated ? 'text-emerald-600' : 'text-slate-500'
+                }`}>{pct}%</span>
               </div>
 
               {/* Barra de Progresso */}
-              <div className="flex-grow h-1.5 bg-slate-100 rounded-full overflow-hidden">
+              <div className="flex-grow h-1.5 bg-slate-100 rounded-full overflow-hidden w-full sm:w-auto">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
                     allValidated ? 'bg-emerald-500' : 'bg-gradient-to-r from-pink-700 to-pink-400'
@@ -922,42 +984,44 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                 />
               </div>
 
-              {/* Percentual */}
-              <span className={`text-[10px] font-black w-9 text-right ${
-                allValidated ? 'text-emerald-600' : 'text-slate-500'
-              }`}>{pct}%</span>
+              <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto">
+                {/* Percentual (Desktop) */}
+                <span className={`text-[10px] font-black w-9 text-right hidden sm:inline ${
+                  allValidated ? 'text-emerald-600' : 'text-slate-500'
+                }`}>{pct}%</span>
 
-              {/* Botão Marcar / Limpar Tudo */}
-              <button
-                type="button"
-                onClick={() => {
-                  const summaryKeys = ['activeBeneficiaries', 'newBeneficiaries', 'canceledBeneficiaries', 'leads', 'conversions', 'ltv', 'nps'];
-                  if (allValidated) {
-                    setValidatedSummary({});
-                    setValidatedInvestments({});
-                    setValidatedCampaigns({});
-                  } else {
-                    const newSummary: Record<string, boolean> = {};
-                    summaryKeys.forEach(k => { newSummary[k] = true; });
-                    const newInv: Record<string, boolean> = {};
-                    formInvestments.forEach(inv => { newInv[inv.categoryId] = true; });
-                    const metricKeys = ['impressions','clicks','ctr','cpc','leads','conversions','agendamentos','vendas'];
-                    const newCamp: Record<string, boolean> = {};
-                    metricKeys.forEach(k => { newCamp[k] = true; });
-                    formCampaigns.forEach(c => { newCamp[c.campaignId] = true; });
-                    setValidatedSummary(newSummary);
-                    setValidatedInvestments(newInv);
-                    setValidatedCampaigns(newCamp);
-                  }
-                }}
-                className={`px-2.5 py-1 text-[9px] font-extrabold rounded-lg cursor-pointer transition-all whitespace-nowrap ${
-                  allValidated
-                    ? 'bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100'
-                    : 'bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100'
-                }`}
-              >
-                {allValidated ? 'Limpar Tudo' : 'Confirmar Tudo'}
-              </button>
+                {/* Botão Marcar / Limpar Tudo */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const summaryKeys = ['activeBeneficiaries', 'newBeneficiaries', 'canceledBeneficiaries', 'leads', 'conversions', 'ltv', 'nps'];
+                    if (allValidated) {
+                      setValidatedSummary({});
+                      setValidatedInvestments({});
+                      setValidatedCampaigns({});
+                    } else {
+                      const newSummary: Record<string, boolean> = {};
+                      summaryKeys.forEach(k => { newSummary[k] = true; });
+                      const newInv: Record<string, boolean> = {};
+                      formInvestments.forEach(inv => { newInv[inv.categoryId] = true; });
+                      const metricKeys = ['impressions','clicks','ctr','cpc','leads','conversions','agendamentos','vendas'];
+                      const newCamp: Record<string, boolean> = {};
+                      metricKeys.forEach(k => { newCamp[k] = true; });
+                      formCampaigns.forEach(c => { newCamp[c.campaignId] = true; });
+                      setValidatedSummary(newSummary);
+                      setValidatedInvestments(newInv);
+                      setValidatedCampaigns(newCamp);
+                    }
+                  }}
+                  className={`w-full sm:w-auto px-3 py-1.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-bold sm:font-extrabold rounded-xl sm:rounded-lg cursor-pointer transition-all text-center ${
+                    allValidated
+                      ? 'bg-rose-50 text-rose-600 border border-rose-100 hover:bg-rose-100'
+                      : 'bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100'
+                  }`}
+                >
+                  {allValidated ? 'Limpar Tudo' : 'Confirmar Tudo'}
+                </button>
+              </div>
             </div>
           );
         })()}
@@ -969,11 +1033,13 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
           </div>
         )}
 
-        {/* Grid de 3 Colunas Principais (Formulários Lado a Lado) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow min-h-0 overflow-y-auto lg:overflow-hidden py-1 pb-20 lg:pb-0">
+        {/* Grid de 3 Colunas Principais (Formulários Lado a Lado no Desktop, Condicional no Mobile) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow min-h-0 overflow-y-auto lg:overflow-hidden py-1 pb-20 lg:pb-0 w-full">
           
           {/* COLUNA 1: RESUMO GERAL */}
-          <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 shadow-sm p-4 md:p-5 flex flex-col h-auto lg:h-full lg:min-h-0 overflow-visible lg:overflow-hidden">
+          <div className={`bg-white rounded-2xl md:rounded-3xl border border-gray-100 shadow-sm p-4 md:p-5 flex-col h-auto lg:h-full lg:min-h-0 overflow-visible lg:overflow-hidden ${
+            manualStep === 0 ? 'flex' : 'hidden lg:flex'
+          }`}>
             <div className="flex items-center gap-2 mb-4 border-b border-gray-50 pb-3">
               <FileText className="w-4 h-4 text-pink-700" />
               <div>
@@ -982,7 +1048,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
               </div>
             </div>
 
-            <div className="space-y-2 text-xs flex-grow overflow-visible lg:overflow-y-auto lg:min-h-0 pr-1 scrollbar-hide">
+            <div className="space-y-2.5 text-xs flex-grow overflow-visible lg:overflow-y-auto lg:min-h-0 pr-1 scrollbar-hide">
               {([
                 { key: 'activeBeneficiaries', label: 'Beneficiários Ativos', unit: 'pessoas', tip: 'Total de beneficiários ativos no ERP Uniodonto no fechamento do mês.' },
                 { key: 'newBeneficiaries', label: 'Novas Vendas (Entradas)', unit: 'pessoas', tip: 'Novos contratos e inclusões realizadas no período.' },
@@ -992,7 +1058,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                 { key: 'ltv', label: 'Lifetime Value (LTV R$)', unit: 'R$', tip: 'LTV estimado em R$ por contrato ativo.' },
                 { key: 'nps', label: 'Pontuação NPS (0 a 100)', unit: 'pts', tip: 'Pontuação líquida obtida na pesquisa de NPS do mês.', min: 0, max: 100 },
               ] as { key: keyof typeof formSummary; label: string; unit: string; tip: string; min?: number; max?: number }[]).map(({ key, label, unit, tip, min, max }) => (
-                <div key={key} className={`flex items-center justify-between border-b border-slate-50 py-1.5 rounded-lg px-1 transition-all ${
+                <div key={key} className={`flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-50 py-2 sm:py-1.5 rounded-lg px-2 transition-all gap-2 sm:gap-0 ${
                   validatedSummary[key] ? 'bg-emerald-50/50' : ''
                 }`}>
                   <div className="flex items-center gap-2">
@@ -1000,26 +1066,26 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                       type="checkbox"
                       checked={!!validatedSummary[key]}
                       onChange={(e) => setValidatedSummary(prev => ({ ...prev, [key]: e.target.checked }))}
-                      className="w-3.5 h-3.5 border-gray-300 rounded focus:ring-emerald-500 accent-emerald-600 cursor-pointer shrink-0"
+                      className="w-4 h-4 border-gray-300 rounded focus:ring-emerald-500 accent-emerald-600 cursor-pointer shrink-0"
                       title="Confirmar dado do mês"
                     />
-                    <span className={`font-medium flex items-center gap-1 ${
-                      validatedSummary[key] ? 'text-emerald-700' : 'text-gray-500'
+                    <span className={`font-semibold flex items-center gap-1.5 text-xs ${
+                      validatedSummary[key] ? 'text-emerald-700' : 'text-gray-600'
                     }`}>
                       {label}
                       <span className="cursor-help text-gray-300 hover:text-pink-600 transition-colors" title={tip}><Info className="w-3.5 h-3.5" /></span>
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
                     <input
                       type="number"
                       value={(formSummary as any)[key]}
                       min={min}
                       max={max}
                       onChange={(e) => setFormSummary(prev => ({ ...prev, [key]: Number(e.target.value) }))}
-                      className="w-24 text-right px-2 py-1 bg-slate-50/50 border border-gray-200 rounded-lg font-bold text-gray-700 focus:outline-none focus:border-pink-500"
+                      className="flex-grow sm:flex-grow-0 w-full sm:w-24 text-right px-2.5 py-1.5 bg-slate-50/50 border border-gray-200 rounded-xl font-bold text-gray-700 focus:outline-none focus:border-pink-500 text-sm"
                     />
-                    <span className="w-14 text-[9px] text-gray-400 font-bold uppercase text-left">{unit}</span>
+                    <span className="w-14 text-[9px] text-gray-400 font-bold uppercase text-left shrink-0">{unit}</span>
                   </div>
                 </div>
               ))}
@@ -1083,7 +1149,9 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
           </div>
 
           {/* COLUNA 2: INVESTIMENTOS */}
-          <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 shadow-sm p-4 md:p-5 flex flex-col h-auto lg:h-full lg:min-h-0 overflow-visible lg:overflow-hidden">
+          <div className={`bg-white rounded-2xl md:rounded-3xl border border-gray-100 shadow-sm p-4 md:p-5 flex-col h-auto lg:h-full lg:min-h-0 overflow-visible lg:overflow-hidden ${
+            manualStep === 1 ? 'flex' : 'hidden lg:flex'
+          }`}>
             <div className="flex items-center justify-between mb-4 border-b border-gray-50 pb-3">
               <div className="flex items-center gap-2">
                 <Coins className="w-4 h-4 text-pink-700" />
@@ -1246,7 +1314,9 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
           </div>
 
           {/* COLUNA 3: TRÁFEGO, CANAIS & CAMPANHAS */}
-          <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 shadow-sm p-4 md:p-5 flex flex-col h-auto lg:h-full lg:min-h-0 overflow-visible lg:overflow-hidden">
+          <div className={`bg-white rounded-2xl md:rounded-3xl border border-gray-100 shadow-sm p-4 md:p-5 flex-col h-auto lg:h-full lg:min-h-0 overflow-visible lg:overflow-hidden ${
+            manualStep === 2 ? 'flex' : 'hidden lg:flex'
+          }`}>
             <div className="flex items-center justify-between mb-4 border-b border-gray-50 pb-3">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-pink-700" />
@@ -1505,23 +1575,24 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
         </div>
 
         {/* Rodapé Operacional (Metadados + Rascunho Salvo) */}
-        <div className="border-t border-slate-100 pt-4 flex flex-col md:flex-row items-center justify-between gap-4 shrink-0 select-none">
+        <div className="border-t border-slate-100 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0 select-none w-full pb-4">
           {/* Canto Esquerdo: Última Atualização + Histórico */}
-          <div className="flex items-center gap-4 text-[10px] text-gray-400">
-            <div className="flex items-center gap-1">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-[10px] text-gray-400 w-full sm:w-auto">
+            <div className="flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-slate-300"></span>
               <span>Última atualização: 05/05/2026 08:30</span>
             </div>
             <button
+              type="button"
               onClick={() => alert('Histórico de envio de dados carregado com sucesso!')}
-              className="px-2.5 py-1 border border-gray-200 hover:border-pink-200 font-semibold rounded-lg hover:bg-pink-50/20 cursor-pointer text-gray-500 transition-colors"
+              className="w-full sm:w-auto text-center px-2.5 py-2 sm:py-1 border border-gray-200 hover:border-pink-200 font-semibold rounded-xl sm:rounded-lg hover:bg-pink-50/20 cursor-pointer text-gray-500 transition-colors"
             >
               Histórico de Envio
             </button>
           </div>
 
           {/* Canto Direito: Rascunho Salvo */}
-          <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100/50 px-3 py-1.5 rounded-xl">
+          <div className="flex items-center justify-center gap-2 text-[10px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100/50 px-3 py-2 rounded-xl w-full sm:w-auto">
             <Check className="w-3.5 h-3.5" />
             <span>Rascunho salvo automaticamente 08:30:45</span>
           </div>
@@ -2045,47 +2116,57 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
   };
 
   return (
-    <div className="flex-grow overflow-y-auto p-4 md:p-5 pb-24 md:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition">
-      <header className="mb-4 md:mb-5 shrink-0 flex justify-between items-center select-none">
+    <div className="flex-grow overflow-y-auto p-4 md:p-5 pb-28 lg:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition">
+      <header className="mb-3 lg:mb-5 shrink-0 flex justify-between items-center select-none">
         <div>
-          <h1 className="text-xl md:text-3xl font-bold text-gray-800">Envio e Integração de Dados</h1>
-          <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
-            Consolide métricas reais manualmente, importe planilhas de marketing ou integre endpoints automatizados.
+          <h1 className="text-[30px] lg:text-3xl font-bold text-gray-800 leading-tight">
+            <span className="lg:hidden">Envio de Dados</span>
+            <span className="hidden lg:inline">Envio e Integração de Dados</span>
+          </h1>
+          <p className="text-[15px] lg:text-sm text-gray-500 mt-1 leading-relaxed">
+            <span className="lg:hidden">Atualize métricas, investimentos e integrações.</span>
+            <span className="hidden lg:inline">Consolide métricas reais manualmente, importe planilhas de marketing ou integre endpoints automatizados.</span>
           </p>
         </div>
       </header>
 
       {/* TABS SELECTOR (ABAS HORIZONTAIS PREMIUM) */}
-      <div className="flex border-b border-gray-200 mb-5 shrink-0 select-none overflow-x-auto scrollbar-hide -mx-4 px-4 whitespace-nowrap">
+      <div className="flex border-b border-gray-200 mb-5 shrink-0 select-none overflow-x-auto scrollbar-hide -mx-4 px-4 whitespace-nowrap h-[52px]">
         <button
           onClick={() => handleTabChange('envio-manual')}
-          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-extrabold cursor-pointer border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-extrabold cursor-pointer border-b-2 transition-all flex items-center gap-2 h-full ${
             activeTab === 'envio-manual'
               ? 'border-pink-700 text-pink-700 scale-102 font-black'
               : 'border-transparent text-gray-400 hover:text-gray-600'
           }`}
         >
-          <FileText className="w-4 h-4 shrink-0" /> Envio Manual
+          <FileText className="w-3.5 h-3.5 shrink-0" />
+          <span className="lg:hidden">Manual</span>
+          <span className="hidden lg:inline">Envio Manual</span>
         </button>
         <button
           onClick={() => handleTabChange('envio-planilhas')}
-          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-extrabold cursor-pointer border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-extrabold cursor-pointer border-b-2 transition-all flex items-center gap-2 h-full ${
             activeTab === 'envio-planilhas'
               ? 'border-pink-700 text-pink-700 scale-102 font-black'
               : 'border-transparent text-gray-400 hover:text-gray-600'
           }`}
         >
-          <FileSpreadsheet className="w-4 h-4 shrink-0" /> Planilhas & APIs
+          <FileSpreadsheet className="w-3.5 h-3.5 shrink-0" />
+          <span className="lg:hidden">Planilhas</span>
+          <span className="hidden lg:inline">Planilhas & APIs</span>
         </button>
         <button
           onClick={() => handleTabChange('envio-conexoes')}
-          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-extrabold cursor-pointer border-b-2 transition-all flex items-center gap-2 ${
+          className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-extrabold cursor-pointer border-b-2 transition-all flex items-center gap-2 h-full ${
             activeTab === 'envio-conexoes'
               ? 'border-pink-700 text-pink-700 scale-102 font-black'
               : 'border-transparent text-gray-400 hover:text-gray-600'
           }`}
         >
-          <Database className="w-4 h-4 shrink-0" /> Integrações & Webhooks
+          <Database className="w-3.5 h-3.5 shrink-0" />
+          <span className="lg:hidden">Integrações</span>
+          <span className="hidden lg:inline">Integrações & Webhooks</span>
         </button>
       </div>
 
