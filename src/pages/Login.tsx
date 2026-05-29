@@ -46,7 +46,18 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
       if (savedUsersRaw) {
         try {
-          currentUsers = JSON.parse(savedUsersRaw);
+          const parsed = JSON.parse(savedUsersRaw) as User[];
+          const isOldData = parsed.length === 0 || 
+                            !parsed.some(u => u.name === 'FerTaise Tech Admin') || 
+                            parsed.some(u => !u.hasOwnProperty('password')) ||
+                            parsed.some(u => !u.hasOwnProperty('username')) ||
+                            parsed.some(u => (u.id === '2' || u.id === '3' || u.id === '4') && !u.photo);
+          if (isOldData) {
+            currentUsers = defaultMockUsers;
+            localStorage.setItem('uniodonto_settings_users', JSON.stringify(defaultMockUsers));
+          } else {
+            currentUsers = parsed;
+          }
         } catch (e) {
           currentUsers = defaultMockUsers;
         }

@@ -57,11 +57,12 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
     if (saved) {
       try {
         const parsed = JSON.parse(saved) as User[];
-        // Verifica se os dados salvos são antigos (não contém o usuário 'FerTaise Tech Admin' ou falta o campo password ou username)
+        // Verifica se os dados salvos são antigos (não contém o usuário 'FerTaise Tech Admin' ou falta o campo password ou username ou as fotos dos médicos)
         const isOldData = parsed.length === 0 || 
                           !parsed.some(u => u.name === 'FerTaise Tech Admin') || 
                           parsed.some(u => !u.hasOwnProperty('password')) ||
-                          parsed.some(u => !u.hasOwnProperty('username'));
+                          parsed.some(u => !u.hasOwnProperty('username')) ||
+                          parsed.some(u => (u.id === '2' || u.id === '3' || u.id === '4') && !u.photo);
         if (isOldData) {
           return mockUsers;
         }
