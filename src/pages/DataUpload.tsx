@@ -29,7 +29,9 @@ import {
   TrendingUp,
   Percent,
   Info,
-  Lock
+  Lock,
+  X,
+  XCircle
 } from 'lucide-react';
 import { useDashboard } from '../hooks/useDashboard';
 import { parseSpreadsheet, downloadExcelTemplate } from '../utils/spreadsheetParser';
@@ -96,6 +98,7 @@ const InvestmentRow: React.FC<InvestmentRowProps> = ({ inv, isAudited, onToggleA
           onChange={onToggleAudit}
           className="w-3.5 h-3.5 border-gray-300 rounded focus:ring-emerald-500 accent-emerald-600 cursor-pointer"
           title="Confirmar lançamento no mês"
+          aria-label="Confirmar lançamento de investimento no mês"
         />
       </td>
       <td className="py-1 w-[42%]">
@@ -106,19 +109,21 @@ const InvestmentRow: React.FC<InvestmentRowProps> = ({ inv, isAudited, onToggleA
           className={`w-full px-1.5 py-0.5 border border-transparent hover:border-gray-200 focus:border-pink-500 rounded bg-transparent font-medium text-gray-700 focus:outline-none ${
             inv.isFixed ? 'text-slate-500 font-bold' : ''
           }`}
+          aria-label="Nome do canal ou fonte de investimento"
         />
       </td>
       <td className="py-1 w-[18%]">
         <select
-          value={inv.customType === 'sales' ? 'Software' : 'Ads'}
+          value={inv.customType}
           onChange={(e) => {
-            const val = e.target.value === 'Software' ? 'sales' : 'marketing';
-            handleUpdateInvestment(inv.categoryId, 'customType', val);
+            handleUpdateInvestment(inv.categoryId, 'customType', e.target.value);
           }}
           className="px-1 py-0.5 border border-transparent hover:border-gray-200 rounded text-[10px] font-semibold text-gray-500 focus:outline-none bg-transparent cursor-pointer"
+          aria-label="Categoria do investimento"
         >
-          <option value="Ads">Ads</option>
-          <option value="Software">Software</option>
+          <option value="marketing">Ads</option>
+          <option value="sales">Software</option>
+          <option value="operational">Operacional</option>
         </select>
       </td>
       <td className="py-1 text-center w-12">
@@ -128,6 +133,7 @@ const InvestmentRow: React.FC<InvestmentRowProps> = ({ inv, isAudited, onToggleA
           onChange={(e) => handleUpdateInvestment(inv.categoryId, 'isFixed', e.target.checked)}
           className="w-3.5 h-3.5 text-pink-600 border-gray-300 rounded focus:ring-pink-500 accent-pink-700 cursor-pointer"
           title="Marcar como valor fixo recorrente"
+          aria-label="Definir investimento como custo fixo recorrente"
         />
       </td>
       <td className="py-1 w-[24%]">
@@ -144,6 +150,7 @@ const InvestmentRow: React.FC<InvestmentRowProps> = ({ inv, isAudited, onToggleA
             className={`w-full text-right py-0.5 border border-transparent hover:border-gray-200 focus:border-pink-500 rounded bg-transparent font-mono font-bold text-gray-700 focus:outline-none ${
               inv.isFixed ? 'pl-6 pr-1.5 bg-slate-50/50' : 'px-1.5'
             }`}
+            aria-label="Valor total investido"
           />
         </div>
       </td>
@@ -153,6 +160,7 @@ const InvestmentRow: React.FC<InvestmentRowProps> = ({ inv, isAudited, onToggleA
           onClick={() => handleRemoveInvestment(inv.categoryId)}
           className="text-gray-300 hover:text-rose-600 transition-colors p-1 cursor-pointer"
           title="Remover fonte de despesa"
+          aria-label="Remover esta fonte de despesa"
         >
           <Trash2 className="w-3.5 h-3.5" />
         </button>
@@ -164,6 +172,28 @@ const InvestmentRow: React.FC<InvestmentRowProps> = ({ inv, isAudited, onToggleA
 export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentPage }) => {
   const { upsertMonthData, resetToDefaultData, allDashboardData, investmentsData } = useDashboard();
   
+  // --- ESTADO PARA TOASTS E MODAIS CUSTOMIZADOS ---
+  const [toast, setToast] = useState<{ type: 'success' | 'error' | 'warning' | 'info'; message: string } | null>(null);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'success') => {
+    setToast({ message, type });
+  };
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   // Determina a aba ativa (sincronizada com o Sidebar ou fallback interno)
   const activeTab = currentPage || 'envio-manual';
   const handleTabChange = (tabId: string) => {
@@ -430,11 +460,11 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
   const handleManualSave = () => {
     // Validação matemática rápida de integridade lógica
     if (formSummary.conversions > formSummary.leads) {
-      alert('❌ Inconsistência Crítica: O número de conversões não pode superar o total de leads captados.');
+      showToast('Inconsistência Crítica: O número de conversões não pode superar o total de leads captados.', 'warning');
       return;
     }
     if (formSummary.canceledBeneficiaries > formSummary.activeBeneficiaries) {
-      alert('❌ Churn Inconsistente: O número de cancelamentos não pode ser maior que o total de beneficiários ativos.');
+      showToast('Churn Inconsistente: O número de cancelamentos não pode ser maior que o total de beneficiários ativos.', 'warning');
       return;
     }
 
@@ -453,12 +483,10 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
       saveAuditToStorage(manualMonth, validatedSummary, validatedInvestments, validatedCampaigns);
       
       const formattedMonth = manualMonth.split('-')[1] + '/' + manualMonth.split('-')[0];
-      setManualSuccessMessage(`Sucesso! Os dados manuais do mês ${formattedMonth} foram consolidados no dashboard.`);
+      showToast(`Os dados manuais do mês ${formattedMonth} foram consolidados no dashboard com sucesso.`, 'success');
       setManualStep(0);
-      
-      setTimeout(() => setManualSuccessMessage(''), 6000);
     } catch (err) {
-      alert(`Erro ao salvar dados manuais: ${(err as Error).message}`);
+      showToast(`Erro ao salvar dados manuais: ${(err as Error).message}`, 'error');
     }
   };
 
@@ -509,7 +537,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
       ) {
         processSelectedFile(droppedFile);
       } else {
-        alert('Por favor, envie apenas arquivos de planilha (.xlsx, .xls, .csv).');
+        showToast('Formato inválido. Por favor, envie apenas arquivos de planilha (.xlsx, .xls, .csv).', 'warning');
       }
     }
   };
@@ -575,14 +603,12 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
       );
       
       const formattedMonth = parsedData.month.split('-')[1] + '/' + parsedData.month.split('-')[0];
-      setImportMessage(`Sucesso! Os dados do mês ${formattedMonth} foram incorporados.`);
+      showToast(`Os dados do mês ${formattedMonth} foram incorporados com sucesso!`, 'success');
       setFile(null);
       setParsedData(null);
       setUploadStatus('idle');
-      
-      setTimeout(() => setImportMessage(''), 5000);
     } catch (err) {
-      alert(`Falha ao incorporar os dados: ${(err as Error).message}`);
+      showToast(`Falha ao incorporar os dados: ${(err as Error).message}`, 'error');
     }
   };
 
@@ -637,10 +663,15 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
   };
 
   const handleResetDatabase = () => {
-    if (confirm('Atenção: Isso excluirá todos os meses importados salvos e redefinirá o banco para a demonstração original (Abril a Junho/2026). Deseja prosseguir?')) {
-      resetToDefaultData();
-      alert('Banco de dados redefinido com sucesso!');
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Redefinir Banco de Dados',
+      message: 'Atenção: Isso excluirá todos os meses importados salvos e redefinirá o banco para a demonstração original (Abril a Junho/2026). Deseja prosseguir?',
+      onConfirm: () => {
+        resetToDefaultData();
+        showToast('Banco de dados redefinido com sucesso!', 'success');
+      }
+    });
   };
 
   // --- ESTADOS DE INTEGRAÇÕES & WEBHOOKS (TERCEIRA TELA) ---
@@ -757,13 +788,13 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
         {/* Sub-Header Horizontal ( Wizard Premium + Botões de Ações ) */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 select-none shrink-0 w-full">
           {/* Step Indicator horizontal limpo */}
-          <div className="flex items-center gap-3 sm:gap-6 bg-white border border-gray-100 shadow-sm rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 overflow-x-auto scrollbar-hide -mx-4 sm:mx-0 w-[calc(100%+2rem)] sm:w-auto shrink-0 select-none">
+          <div className="flex items-center justify-between sm:justify-start gap-1.5 sm:gap-6 bg-white border border-gray-100 shadow-sm rounded-2xl px-2.5 sm:px-4 py-2.5 sm:py-3 w-full sm:w-auto shrink-0 select-none">
             {steps.map((st, index) => (
               <React.Fragment key={st.id}>
                 <button 
                   type="button"
                   onClick={() => setManualStep(st.id)}
-                  className="flex items-center gap-2 shrink-0 focus:outline-none cursor-pointer"
+                  className="flex items-center gap-1.5 sm:gap-2 shrink-0 focus:outline-none cursor-pointer"
                 >
                   <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full font-bold text-[9px] sm:text-[10px] flex items-center justify-center transition-all ${
                     st.id === manualStep 
@@ -785,7 +816,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                   </div>
                 </button>
                 {index < steps.length - 1 && (
-                  <div className="w-4 sm:w-8 border-t border-dashed border-gray-200 shrink-0"></div>
+                  <div className="flex-1 sm:flex-initial w-2 sm:w-8 border-t border-dashed border-gray-200 shrink-0"></div>
                 )}
               </React.Fragment>
             ))}
@@ -1145,6 +1176,18 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                   <span className="w-14 text-[9px] text-gray-400 font-bold uppercase text-left">%</span>
                 </div>
               </div>
+
+              {/* Botões de Navegação Mobile */}
+              <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-end lg:hidden shrink-0 select-none">
+                <button
+                  type="button"
+                  onClick={() => setManualStep(1)}
+                  className="px-5 py-2.5 bg-gradient-to-r from-pink-700 to-pink-500 text-white font-extrabold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-98 transition-all"
+                >
+                  <span>Investimentos</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1223,6 +1266,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                           checked={!!validatedInvestments[inv.categoryId]}
                           onChange={() => setValidatedInvestments(prev => ({ ...prev, [inv.categoryId]: !prev[inv.categoryId] }))}
                           className="w-4 h-4 border-gray-300 rounded focus:ring-emerald-500 accent-emerald-600 cursor-pointer"
+                          aria-label="Confirmar lançamento de investimento no mês (mobile)"
                         />
                         <span className="text-[10px] text-gray-400 font-extrabold uppercase">Auditado</span>
                       </div>
@@ -1231,6 +1275,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                         type="button"
                         onClick={() => handleRemoveInvestment(inv.categoryId)}
                         className="text-gray-300 hover:text-rose-600 transition-colors p-1 cursor-pointer"
+                        aria-label="Remover esta fonte de despesa (mobile)"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -1245,6 +1290,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                         className={`w-full px-2.5 py-1.5 border border-slate-200 focus:border-pink-500 rounded-xl bg-slate-50/50 text-xs font-semibold text-gray-700 focus:outline-none ${
                           inv.isFixed ? 'text-slate-500 font-bold' : ''
                         }`}
+                        aria-label="Nome do canal ou fonte de investimento (mobile)"
                       />
                     </div>
 
@@ -1252,15 +1298,16 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                       <div className="flex flex-col gap-1">
                         <label className="text-[9px] font-bold text-gray-400 uppercase">Categoria</label>
                         <select
-                          value={inv.customType === 'sales' ? 'Software' : 'Ads'}
+                          value={inv.customType}
                           onChange={(e) => {
-                            const val = e.target.value === 'Software' ? 'sales' : 'marketing';
-                            handleUpdateInvestment(inv.categoryId, 'customType', val);
+                            handleUpdateInvestment(inv.categoryId, 'customType', e.target.value);
                           }}
                           className="w-full px-2.5 py-1.5 border border-slate-200 rounded-xl text-xs font-bold text-gray-700 bg-slate-50 focus:outline-none cursor-pointer"
+                          aria-label="Categoria do investimento (mobile)"
                         >
-                          <option value="Ads">Ads</option>
-                          <option value="Software">Software</option>
+                          <option value="marketing">Ads</option>
+                          <option value="sales">Software</option>
+                          <option value="operational">Operacional</option>
                         </select>
                       </div>
 
@@ -1273,6 +1320,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                             checked={!!inv.isFixed}
                             onChange={(e) => handleUpdateInvestment(inv.categoryId, 'isFixed', e.target.checked)}
                             className="w-4 h-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500 accent-pink-700 cursor-pointer"
+                            aria-label="Definir investimento como custo fixo recorrente (mobile)"
                           />
                           <label htmlFor={`fix-mob-${inv.categoryId}`} className="text-[11px] font-bold text-slate-500 cursor-pointer">Fixo Recorrente</label>
                         </div>
@@ -1294,6 +1342,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                           }}
                           placeholder="0,00"
                           className="w-full pl-8 pr-3 py-1.5 border border-slate-200 focus:border-pink-500 rounded-xl bg-slate-50/50 font-mono font-bold text-xs text-gray-700 focus:outline-none text-right"
+                          aria-label="Valor total investido (mobile)"
                         />
                       </div>
                     </div>
@@ -1310,6 +1359,26 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                   {totalInvestments.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </span>
               </div>
+            </div>
+
+            {/* Botões de Navegação Mobile */}
+            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between lg:hidden shrink-0 select-none">
+              <button
+                type="button"
+                onClick={() => setManualStep(0)}
+                className="px-4 py-2.5 bg-slate-100 text-slate-700 font-extrabold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer active:scale-98 transition-all"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Voltar</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setManualStep(2)}
+                className="px-5 py-2.5 bg-gradient-to-r from-pink-700 to-pink-500 text-white font-extrabold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-98 transition-all"
+              >
+                <span>Tráfego & Campanhas</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
 
@@ -1409,6 +1478,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                           onChange={(e) => setValidatedCampaigns(prev => ({ ...prev, [c.campaignId]: e.target.checked }))}
                           className="w-3.5 h-3.5 border-gray-300 rounded focus:ring-emerald-500 accent-emerald-600 cursor-pointer"
                           title="Confirmar campanha do mês"
+                          aria-label="Confirmar lançamento de campanha no mês"
                         />
                       </td>
                       <td className={`py-1 font-semibold ${ validatedCampaigns[c.campaignId] ? 'text-emerald-700' : 'text-indigo-950' }`}>
@@ -1417,6 +1487,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                           value={c.campaignName}
                           onChange={(e) => handleUpdateCampaign(c.campaignId, 'campaignName', e.target.value)}
                           className="w-full px-1.5 py-0.5 border border-transparent hover:border-gray-200 focus:border-pink-500 rounded bg-transparent font-semibold focus:outline-none"
+                          aria-label="Nome da campanha de marketing"
                         />
                       </td>
                       <td className="py-1">
@@ -1424,6 +1495,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                           value={c.platform}
                           onChange={(e) => handleUpdateCampaign(c.campaignId, 'platform', e.target.value)}
                           className="px-1 py-0.5 border border-transparent hover:border-gray-200 rounded text-[10px] font-semibold text-gray-500 focus:outline-none"
+                          aria-label="Plataforma de anúncios da campanha"
                         >
                           <option value="Google Ads">Google Ads</option>
                           <option value="Meta Ads">Meta Ads</option>
@@ -1438,6 +1510,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                           placeholder="Cliques"
                           onChange={(e) => handleUpdateCampaign(c.campaignId, 'clicks', Number(e.target.value))}
                           className="w-16 text-right px-1 py-0.5 border border-transparent hover:border-gray-200 focus:border-pink-500 rounded bg-transparent font-mono font-semibold text-gray-700 focus:outline-none"
+                          aria-label="Quantidade de cliques da campanha"
                         />
                       </td>
                       <td className="py-1 text-center">
@@ -1445,6 +1518,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                           type="button"
                           onClick={() => handleRemoveCampaign(c.campaignId)}
                           className="text-gray-300 hover:text-rose-600 transition-colors p-1"
+                          aria-label="Remover esta campanha"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -1508,6 +1582,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                               checked={!!validatedCampaigns[c.campaignId]}
                               onChange={(e) => setValidatedCampaigns(prev => ({ ...prev, [c.campaignId]: e.target.checked }))}
                               className="w-4 h-4 border-gray-300 rounded focus:ring-emerald-500 accent-emerald-600 cursor-pointer"
+                              aria-label="Confirmar lançamento de campanha no mês (mobile)"
                             />
                             <span className="text-[10px] text-gray-400 font-extrabold uppercase">Auditada</span>
                           </div>
@@ -1516,6 +1591,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                             type="button"
                             onClick={() => handleRemoveCampaign(c.campaignId)}
                             className="text-gray-300 hover:text-rose-600 transition-colors p-1 cursor-pointer"
+                            aria-label="Remover esta campanha (mobile)"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -1528,6 +1604,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                             value={c.campaignName}
                             onChange={(e) => handleUpdateCampaign(c.campaignId, 'campaignName', e.target.value)}
                             className="w-full px-2.5 py-1.5 border border-slate-200 focus:border-pink-500 rounded-xl bg-slate-50/50 text-xs font-semibold text-gray-700 focus:outline-none"
+                            aria-label="Nome da campanha de marketing (mobile)"
                           />
                         </div>
 
@@ -1538,6 +1615,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                               value={c.platform}
                               onChange={(e) => handleUpdateCampaign(c.campaignId, 'platform', e.target.value)}
                               className="w-full px-2.5 py-1.5 border border-slate-200 rounded-xl text-xs font-bold text-gray-700 bg-slate-50 focus:outline-none cursor-pointer"
+                              aria-label="Plataforma de anúncios da campanha (mobile)"
                             >
                               <option value="Google Ads">Google Ads</option>
                               <option value="Meta Ads">Meta Ads</option>
@@ -1554,6 +1632,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                               placeholder="Cliques"
                               onChange={(e) => handleUpdateCampaign(c.campaignId, 'clicks', Number(e.target.value))}
                               className="w-full px-2.5 py-1.5 border border-slate-200 focus:border-pink-500 rounded-xl bg-slate-50/50 font-mono font-bold text-xs text-gray-700 focus:outline-none text-right"
+                              aria-label="Quantidade de cliques da campanha (mobile)"
                             />
                           </div>
                         </div>
@@ -1571,6 +1650,26 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                 </div>
               </div>
             </div>
+
+            {/* Botões de Navegação Mobile */}
+            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between lg:hidden shrink-0 select-none">
+              <button
+                type="button"
+                onClick={() => setManualStep(1)}
+                className="px-4 py-2.5 bg-slate-100 text-slate-700 font-extrabold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer active:scale-98 transition-all"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Voltar</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleManualSave}
+                className="px-5 py-2.5 bg-gradient-to-r from-pink-700 to-pink-500 text-white font-extrabold rounded-2xl text-xs flex items-center gap-1.5 cursor-pointer shadow-md active:scale-98 transition-all"
+              >
+                <Save className="w-4 h-4" />
+                <span>Salvar Dados</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1584,7 +1683,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
             </div>
             <button
               type="button"
-              onClick={() => alert('Histórico de envio de dados carregado com sucesso!')}
+              onClick={() => showToast('Histórico de envio de dados carregado com sucesso!', 'success')}
               className="w-full sm:w-auto text-center px-2.5 py-2 sm:py-1 border border-gray-200 hover:border-pink-200 font-semibold rounded-xl sm:rounded-lg hover:bg-pink-50/20 cursor-pointer text-gray-500 transition-colors"
             >
               Histórico de Envio
@@ -1886,228 +1985,243 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
   // Renderização da aba Integrações & Webhooks
   const renderWebhookView = () => {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow overflow-y-auto pr-1 animate-fadeIn pb-20 lg:pb-0">
-        {/* Bloco de Conexão de Banco de Dados */}
-        <div className="lg:col-span-2 flex flex-col gap-6">
-          <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-6 flex flex-col h-fit">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 border-b border-gray-50 pb-4 select-none">
-              <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-700 shrink-0">
-                  <Database className="w-5 h-5" />
-                </div>
-                <div className="text-left">
-                  <h2 className="text-base sm:text-lg font-bold text-gray-800">Conexão de Banco de Dados</h2>
-                  <p className="text-xs text-gray-400 font-sans leading-relaxed">Vincule o banco de dados ERP da Cooperativa para sincronizações</p>
-                </div>
-              </div>
-              <span className="text-[10px] bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-full whitespace-nowrap self-start sm:self-auto">
-                Sincronismo Seguro (SSL)
-              </span>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-              <div className="flex flex-col gap-1 text-left">
-                <label className="text-[10px] font-extrabold text-gray-400 uppercase">Tecnologia do Banco</label>
-                <select
-                  value={dbType}
-                  onChange={(e) => setDbType(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-slate-50 focus:outline-none cursor-pointer hover:bg-slate-100"
-                >
-                  <option value="postgres">PostgreSQL (Recomendado)</option>
-                  <option value="mysql">MySQL Server</option>
-                  <option value="sqlserver">Microsoft SQL Server</option>
-                  <option value="salesforce">Salesforce CRM Connector</option>
-                  <option value="hubspot">Hubspot Marketing Database</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1 text-left">
-                <label className="text-[10px] font-extrabold text-gray-400 uppercase">Servidor / Host IP</label>
-                <input
-                  type="text"
-                  placeholder="db.uniodontopassos.com.br"
-                  defaultValue="192.168.10.45"
-                  className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-medium text-gray-700 bg-slate-50 focus:outline-none focus:border-pink-500"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1 text-left">
-                <label className="text-[10px] font-extrabold text-gray-400 uppercase">Porta</label>
-                <input
-                  type="text"
-                  defaultValue={dbType === 'postgres' ? '5432' : dbType === 'mysql' ? '3306' : '1433'}
-                  className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-medium text-gray-700 bg-slate-50 focus:outline-none focus:border-pink-500"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1 text-left">
-                <label className="text-[10px] font-extrabold text-gray-400 uppercase">Nome do Banco de Dados</label>
-                <input
-                  type="text"
-                  defaultValue="uniodonto_passos_erp"
-                  className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-medium text-gray-700 bg-slate-50 focus:outline-none focus:border-pink-500"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1 text-left">
-                <label className="text-[10px] font-extrabold text-gray-400 uppercase">Usuário de Leitura (BI)</label>
-                <input
-                  type="text"
-                  defaultValue="usr_bi_read"
-                  className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-medium text-gray-700 bg-slate-50 focus:outline-none focus:border-pink-500"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1 text-left">
-                <label className="text-[10px] font-extrabold text-gray-400 uppercase">Senha</label>
-                <input
-                  type="password"
-                  defaultValue="••••••••••••••••"
-                  disabled
-                  className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-medium text-gray-400 bg-slate-100 focus:outline-none cursor-not-allowed"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={testDbConnection}
-                disabled={isTestingDb}
-                className="py-2.5 px-5 bg-slate-900 text-white font-bold rounded-xl text-xs hover:bg-slate-800 transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50 select-none"
-              >
-                {isTestingDb ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    Testando conexão...
-                  </>
-                ) : (
-                  <>
-                    <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
-                    Testar Conexão com o Banco
-                  </>
-                )}
-              </button>
-            </div>
-
-            {dbTestSuccess && (
-              <div className="mt-4 p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2 animate-fadeIn text-left">
-                <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-                <p className="text-[11px] text-emerald-800 font-semibold leading-relaxed">
-                  Conexão estabelecida com sucesso! O túnel SSL criptografado validou o acesso de leitura técnica à tabela <code>beneficiarios_consolidado</code>.
-                </p>
-              </div>
-            )}
+      <div className="flex flex-col gap-6 flex-grow overflow-y-auto pr-1 animate-fadeIn pb-20 lg:pb-0 w-full">
+        {/* Banner de Modo de Demonstração */}
+        <div className="bg-amber-50/80 backdrop-blur-xs border border-amber-200/55 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 text-left">
+          <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800 shrink-0">
+            <Info className="w-5 h-5" />
           </div>
-
-          {/* Seletor e logs de Webhooks */}
-          <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-6 flex flex-col h-fit">
-            <div className="flex items-center justify-between mb-4 border-b border-gray-50 pb-4 select-none">
-              <div className="flex items-center gap-2">
-                <Cpu className="w-6 h-6 text-pink-700 animate-spin-slow" />
-                <h2 className="text-base sm:text-lg font-bold text-gray-800 font-sans">Webhooks de Integração Automática</h2>
-              </div>
-              <span className="text-[10px] bg-purple-50 text-purple-700 font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap">
-                API v1.3
-              </span>
-            </div>
-
-            <p className="text-xs text-gray-500 mb-5 text-left leading-relaxed">
-              Webhooks permitem que sistemas externos (como formulários de leads do WordPress, ferramentas de CRM ou Apps de corretores) empurrem dados em tempo real para o dashboard.
+          <div>
+            <h4 className="text-xs font-bold text-amber-900 font-sans">Ambiente de Demonstração (Simulado)</h4>
+            <p className="text-[11px] text-amber-800/80 font-semibold mt-0.5 leading-relaxed font-sans">
+              As configurações de banco de dados e endpoints de webhook listados abaixo são simulações interativas para fins de homologação visual e de fluxo. Nenhuma credencial ou webhook real é ativado ou gravado externamente.
             </p>
+          </div>
+        </div>
 
-            <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex flex-col gap-3 mb-5 select-none text-left">
-              <div className="flex flex-col gap-1.5 font-sans">
-                <label className="text-[10px] font-bold text-gray-400 uppercase">Endpoint URL de Recebimento</label>
-                <div className="flex bg-white border border-gray-200 rounded-xl overflow-hidden p-1">
-                  <span className="bg-slate-50 px-2 py-1.5 font-mono text-[9px] font-bold text-gray-400 rounded-lg flex items-center uppercase">POST</span>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
+          {/* Bloco de Conexão de Banco de Dados */}
+          <div className="lg:col-span-2 flex flex-col gap-6">
+            <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-6 flex flex-col h-fit">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 border-b border-gray-50 pb-4 select-none">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-700 shrink-0">
+                    <Database className="w-5 h-5" />
+                  </div>
+                  <div className="text-left">
+                    <h2 className="text-base sm:text-lg font-bold text-gray-800">Conexão de Banco de Dados</h2>
+                    <p className="text-xs text-gray-400 font-sans leading-relaxed">Vincule o banco de dados ERP da Cooperativa para sincronizações</p>
+                  </div>
+                </div>
+                <span className="text-[10px] bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-full whitespace-nowrap self-start sm:self-auto">
+                  Sincronismo Seguro (SSL)
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
+                <div className="flex flex-col gap-1 text-left">
+                  <label className="text-[10px] font-extrabold text-gray-400 uppercase">Tecnologia do Banco</label>
+                  <select
+                    value={dbType}
+                    onChange={(e) => setDbType(e.target.value)}
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-bold text-gray-700 bg-slate-50 focus:outline-none cursor-pointer hover:bg-slate-100"
+                  >
+                    <option value="postgres">PostgreSQL (Recomendado)</option>
+                    <option value="mysql">MySQL Server</option>
+                    <option value="sqlserver">Microsoft SQL Server</option>
+                    <option value="salesforce">Salesforce CRM Connector</option>
+                    <option value="hubspot">Hubspot Marketing Database</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1 text-left">
+                  <label className="text-[10px] font-extrabold text-gray-400 uppercase">Servidor / Host IP</label>
                   <input
                     type="text"
-                    readOnly
-                    value="https://api.uni-passos.com.br/v1/integrations/webhook/d0f81d898ecc"
-                    className="flex-grow px-2 py-1 bg-white font-mono text-[10px] text-gray-500 border-none outline-none focus:ring-0 select-all"
+                    placeholder="db.uniodontopassos.com.br"
+                    defaultValue="192.168.10.45"
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-medium text-gray-700 bg-slate-50 focus:outline-none focus:border-pink-500"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1 text-left">
+                  <label className="text-[10px] font-extrabold text-gray-400 uppercase">Porta</label>
+                  <input
+                    type="text"
+                    defaultValue={dbType === 'postgres' ? '5432' : dbType === 'mysql' ? '3306' : '1433'}
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-medium text-gray-700 bg-slate-50 focus:outline-none focus:border-pink-500"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1 text-left">
+                  <label className="text-[10px] font-extrabold text-gray-400 uppercase">Nome do Banco de Dados</label>
+                  <input
+                    type="text"
+                    defaultValue="uniodonto_passos_erp"
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-medium text-gray-700 bg-slate-50 focus:outline-none focus:border-pink-500"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1 text-left">
+                  <label className="text-[10px] font-extrabold text-gray-400 uppercase">Usuário de Leitura (BI)</label>
+                  <input
+                    type="text"
+                    defaultValue="usr_bi_read"
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-medium text-gray-700 bg-slate-50 focus:outline-none focus:border-pink-500"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1 text-left">
+                  <label className="text-[10px] font-extrabold text-gray-400 uppercase">Senha</label>
+                  <input
+                    type="password"
+                    defaultValue="••••••••••••••••"
+                    disabled
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-xs font-medium text-gray-400 bg-slate-100 focus:outline-none cursor-not-allowed"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold text-gray-400 uppercase">Eventos Escutados</label>
-                <div className="flex flex-wrap gap-2 mt-1 text-[10px] font-semibold text-slate-700">
-                  <div className="flex items-center gap-1.5 bg-white border border-slate-100 px-2 py-1 rounded-lg shadow-xs">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> lead.criado
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white border border-slate-100 px-2 py-1 rounded-lg shadow-xs">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> beneficiario.ativo
-                  </div>
-                  <div className="flex items-center gap-1.5 bg-white border border-slate-100 px-2 py-1 rounded-lg shadow-xs">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> venda.completada
-                  </div>
-                </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={testDbConnection}
+                  disabled={isTestingDb}
+                  className="py-2.5 px-5 bg-slate-900 text-white font-bold rounded-xl text-xs hover:bg-slate-800 transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50 select-none"
+                >
+                  {isTestingDb ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Testando conexão...
+                    </>
+                  ) : (
+                    <>
+                      <Activity className="w-4 h-4 text-emerald-400 animate-pulse" />
+                      Testar Conexão com o Banco
+                    </>
+                  )}
+                </button>
               </div>
-            </div>
 
-            <div className="flex items-center gap-3">
-              <button
-                onClick={simulateIncomingWebhook}
-                className="py-2.5 px-5 bg-gradient-to-r from-pink-700 to-pink-500 text-white font-bold rounded-xl text-xs hover:shadow-lg active:scale-98 cursor-pointer transition-all flex items-center gap-2 select-none"
-              >
-                <Play className="w-4 h-4 fill-current" />
-                Simular Chamada de Webhook Externa (Novo Registro)
-              </button>
+              {dbTestSuccess && (
+                <div className="mt-4 p-3 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center gap-2 animate-fadeIn text-left">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <p className="text-[11px] text-emerald-800 font-semibold leading-relaxed">
+                    Conexão estabelecida com sucesso! O túnel SSL criptografado validou o acesso de leitura técnica à tabela <code>beneficiarios_consolidado</code>.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Console de Webhooks */}
-            {webhookLogs.length > 0 && (
-              <div className="mt-5 flex flex-col bg-[#0b0f19] border border-slate-900 rounded-2xl overflow-hidden shadow-2xl">
-                <div className="bg-[#111827] px-4 py-2.5 border-b border-slate-900 flex justify-between items-center select-none">
-                  <span className="text-[10px] font-mono font-bold text-gray-400 flex items-center gap-2">
-                    <Terminal className="w-4 h-4 text-pink-500 animate-pulse" />
-                    CONEXÃO_WEBHOOK_RECEIVER.EXE
-                  </span>
-                  <div className="flex gap-1.5">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
-                    <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+            <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-6 flex flex-col h-fit">
+              <div className="flex items-center justify-between mb-4 border-b border-gray-50 pb-4 select-none">
+                <div className="flex items-center gap-2">
+                  <Cpu className="w-6 h-6 text-pink-700 animate-spin-slow" />
+                  <h2 className="text-base sm:text-lg font-bold text-gray-800 font-sans">Webhooks de Integração Automática</h2>
+                </div>
+                <span className="text-[10px] bg-purple-50 text-purple-700 font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap">
+                  API v1.3
+                </span>
+              </div>
+
+              <p className="text-xs text-gray-500 mb-5 text-left leading-relaxed font-sans">
+                Webhooks permitem que sistemas externos (como formulários de leads do WordPress, ferramentas de CRM ou Apps de corretores) empurrem dados em tempo real para o dashboard.
+              </p>
+
+              <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex flex-col gap-3 mb-5 select-none text-left">
+                <div className="flex flex-col gap-1.5 font-sans">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase">Endpoint URL de Recebimento</label>
+                  <div className="flex bg-white border border-gray-200 rounded-xl overflow-hidden p-1">
+                    <span className="bg-slate-50 px-2 py-1.5 font-mono text-[9px] font-bold text-gray-400 rounded-lg flex items-center uppercase">POST</span>
+                    <input
+                      type="text"
+                      readOnly
+                      value="https://api.uni-passos.com.br/v1/integrations/webhook/d0f81d898ecc"
+                      className="flex-grow px-2 py-1 bg-white font-mono text-[10px] text-gray-500 border-none outline-none focus:ring-0 select-all"
+                    />
                   </div>
                 </div>
 
-                <div 
-                  ref={webhookLogContainerRef}
-                  className="p-4 h-[220px] overflow-y-auto font-mono text-[10px] leading-relaxed flex flex-col gap-3 text-slate-300"
-                >
-                  {webhookLogs.map((log) => (
-                    <div key={log.id} className="border-b border-slate-800/60 pb-3 last:border-b-0 last:pb-0 text-left">
-                      <div className="flex items-center justify-between text-[9px] font-bold text-slate-500 mb-1.5">
-                        <span className="flex items-center gap-1">
-                          <span className="text-emerald-400">⚡ EVENT_RECEIVED</span> | [{log.time}]
-                        </span>
-                        <span className="bg-emerald-950/80 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-900">HTTP {log.status}</span>
-                      </div>
-                      <div className="mb-1 text-slate-400">
-                        <span className="font-bold text-pink-500">Evento: </span><code>{log.event}</code> | <span className="font-bold text-blue-400">Origem: </span>{log.origin}
-                      </div>
-                      <div className="bg-black/40 p-2 rounded-xl text-left border border-slate-800/30 overflow-x-auto">
-                        <pre className="text-emerald-400 font-mono text-[9px]">{JSON.stringify(log.payload, null, 2)}</pre>
-                      </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase">Eventos Escutados</label>
+                  <div className="flex flex-wrap gap-2 mt-1 text-[10px] font-semibold text-slate-700">
+                    <div className="flex items-center gap-1.5 bg-white border border-slate-100 px-2 py-1 rounded-lg shadow-xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> lead.criado
                     </div>
-                  ))}
+                    <div className="flex items-center gap-1.5 bg-white border border-slate-100 px-2 py-1 rounded-lg shadow-xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> beneficiario.ativo
+                    </div>
+                    <div className="flex items-center gap-1.5 bg-white border border-slate-100 px-2 py-1 rounded-lg shadow-xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> venda.completada
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
 
-        {/* Informações da integração e manual lateral */}
-        <div className="flex flex-col gap-6 select-none">
-          <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-6">
-            <h2 className="text-md font-bold text-gray-800 mb-3 border-b border-gray-50 pb-2 text-left">Integração sem Complicações</h2>
-            <p className="text-xs text-gray-500 leading-relaxed font-sans mb-4 text-left">
-              Utilize o console de Webhooks ao lado para realizar simulações e validar payloads. No ambiente real, a estrutura JSON exibida no terminal é a mesma necessária para atualizar os dados de leads e beneficiários do dashboard em tempo real.
-            </p>
-            <div className="flex items-center gap-2.5 bg-blue-50/50 border border-blue-100/60 p-3 rounded-2xl text-left font-sans">
-              <Globe className="w-5 h-5 text-blue-600 shrink-0" />
-              <span className="text-[10px] text-blue-800 font-semibold leading-relaxed">
-                Nossa documentação Swagger oficial da API está disponível no repositório técnico local da Uniodonto.
-              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={simulateIncomingWebhook}
+                  className="py-2.5 px-5 bg-gradient-to-r from-pink-700 to-pink-500 text-white font-bold rounded-xl text-xs hover:shadow-lg active:scale-98 cursor-pointer transition-all flex items-center gap-2 select-none"
+                >
+                  <Play className="w-4 h-4 fill-current" />
+                  Simular Chamada de Webhook Externa (Novo Registro)
+                </button>
+              </div>
+
+              {/* Console de Webhooks */}
+              {webhookLogs.length > 0 && (
+                <div className="mt-5 flex flex-col bg-[#0b0f19] border border-slate-900 rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="bg-[#111827] px-4 py-2.5 border-b border-slate-900 flex justify-between items-center select-none">
+                    <span className="text-[10px] font-mono font-bold text-gray-400 flex items-center gap-2 font-sans">
+                      <Terminal className="w-4 h-4 text-pink-500 animate-pulse" />
+                      CONEXÃO_WEBHOOK_RECEIVER.EXE
+                    </span>
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                      <div className="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                      <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                    </div>
+                  </div>
+
+                  <div 
+                    ref={webhookLogContainerRef}
+                    className="p-4 h-[220px] overflow-y-auto font-mono text-[10px] leading-relaxed flex flex-col gap-3 text-slate-300"
+                  >
+                    {webhookLogs.map((log) => (
+                      <div key={log.id} className="border-b border-slate-800/60 pb-3 last:border-b-0 last:pb-0 text-left">
+                        <div className="flex items-center justify-between text-[9px] font-bold text-slate-500 mb-1.5">
+                          <span className="flex items-center gap-1 font-sans">
+                            <span className="text-emerald-400">⚡ EVENT_RECEIVED</span> | [{log.time}]
+                          </span>
+                          <span className="bg-emerald-950/80 text-emerald-400 px-1.5 py-0.5 rounded border border-emerald-900 font-sans">HTTP {log.status}</span>
+                        </div>
+                        <div className="mb-1 text-slate-400 font-sans">
+                          <span className="font-bold text-pink-500 font-sans">Evento: </span><code>{log.event}</code> | <span className="font-bold text-blue-400 font-sans">Origem: </span>{log.origin}
+                        </div>
+                        <div className="bg-black/40 p-2 rounded-xl text-left border border-slate-800/30 overflow-x-auto">
+                          <pre className="text-emerald-400 font-mono text-[9px]">{JSON.stringify(log.payload, null, 2)}</pre>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Informações da integração e manual lateral */}
+          <div className="flex flex-col gap-6 select-none">
+            <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-6">
+              <h2 className="text-md font-bold text-gray-800 mb-3 border-b border-gray-50 pb-2 text-left">Integração sem Complicações</h2>
+              <p className="text-xs text-gray-500 leading-relaxed font-sans mb-4 text-left">
+                Utilize o console de Webhooks ao lado para realizar simulações e validar payloads. No ambiente real, a estrutura JSON exibida no terminal é a mesma necessária para atualizar os dados de leads e beneficiários do dashboard em tempo real.
+              </p>
+              <div className="flex items-center gap-2.5 bg-blue-50/50 border border-blue-100/60 p-3 rounded-2xl text-left font-sans">
+                <Globe className="w-5 h-5 text-blue-600 shrink-0" />
+                <span className="text-[10px] text-blue-800 font-semibold leading-relaxed">
+                  Nossa documentação Swagger oficial da API está disponível no repositório técnico local da Uniodonto.
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -2183,6 +2297,75 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
         {activeTab === 'envio-planilhas' && renderSpreadsheetView()}
         {activeTab === 'envio-conexoes' && renderWebhookView()}
       </div>
+
+      {/* Toast customizado de feedback */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-[9999] max-w-sm w-full bg-white/95 backdrop-blur-md border border-gray-100 shadow-2xl rounded-2xl p-4 flex items-start gap-3 animate-slideUp">
+          <div className={`p-1.5 rounded-xl shrink-0 ${
+            toast.type === 'success' ? 'bg-emerald-50 text-emerald-600' :
+            toast.type === 'error' ? 'bg-rose-50 text-rose-600' :
+            'bg-amber-50 text-amber-600'
+          }`}>
+            {toast.type === 'success' && <CheckCircle2 className="w-4 h-4" />}
+            {toast.type === 'error' && <XCircle className="w-4 h-4" />}
+            {toast.type === 'warning' && <AlertTriangle className="w-4 h-4" />}
+          </div>
+          <div className="flex-grow text-left">
+            <h5 className="text-xs font-bold text-gray-800 font-sans">
+              {toast.type === 'success' ? 'Sucesso!' :
+               toast.type === 'error' ? 'Erro' :
+               'Atenção'}
+            </h5>
+            <p className="text-[11px] text-gray-500 font-semibold mt-0.5 leading-relaxed font-sans">
+              {toast.message}
+            </p>
+          </div>
+          <button 
+            onClick={() => setToast(null)}
+            className="text-gray-400 hover:text-gray-600 cursor-pointer transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Modal de Confirmação Customizado */}
+      {confirmModal && confirmModal.isOpen && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="bg-white border border-gray-100 shadow-2xl rounded-3xl p-6 max-w-md w-full animate-scaleUp text-center">
+            <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="w-6 h-6 animate-pulse" />
+            </div>
+            <h3 className="text-sm font-black text-gray-800 uppercase tracking-wide mb-2 font-sans">
+              {confirmModal.title}
+            </h3>
+            <p className="text-xs text-gray-500 font-medium leading-relaxed mb-6 font-sans">
+              {confirmModal.message}
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+                className="px-4 py-2.5 border border-gray-200 text-gray-500 hover:text-gray-700 font-bold rounded-2xl text-xs cursor-pointer hover:bg-slate-50 transition-all select-none"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  confirmModal.onConfirm();
+                  setConfirmModal({ ...confirmModal, isOpen: false });
+                }}
+                className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-2xl text-xs cursor-pointer shadow-sm active:scale-98 transition-all select-none"
+              >
+                Confirmar e Prosseguir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

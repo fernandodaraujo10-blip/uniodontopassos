@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Database, Send } from 'lucide-react';
 import Header from '../components/layout/Header';
 import KPICardGrid from '../components/cards/KPICardGrid';
 import AdPerformanceChart from '../components/charts/AdPerformanceChart';
@@ -9,7 +10,11 @@ import { DashboardArea } from '../components/filters/FilterTabs';
 import { useDashboard } from '../hooks/useDashboard';
 import { adaptModernToLegacy } from '../utils/dashboardAdapter';
 
-export const Dashboard: React.FC = () => {
+interface DashboardProps {
+  setCurrentPage?: (page: string) => void;
+}
+
+export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
   const {
     selectedMonth,
     setSelectedMonth,
@@ -50,8 +55,27 @@ export const Dashboard: React.FC = () => {
 
   if (!activeMonthData) {
     return (
-      <div className="flex-grow flex items-center justify-center bg-[#F8F9FA] text-gray-500 font-sans">
-        Nenhum dado disponível para este período.
+      <div className="flex-grow flex items-center justify-center bg-[#F8F9FA] dark:bg-slate-950 p-6 select-none animate-fadeIn h-full w-full">
+        <div className="bg-white dark:bg-slate-900 border border-gray-100 dark:border-slate-800 rounded-3xl p-8 max-w-md w-full shadow-[0_20px_50px_rgba(0,0,0,0.03)] text-center flex flex-col items-center">
+          <div className="w-16 h-16 bg-pink-50 dark:bg-pink-950/30 rounded-2xl flex items-center justify-center text-pink-700 dark:text-pink-400 mb-6 shadow-sm">
+            <Database className="w-8 h-8" />
+          </div>
+          <h3 className="text-lg font-black text-slate-800 dark:text-slate-100 tracking-tight mb-2">
+            Nenhum dado disponível
+          </h3>
+          <p className="text-xs text-gray-500 dark:text-slate-400 mb-6 leading-relaxed">
+            Não encontramos registros estatísticos ou financeiros importados para o mês selecionado. Envie os lançamentos deste mês para gerar o relatório consolidado.
+          </p>
+          {setCurrentPage && (
+            <button
+              onClick={() => setCurrentPage('envio-manual')}
+              className="w-full py-3 bg-gradient-to-r from-[#D81B60] to-[#E91E63] text-white font-extrabold rounded-xl shadow-[0_4px_12px_rgba(216,27,96,0.25)] hover:scale-102 transition-transform duration-200 cursor-pointer text-xs uppercase tracking-wider flex items-center justify-center gap-2"
+            >
+              <Send className="w-4 h-4" />
+              <span>Enviar Dados deste Mês</span>
+            </button>
+          )}
+        </div>
       </div>
     );
   }

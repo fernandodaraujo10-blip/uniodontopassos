@@ -30,7 +30,7 @@ export const MonthNavigator: React.FC<MonthNavigatorProps> = ({
   return (
     <>
       {/* ── MOBILE: apenas setas + mês atual ── */}
-      <div className="flex md:hidden items-center bg-white rounded-xl shadow-sm border border-gray-100 p-1 select-none shrink-0 gap-1">
+      <div className="flex lg:hidden items-center bg-white rounded-xl shadow-sm border border-gray-100 p-1 select-none shrink-0 gap-1">
         <button
           onClick={() => navigateMonth(-1)}
           disabled={currentIndex <= 0}
@@ -58,7 +58,7 @@ export const MonthNavigator: React.FC<MonthNavigatorProps> = ({
       </div>
 
       {/* ── DESKTOP: todos os meses em scrollbar ── */}
-      <div className="hidden md:flex items-center bg-white rounded-xl shadow-sm border border-gray-100 p-1 select-none shrink-0">
+      <div className="hidden lg:flex items-center bg-white rounded-xl shadow-sm border border-gray-100 p-1 select-none shrink-0">
         {/* Botão Retroceder */}
         <button
           onClick={() => navigateMonth(-1)}

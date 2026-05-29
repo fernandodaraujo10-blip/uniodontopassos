@@ -35,9 +35,9 @@ export interface User {
 
 const mockUsers: User[] = [
   { id: '1', name: 'FerTaise Tech Admin', email: 'fertaisetech@gmail.com', username: 'fertaisetech@gmail.com', role: 'Tech FerTaise', status: 'ativo', avatarColor: 'from-pink-600 to-rose-400', password: '1234' },
-  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-blue-600 to-teal-400', password: '1234' },
-  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-purple-600 to-indigo-400', password: '1234' },
-  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-amber-600 to-orange-400', password: '1234' },
+  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-blue-600 to-teal-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
+  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-purple-600 to-indigo-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
+  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-amber-600 to-orange-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
   { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'inativo', avatarColor: 'from-emerald-600 to-green-400', password: '1234' }
 ];
 
@@ -326,62 +326,66 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
       <div className="flex-grow flex flex-col md:flex-row gap-6 overflow-hidden min-h-0">
         
         {/* Menu de Abas Mobile (Scroll Horizontal) */}
-        <div className="flex md:hidden overflow-x-auto scrollbar-hide py-1 mb-1 flex-row gap-2 shrink-0 select-none -mx-4 px-4">
-          <button
-            onClick={() => setActiveTab('meu-perfil')}
-            className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
-              activeTab === 'meu-perfil'
-                ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
-                : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
-            }`}
-          >
-            <UserIcon className="w-3.5 h-3.5 shrink-0" />
-            <span>Meu Perfil</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('usuarios')}
-            className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
-              activeTab === 'usuarios'
-                ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
-                : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
-            }`}
-          >
-            <Users className="w-3.5 h-3.5 shrink-0" />
-            <span>Usuários</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('perfil')}
-            className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
-              activeTab === 'perfil'
-                ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
-                : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
-            }`}
-          >
-            <Building2 className="w-3.5 h-3.5 shrink-0" />
-            <span>Cooperativa</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('seguranca')}
-            className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
-              activeTab === 'seguranca'
-                ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
-                : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
-            }`}
-          >
-            <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
-            <span>Segurança & API</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('notificacoes')}
-            className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
-              activeTab === 'notificacoes'
-                ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
-                : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
-            }`}
-          >
-            <BellRing className="w-3.5 h-3.5 shrink-0" />
-            <span>Notificações</span>
-          </button>
+        <div className="relative md:hidden shrink-0 -mx-4">
+          <div className="flex overflow-x-auto scrollbar-hide py-1 mb-1 flex-row gap-2 select-none px-4">
+            <button
+              onClick={() => setActiveTab('meu-perfil')}
+              className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+                activeTab === 'meu-perfil'
+                  ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
+                  : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
+              }`}
+            >
+              <UserIcon className="w-3.5 h-3.5 shrink-0" />
+              <span>Meu Perfil</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('usuarios')}
+              className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+                activeTab === 'usuarios'
+                  ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
+                  : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5 shrink-0" />
+              <span>Usuários</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('perfil')}
+              className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+                activeTab === 'perfil'
+                  ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
+                  : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
+              }`}
+            >
+              <Building2 className="w-3.5 h-3.5 shrink-0" />
+              <span>Cooperativa</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('seguranca')}
+              className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+                activeTab === 'seguranca'
+                  ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
+                  : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
+              }`}
+            >
+              <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
+              <span>Segurança & API</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('notificacoes')}
+              className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+                activeTab === 'notificacoes'
+                  ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
+                  : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
+              }`}
+            >
+              <BellRing className="w-3.5 h-3.5 shrink-0" />
+              <span>Notificações</span>
+            </button>
+          </div>
+          {/* Sombreamento degradê à direita para indicar rolagem horizontal */}
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#F8F9FA] to-transparent pointer-events-none z-10" />
         </div>
 
         {/* Menu Lateral de Abas de Configurações - Desktop */}
@@ -449,7 +453,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
           
           {/* TAB 0: MEU PERFIL PESSOAL */}
           {activeTab === 'meu-perfil' && loggedUser && (
-            <div className="flex flex-col h-full overflow-y-auto animate-fadeIn text-left select-none max-w-xl">
+            <div className="flex flex-col h-full overflow-y-auto pr-1 animate-fadeIn text-left select-none max-w-xl">
               <h2 className="text-md font-extrabold text-slate-800 mb-1">Meu Perfil Pessoal</h2>
               <p className="text-xs text-gray-400 mb-6">Atualize sua foto de perfil e dados cadastrais de acesso ao painel</p>
 
@@ -769,7 +773,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
 
           {/* TAB 2: PERFIL DA COOPERATIVA */}
           {activeTab === 'perfil' && (
-            <div className="flex flex-col h-full overflow-hidden animate-fadeIn text-left select-none">
+            <div className="flex flex-col h-full overflow-y-auto pr-1 animate-fadeIn text-left select-none">
               <h2 className="text-md font-extrabold text-slate-800 mb-1">Perfil Corporativo</h2>
               <p className="text-xs text-gray-400 mb-6">Parametrize as informações oficiais da cooperativa exibidas no dashboard</p>
 
@@ -848,7 +852,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
 
           {/* TAB 3: SEGURANÇA & API */}
           {activeTab === 'seguranca' && (
-            <div className="flex flex-col h-full overflow-hidden animate-fadeIn text-left select-none">
+            <div className="flex flex-col h-full overflow-y-auto pr-1 animate-fadeIn text-left select-none">
               <h2 className="text-md font-extrabold text-slate-800 mb-1">Aparência & Segurança do Painel</h2>
               <p className="text-xs text-gray-400 mb-6">Personalize a exibição do dashboard e configure tokens de segurança das APIs corporativas</p>
 
@@ -953,7 +957,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
 
           {/* TAB 4: NOTIFICAÇÕES & ALERTAS */}
           {activeTab === 'notificacoes' && (
-            <div className="flex flex-col h-full overflow-hidden animate-fadeIn text-left select-none">
+            <div className="flex flex-col h-full overflow-y-auto pr-1 animate-fadeIn text-left select-none">
               <h2 className="text-md font-extrabold text-slate-800 mb-1">Notificações & Alertas de Negócio</h2>
               <p className="text-xs text-gray-400 mb-6">Parametrize alertas automáticos de desvios matemáticos de metas em tempo real</p>
 

@@ -5,9 +5,9 @@ import { User } from './Settings';
 // Mock padrão igual ao Settings.tsx caso o localStorage esteja vazio
 const defaultMockUsers: User[] = [
   { id: '1', name: 'FerTaise Tech Admin', email: 'fertaisetech@gmail.com', username: 'fertaisetech@gmail.com', role: 'Tech FerTaise', status: 'ativo', avatarColor: 'from-pink-600 to-rose-400', password: '1234' },
-  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-blue-600 to-teal-400', password: '1234' },
-  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-purple-600 to-indigo-400', password: '1234' },
-  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-amber-600 to-orange-400', password: '1234' },
+  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-blue-600 to-teal-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
+  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-purple-600 to-indigo-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
+  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-amber-600 to-orange-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
   { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'inativo', avatarColor: 'from-emerald-600 to-green-400', password: '1234' }
 ];
 
@@ -99,8 +99,12 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         
         {/* Header do Login */}
         <div className="flex flex-col items-center mb-6 sm:mb-8 text-center">
-          <div className="w-14 h-14 bg-gradient-to-tr from-pink-700 to-pink-500 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-pink-100 mb-4 animate-scaleUp">
-            U
+          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-pink-100/50 mb-4 animate-scaleUp border border-pink-100/30 p-1.5 overflow-hidden flex-shrink-0">
+            <img 
+              src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FLogo.png?alt=media&token=88d82c51-1da6-489a-a966-4477e09d335a" 
+              alt="Uniodonto Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           <h2 className="text-gray-800 font-black text-lg sm:text-xl tracking-tight leading-tight">
             UNIODONTO PASSOS

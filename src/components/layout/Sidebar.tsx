@@ -39,6 +39,69 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
 
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState<boolean>(false);
+
+  // Focus trap e fechamento por Escape para os modais da Sidebar
+  const helpModalRef = React.useRef<HTMLDivElement>(null);
+  const logoutModalRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // 1. Fechamento com a tecla Escape
+      if (e.key === 'Escape') {
+        setIsHelpOpen(false);
+        setIsLogoutOpen(false);
+        return;
+      }
+
+      // 2. Focus Trap
+      const activeModal = isHelpOpen ? helpModalRef.current : (isLogoutOpen ? logoutModalRef.current : null);
+      if (!activeModal) return;
+
+      if (e.key === 'Tab') {
+        const focusableElements = activeModal.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements.length === 0) return;
+
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          // Shift + Tab -> Se o elemento focado for o primeiro, vai para o último
+          if (document.activeElement === firstElement) {
+            lastElement.focus();
+            e.preventDefault();
+          }
+        } else {
+          // Tab -> Se o elemento focado for o último, vai para o primeiro
+          if (document.activeElement === lastElement) {
+            firstElement.focus();
+            e.preventDefault();
+          }
+        }
+      }
+    };
+
+    if (isHelpOpen || isLogoutOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+      // Coloca o foco inicial dentro do modal
+      setTimeout(() => {
+        const activeModal = isHelpOpen ? helpModalRef.current : (isLogoutOpen ? logoutModalRef.current : null);
+        if (activeModal) {
+          const focusable = activeModal.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea'
+          );
+          if (focusable.length > 0) {
+            focusable[0].focus();
+          }
+        }
+      }, 50);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isHelpOpen, isLogoutOpen]);
   
   // Estado para controlar a abertura das opções de envio
   const [isEnvioOpen, setIsEnvioOpen] = useState<boolean>(() => {
@@ -90,8 +153,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
 
         {/* Header da Sidebar */}
         <div className={`p-6 flex items-center ${isCollapsed ? 'justify-center px-0' : 'space-x-3'}`}>
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-pink-700 font-bold text-xl shadow-md transition-transform duration-300 hover:scale-105 flex-shrink-0">
-            U
+          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-md transition-transform duration-300 hover:scale-105 flex-shrink-0 p-1.5 overflow-hidden">
+            <img 
+              src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FLogo.png?alt=media&token=88d82c51-1da6-489a-a966-4477e09d335a" 
+              alt="Uniodonto Logo" 
+              className="w-full h-full object-contain"
+            />
           </div>
           {!isCollapsed && (
             <span className="font-semibold text-lg tracking-wide transition-all duration-300 whitespace-nowrap">
@@ -188,7 +255,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
 
                 {/* Tooltip Flutuante Lateral */}
                 {isCollapsed && (
-                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900/95 text-white text-[10px] font-bold rounded-lg shadow-lg border border-slate-800 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out pointer-events-none translate-x-[-8px] group-hover:translate-x-0 z-50 select-none">
+                  <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900/95 text-white text-[10px] font-bold rounded-lg shadow-lg border border-slate-800 whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-focus:opacity-100 transition-all duration-300 ease-out pointer-events-none translate-x-[-8px] group-hover:translate-x-0 group-focus-within:translate-x-0 group-focus:translate-x-0 z-50 select-none">
                     {/* Setinha do Tooltip */}
                     <div className="absolute right-full top-1/2 -translate-y-1/2 border-y-4 border-y-transparent border-r-4 border-r-slate-900/95" />
                     {item.label}
@@ -204,7 +271,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
           {/* Perfil do Usuário Logado */}
           {loggedUser && (
             isCollapsed ? (
-              <div className="relative group flex justify-center mb-4 cursor-pointer" onClick={() => setCurrentPage('configuracoes')}>
+              <div className="relative group flex justify-center mb-4 cursor-pointer focus:outline-none" tabIndex={0} onClick={() => setCurrentPage('configuracoes')} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setCurrentPage('configuracoes'); } }}>
                 {loggedUser.photo ? (
                   <img
                     src={loggedUser.photo}
@@ -217,7 +284,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
                   </div>
                 )}
                 {/* Tooltip flutuante */}
-                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900/95 text-white text-[10px] font-bold rounded-lg shadow-lg border border-slate-800 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out pointer-events-none translate-x-[-8px] group-hover:translate-x-0 z-50 select-none">
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900/95 text-white text-[10px] font-bold rounded-lg shadow-lg border border-slate-800 whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-focus:opacity-100 transition-all duration-300 ease-out pointer-events-none translate-x-[-8px] group-hover:translate-x-0 group-focus-within:translate-x-0 group-focus:translate-x-0 z-50 select-none">
                   <div className="absolute right-full top-1/2 -translate-y-1/2 border-y-4 border-y-transparent border-r-4 border-r-slate-900/95" />
                   <p className="font-bold text-xs">{loggedUser.name}</p>
                   <p className="text-[9px] opacity-70 font-medium">{loggedUser.role}</p>
@@ -266,7 +333,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
             
             {/* Tooltip Flutuante Configurações */}
             {isCollapsed && (
-              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900/95 text-white text-[10px] font-bold rounded-lg shadow-lg border border-slate-800 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out pointer-events-none translate-x-[-8px] group-hover:translate-x-0 z-50 select-none">
+              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900/95 text-white text-[10px] font-bold rounded-lg shadow-lg border border-slate-800 whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-focus:opacity-100 transition-all duration-300 ease-out pointer-events-none translate-x-[-8px] group-hover:translate-x-0 group-focus-within:translate-x-0 group-focus:translate-x-0 z-50 select-none">
                 <div className="absolute right-full top-1/2 -translate-y-1/2 border-y-4 border-y-transparent border-r-4 border-r-slate-900/95" />
                 Configurações
               </div>
@@ -281,7 +348,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
                 e.preventDefault();
                 setIsHelpOpen(true);
               }}
-              className={`flex items-center text-sm opacity-80 hover:opacity-100 transition-opacity duration-200 ${
+              className={`flex items-center text-sm transition-all duration-200 ${
+                isHelpOpen
+                  ? 'text-white font-bold opacity-100'
+                  : 'opacity-85 hover:opacity-100 text-slate-100'
+              } ${
                 isCollapsed ? 'justify-center' : 'space-x-3'
               }`}
             >
@@ -291,7 +362,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
             
             {/* Tooltip Flutuante Ajuda */}
             {isCollapsed && (
-              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900/95 text-white text-[10px] font-bold rounded-lg shadow-lg border border-slate-800 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out pointer-events-none translate-x-[-8px] group-hover:translate-x-0 z-50 select-none">
+              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900/95 text-white text-[10px] font-bold rounded-lg shadow-lg border border-slate-800 whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-focus:opacity-100 transition-all duration-300 ease-out pointer-events-none translate-x-[-8px] group-hover:translate-x-0 group-focus-within:translate-x-0 group-focus:translate-x-0 z-50 select-none">
                 <div className="absolute right-full top-1/2 -translate-y-1/2 border-y-4 border-y-transparent border-r-4 border-r-slate-900/95" />
                 Ajuda
               </div>
@@ -316,7 +387,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
 
             {/* Tooltip Flutuante Sair */}
             {isCollapsed && (
-              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900/95 text-white text-[10px] font-bold rounded-lg shadow-lg border border-slate-800 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out pointer-events-none translate-x-[-8px] group-hover:translate-x-0 z-50 select-none">
+              <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900/95 text-white text-[10px] font-bold rounded-lg shadow-lg border border-slate-800 whitespace-nowrap opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 group-focus:opacity-100 transition-all duration-300 ease-out pointer-events-none translate-x-[-8px] group-hover:translate-x-0 group-focus-within:translate-x-0 group-focus:translate-x-0 z-50 select-none">
                 <div className="absolute right-full top-1/2 -translate-y-1/2 border-y-4 border-y-transparent border-r-4 border-r-slate-900/95" />
                 Sair
               </div>
@@ -328,7 +399,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
       {/* MODAL DE AJUDA PREMIUM */}
       {isHelpOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[1000] flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full border border-gray-100 shadow-[0_20px_50px_rgba(136,14,79,0.08)] text-slate-800 animate-modal flex flex-col items-center text-center">
+          <div ref={helpModalRef} className="bg-white rounded-3xl p-6 max-w-sm w-full border border-gray-100 shadow-[0_20px_50px_rgba(136,14,79,0.08)] text-slate-800 animate-modal flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-pink-100 rounded-2xl flex items-center justify-center text-pink-700 mb-4 shadow-sm">
               <HelpCircle className="w-6 h-6" />
             </div>
@@ -363,7 +434,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
       {/* MODAL DE CONFIRMAÇÃO DE SAÍDA PREMIUM */}
       {isLogoutOpen && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[1000] flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full border border-gray-100 shadow-[0_20px_50px_rgba(136,14,79,0.08)] text-slate-800 animate-modal flex flex-col items-center text-center">
+          <div ref={logoutModalRef} className="bg-white rounded-3xl p-6 max-w-sm w-full border border-gray-100 shadow-[0_20px_50px_rgba(136,14,79,0.08)] text-slate-800 animate-modal flex flex-col items-center text-center">
             <div className="w-12 h-12 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 mb-4 shadow-sm">
               <LogOut className="w-6 h-6" />
             </div>
