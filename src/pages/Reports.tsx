@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FileText, Download, TrendingUp, Printer, Calendar, DollarSign, Users, Award } from 'lucide-react';
 import { useDashboard } from '../hooks/useDashboard';
 import { TrendCharts } from '../components/charts/TrendCharts';
@@ -9,11 +9,52 @@ export const Reports: React.FC = () => {
     reportFilter, 
     setReportFilter, 
     consolidatedReport, 
-    availableMonths 
+    availableMonths,
+    selectedMonth
   } = useDashboard();
 
   // Estado local para controlar se exibe colunas detalhadas na tabela do relatório
   const [showChannelDetails, setShowChannelDetails] = useState<boolean>(false);
+
+  // Estado para controlar se filtra apenas o mês atual do dashboard
+  const [isCurrentMonthOnly, setIsCurrentMonthOnly] = useState<boolean>(false);
+  const [prevMonths, setPrevMonths] = useState<{ start: string; end: string }>({
+    start: reportFilter.startMonth,
+    end: reportFilter.endMonth
+  });
+
+  // Atualiza os meses de início/fim caso o mês selecionado no painel mude e a caixa esteja ativa
+  useEffect(() => {
+    if (isCurrentMonthOnly) {
+      setReportFilter({
+        ...reportFilter,
+        startMonth: selectedMonth,
+        endMonth: selectedMonth
+      });
+    }
+  }, [selectedMonth, isCurrentMonthOnly]);
+
+  const handleCurrentMonthOnlyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+    setIsCurrentMonthOnly(checked);
+    if (checked) {
+      setPrevMonths({
+        start: reportFilter.startMonth,
+        end: reportFilter.endMonth
+      });
+      setReportFilter({
+        ...reportFilter,
+        startMonth: selectedMonth,
+        endMonth: selectedMonth
+      });
+    } else {
+      setReportFilter({
+        ...reportFilter,
+        startMonth: prevMonths.start,
+        endMonth: prevMonths.end
+      });
+    }
+  };
 
   // Função para formatar moeda pt-BR
   const formatarMoeda = (valor: number): string => {
@@ -340,12 +381,27 @@ export const Reports: React.FC = () => {
             </div>
             
             <div className="space-y-4 text-xs font-medium text-gray-500 select-none">
+              {/* Checkbox Mês Atual */}
+              <div className="flex items-center gap-2 pb-2 border-b border-gray-50">
+                <input 
+                  type="checkbox" 
+                  id="currentMonthOnly"
+                  checked={isCurrentMonthOnly}
+                  onChange={handleCurrentMonthOnlyChange}
+                  className="w-4 h-4 text-pink-700 border-gray-200 rounded focus:ring-pink-500 accent-pink-700 cursor-pointer"
+                />
+                <label htmlFor="currentMonthOnly" className="text-gray-700 font-bold cursor-pointer select-none">
+                  Filtrar apenas Mês Atual
+                </label>
+              </div>
+
               <div>
-                <label className="block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1">Mês de Início</label>
+                <label className={`block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1 transition-opacity duration-200 ${isCurrentMonthOnly ? 'opacity-50' : ''}`}>Mês de Início</label>
                 <select 
                   value={reportFilter.startMonth}
                   onChange={(e) => setReportFilter({ ...reportFilter, startMonth: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 focus:outline-none focus:border-pink-200 text-gray-700 font-semibold cursor-pointer"
+                  disabled={isCurrentMonthOnly}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 focus:outline-none focus:border-pink-200 text-gray-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100/50 transition-all duration-200 cursor-pointer"
                 >
                   {availableMonths.map(m => (
                     <option key={m.value} value={m.value}>{m.label}</option>
@@ -354,11 +410,12 @@ export const Reports: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1">Mês de Fim</label>
+                <label className={`block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1 transition-opacity duration-200 ${isCurrentMonthOnly ? 'opacity-50' : ''}`}>Mês de Fim</label>
                 <select 
                   value={reportFilter.endMonth}
                   onChange={(e) => setReportFilter({ ...reportFilter, endMonth: e.target.value })}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 focus:outline-none focus:border-pink-200 text-gray-700 font-semibold cursor-pointer"
+                  disabled={isCurrentMonthOnly}
+                  className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 focus:outline-none focus:border-pink-200 text-gray-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100/50 transition-all duration-200 cursor-pointer"
                 >
                   {availableMonths.map(m => (
                     <option key={m.value} value={m.value}>{m.label}</option>
