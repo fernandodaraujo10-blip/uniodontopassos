@@ -1,10 +1,12 @@
 import React from 'react';
 import { LayoutGrid, BarChart3, Send, Settings, LogOut } from 'lucide-react';
+import { User } from '../../pages/Settings';
 
 interface MobileBottomNavProps {
   currentPage: string;
   setCurrentPage: (page: string) => void;
   onLogout?: () => void;
+  loggedUser?: User | null;
 }
 
 interface NavItem {
@@ -18,6 +20,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   currentPage,
   setCurrentPage,
   onLogout,
+  loggedUser,
 }) => {
   const items: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
@@ -33,6 +36,15 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       },
     },
   ];
+
+  const getInitials = (name: string) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
 
   const isActive = (id: string) => {
     if (id === 'envio') return currentPage.startsWith('envio');
@@ -61,7 +73,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 setCurrentPage(item.id);
               }
             }}
-          className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-all duration-200 cursor-pointer select-none focus:outline-none
+            className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-all duration-200 cursor-pointer select-none focus:outline-none
               ${active
                 ? 'text-pink-700'
                 : item.id === 'sair'
@@ -75,10 +87,34 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
             {active && (
               <span className="absolute top-0 w-8 h-0.5 bg-pink-700 rounded-b-full" />
             )}
-            <Icon
-              className={`w-5 h-5 transition-transform duration-200 ${active ? 'scale-110' : ''}`}
-              strokeWidth={active ? 2.5 : 1.8}
-            />
+
+            {item.id === 'configuracoes' && loggedUser ? (
+              loggedUser.photo ? (
+                <img
+                  src={loggedUser.photo}
+                  alt={loggedUser.name}
+                  className={`w-5 h-5 rounded-full object-cover border transition-all duration-200 ${
+                    active ? 'border-pink-700 scale-110' : 'border-gray-300'
+                  }`}
+                />
+              ) : (
+                <div
+                  className={`w-5 h-5 rounded-full bg-gradient-to-tr ${
+                    loggedUser.avatarColor || 'from-pink-600 to-rose-400'
+                  } flex items-center justify-center font-extrabold text-[8px] text-white shadow-xs shrink-0 select-none border transition-all duration-200 ${
+                    active ? 'border-pink-700 scale-110' : 'border-transparent'
+                  }`}
+                >
+                  {getInitials(loggedUser.name)}
+                </div>
+              )
+            ) : (
+              <Icon
+                className={`w-5 h-5 transition-transform duration-200 ${active ? 'scale-110' : ''}`}
+                strokeWidth={active ? 2.5 : 1.8}
+              />
+            )}
+
             <span
               className={`text-[10px] font-semibold leading-none transition-all duration-200 ${
                 active ? 'opacity-100' : 'opacity-70'

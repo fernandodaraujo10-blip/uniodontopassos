@@ -11,19 +11,19 @@ describe('Painel de Configurações - Testes de Gestão de Usuários e Senhas', 
   it('1. Deve renderizar a listagem inicial dos novos usuários e seus cargos corretamente', () => {
     render(<Settings />);
 
-    // Verifica se os novos usuários solicitados estão presentes na tabela
-    expect(screen.getByText('FerTaise Tech Admin')).toBeInTheDocument();
-    expect(screen.getByText('Dr. Elcio Beraldo')).toBeInTheDocument();
-    expect(screen.getByText('Dr. Luiz Fernando')).toBeInTheDocument();
-    expect(screen.getByText('Dr. Mateus José')).toBeInTheDocument();
-    expect(screen.getByText('Janaína Pádua')).toBeInTheDocument();
+    // Verifica se os novos usuários solicitados estão presentes na tabela (mobile e desktop)
+    expect(screen.getAllByText('FerTaise Tech Admin')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Dr. Elcio Beraldo')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Dr. Luiz Fernando')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Dr. Mateus José')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Janaína Pádua')[0]).toBeInTheDocument();
 
     // Verifica se os emails estão corretos
-    expect(screen.getByText('fertaisetech@gmail.com')).toBeInTheDocument();
-    expect(screen.getByText('elcio@uniodonto.com')).toBeInTheDocument();
-    expect(screen.getByText('luiz@uniodonto.com')).toBeInTheDocument();
-    expect(screen.getByText('mateus@uniodonto.com')).toBeInTheDocument();
-    expect(screen.getByText('gerente@uniodonto.com')).toBeInTheDocument();
+    expect(screen.getAllByText('fertaisetech@gmail.com')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('elcio@uniodonto.com')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('luiz@uniodonto.com')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('mateus@uniodonto.com')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('gerente@uniodonto.com')[0]).toBeInTheDocument();
 
     // Verifica os novos cargos atribuídos
     const techRoles = screen.getAllByText('Tech FerTaise');
@@ -67,8 +67,8 @@ describe('Painel de Configurações - Testes de Gestão de Usuários e Senhas', 
     fireEvent.click(btnCriar);
 
     // Verifica se o modal fechou e o usuário foi criado na listagem
-    expect(screen.getByText('Mariana Costa')).toBeInTheDocument();
-    expect(screen.getByText('mariana.costa@uniodonto.com')).toBeInTheDocument();
+    expect(screen.getAllByText('Mariana Costa')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('mariana.costa@uniodonto.com')[0]).toBeInTheDocument();
     expect(screen.getAllByText('Tech FerTaise').length).toBeGreaterThan(1); // Múltiplos usuários com cargo Tech FerTaise
   });
 
@@ -130,7 +130,7 @@ describe('Painel de Configurações - Testes de Gestão de Usuários e Senhas', 
     render(<Settings theme="light" setTheme={handleSetTheme} />);
 
     // Navega até a aba "Segurança & API" (rebatizada para "Aparência & Segurança do Painel")
-    const btnSeguranca = screen.getByRole('button', { name: /Segurança/i });
+    const btnSeguranca = screen.getAllByRole('button', { name: /Segurança/i })[0];
     fireEvent.click(btnSeguranca);
 
     // Verifica se os botões de Modo Claro e Modo Escuro estão presentes

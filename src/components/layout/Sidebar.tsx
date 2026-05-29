@@ -13,18 +13,29 @@ import {
   Server,
   Settings
 } from 'lucide-react';
+import { User } from '../../pages/Settings';
 
 interface SidebarProps {
   currentPage: string;
   setCurrentPage: (page: string) => void;
   onLogout?: () => void;
+  loggedUser?: User | null;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, onLogout }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, onLogout, loggedUser }) => {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
     const saved = localStorage.getItem('sidebar-collapsed');
     return saved === 'true';
   });
+
+  const getInitials = (name: string) => {
+    if (!name) return 'U';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.slice(0, 2).toUpperCase();
+  };
 
   const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
   const [isLogoutOpen, setIsLogoutOpen] = useState<boolean>(false);
@@ -190,6 +201,49 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
 
         {/* Footer da Sidebar */}
         <div className={`p-6 space-y-4 border-t border-white/10 ${isCollapsed ? 'px-2' : ''}`}>
+          {/* Perfil do Usuário Logado */}
+          {loggedUser && (
+            isCollapsed ? (
+              <div className="relative group flex justify-center mb-4 cursor-pointer" onClick={() => setCurrentPage('configuracoes')}>
+                {loggedUser.photo ? (
+                  <img
+                    src={loggedUser.photo}
+                    alt={loggedUser.name}
+                    className="w-10 h-10 rounded-full object-cover border border-white/20 shadow-sm"
+                  />
+                ) : (
+                  <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${loggedUser.avatarColor || 'from-pink-600 to-rose-400'} flex items-center justify-center font-extrabold text-xs text-white shadow-sm shrink-0 select-none`}>
+                    {getInitials(loggedUser.name)}
+                  </div>
+                )}
+                {/* Tooltip flutuante */}
+                <div className="absolute left-full top-1/2 -translate-y-1/2 ml-3 px-2.5 py-1.5 bg-slate-900/95 text-white text-[10px] font-bold rounded-lg shadow-lg border border-slate-800 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out pointer-events-none translate-x-[-8px] group-hover:translate-x-0 z-50 select-none">
+                  <div className="absolute right-full top-1/2 -translate-y-1/2 border-y-4 border-y-transparent border-r-4 border-r-slate-900/95" />
+                  <p className="font-bold text-xs">{loggedUser.name}</p>
+                  <p className="text-[9px] opacity-70 font-medium">{loggedUser.role}</p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3 p-3 bg-white/10 rounded-2xl border border-white/10 mb-4 animate-fadeIn">
+                {loggedUser.photo ? (
+                  <img
+                    src={loggedUser.photo}
+                    alt={loggedUser.name}
+                    className="w-10 h-10 rounded-full object-cover border border-white/20 shadow-sm shrink-0"
+                  />
+                ) : (
+                  <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${loggedUser.avatarColor || 'from-pink-600 to-rose-400'} flex items-center justify-center font-extrabold text-xs text-white shadow-sm shrink-0 select-none`}>
+                    {getInitials(loggedUser.name)}
+                  </div>
+                )}
+                <div className="flex flex-col text-left min-w-0">
+                  <span className="font-bold text-xs truncate whitespace-nowrap">{loggedUser.name}</span>
+                  <span className="text-[10px] opacity-70 truncate whitespace-nowrap">{loggedUser.role}</span>
+                </div>
+              </div>
+            )
+          )}
+
           {/* Configurações */}
           <div className="relative group">
             <a

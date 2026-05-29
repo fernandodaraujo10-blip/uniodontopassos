@@ -57,7 +57,14 @@ export const App: React.FC = () => {
       case 'envio-conexoes':
         return <DataUpload currentPage={currentPage} setCurrentPage={setCurrentPage} />;
       case 'configuracoes':
-        return <Settings theme={theme} setTheme={setTheme} />;
+        return (
+          <Settings
+            theme={theme}
+            setTheme={setTheme}
+            loggedUser={loggedUser}
+            onUpdateLoggedUser={handleLoginSuccess}
+          />
+        );
       default:
         return <Dashboard />;
     }
@@ -76,6 +83,7 @@ export const App: React.FC = () => {
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           onLogout={handleLogout}
+          loggedUser={loggedUser}
         />
 
         {/* Conteúdo Principal Dinâmico */}
@@ -89,6 +97,7 @@ export const App: React.FC = () => {
           currentPage={currentPage}
           setCurrentPage={setCurrentPage}
           onLogout={handleLogout}
+          loggedUser={loggedUser}
         />
       </div>
     </DashboardProvider>

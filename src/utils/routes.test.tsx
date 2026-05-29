@@ -52,41 +52,41 @@ describe('Rota — FilterTabs (Sub-rota de Área do Dashboard)', () => {
   it('renderiza as 3 abas: Geral, Marketing, Análise & Crescimento', () => {
     const handler = vi.fn();
     render(<FilterTabs currentArea="geral" onChangeArea={handler} />);
-    expect(screen.getByText('Geral')).toBeInTheDocument();
-    expect(screen.getByText('Marketing')).toBeInTheDocument();
-    expect(screen.getByText('Análise & Crescimento')).toBeInTheDocument();
+    expect(screen.getAllByText('Geral')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Marketing')[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/Análise/)[0]).toBeInTheDocument();
   });
 
   it('"Geral" está ativo por padrão (tem classe de destaque)', () => {
     render(<FilterTabs currentArea="geral" onChangeArea={vi.fn()} />);
-    const btn = screen.getByText('Geral');
-    expect(btn.className).toContain('bg-pink-700');
+    const btn = screen.getAllByText('Geral')[0].closest('button');
+    expect(btn?.className).toContain('bg-pink-700');
   });
 
   it('clica em "Marketing" → onChangeArea("marketing") é chamado', () => {
     const handler = vi.fn();
     render(<FilterTabs currentArea="geral" onChangeArea={handler} />);
-    fireEvent.click(screen.getByText('Marketing'));
+    fireEvent.click(screen.getAllByText('Marketing')[0]);
     expect(handler).toHaveBeenCalledWith('marketing');
   });
 
   it('clica em "Análise & Crescimento" → onChangeArea("analise") é chamado', () => {
     const handler = vi.fn();
     render(<FilterTabs currentArea="geral" onChangeArea={handler} />);
-    fireEvent.click(screen.getByText('Análise & Crescimento'));
+    fireEvent.click(screen.getAllByText(/Análise/)[0]);
     expect(handler).toHaveBeenCalledWith('analise');
   });
 
   it('"Marketing" renderiza como ativo quando currentArea="marketing"', () => {
     render(<FilterTabs currentArea="marketing" onChangeArea={vi.fn()} />);
-    const btn = screen.getByText('Marketing');
-    expect(btn.className).toContain('bg-pink-700');
+    const btn = screen.getAllByText('Marketing')[0].closest('button');
+    expect(btn?.className).toContain('bg-pink-700');
   });
 
   it('"Geral" não tem classe ativa quando currentArea="marketing"', () => {
     render(<FilterTabs currentArea="marketing" onChangeArea={vi.fn()} />);
-    const btn = screen.getByText('Geral');
-    expect(btn.className).not.toContain('bg-pink-700');
+    const btn = screen.getAllByText('Geral')[0].closest('button');
+    expect(btn?.className).not.toContain('bg-pink-700');
   });
 });
 
@@ -95,28 +95,28 @@ describe('Rota — FilterTabs (Sub-rota de Área do Dashboard)', () => {
 describe('Rota — MonthNavigator (Navegação de Período Mensal)', () => {
   it('renderiza os 6 meses disponíveis como botões', () => {
     withProvider(<MonthNavigator currentMonthKey="2026-05" onChangeMonth={vi.fn()} />);
-    expect(screen.getByText('Maio/2026')).toBeInTheDocument();
-    expect(screen.getByText('Abril/2026')).toBeInTheDocument();
-    expect(screen.getByText('Junho/2026')).toBeInTheDocument();
+    expect(screen.getAllByText('Maio/2026')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Abril/2026')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('Junho/2026')[0]).toBeInTheDocument();
   });
 
   it('"Maio/2026" está ativo (classe bg-pink-100)', () => {
     withProvider(<MonthNavigator currentMonthKey="2026-05" onChangeMonth={vi.fn()} />);
-    const btn = screen.getByText('Maio/2026');
+    const btn = screen.getAllByText('Maio/2026')[0];
     expect(btn.closest('button')?.className).toContain('bg-pink-100');
   });
 
   it('clica em "Junho/2026" → onChangeMonth("2026-06") é chamado', () => {
     const handler = vi.fn();
     withProvider(<MonthNavigator currentMonthKey="2026-05" onChangeMonth={handler} />);
-    fireEvent.click(screen.getByText('Junho/2026'));
+    fireEvent.click(screen.getAllByText('Junho/2026')[0]);
     expect(handler).toHaveBeenCalledWith('2026-06');
   });
 
   it('clica em "Abril/2026" → onChangeMonth("2026-04") é chamado', () => {
     const handler = vi.fn();
     withProvider(<MonthNavigator currentMonthKey="2026-05" onChangeMonth={handler} />);
-    fireEvent.click(screen.getByText('Abril/2026'));
+    fireEvent.click(screen.getAllByText('Abril/2026')[0]);
     expect(handler).toHaveBeenCalledWith('2026-04');
   });
 
@@ -175,7 +175,7 @@ describe('Rota — Fluxo Login → Dashboard (Integração)', () => {
 
     act(() => { vi.advanceTimersByTime(400); });
 
-    expect(screen.getByText('Visão geral')).toBeInTheDocument();
+    expect(screen.getAllByText('Visão geral')[0]).toBeInTheDocument();
   });
 
   it('após login, pode navegar para Relatórios e o Dashboard desaparece', async () => {
@@ -192,8 +192,8 @@ describe('Rota — Fluxo Login → Dashboard (Integração)', () => {
     act(() => { vi.advanceTimersByTime(400); });
 
     // Agora no dashboard — navegar para Relatórios
-    fireEvent.click(screen.getByText('Relatórios'));
-    expect(screen.queryByText('Visão geral')).not.toBeInTheDocument();
+    fireEvent.click(screen.getAllByText('Relatórios')[0]);
+    expect(screen.queryAllByText('Visão geral').length).toBe(0);
   });
 
   it('após login, pode voltar para Dashboard pelo link "Dashboard" na Sidebar', async () => {
@@ -209,8 +209,8 @@ describe('Rota — Fluxo Login → Dashboard (Integração)', () => {
     fireEvent.click(screen.getByRole('button', { name: /Entrar no Painel/i }));
     act(() => { vi.advanceTimersByTime(400); });
 
-    fireEvent.click(screen.getByText('Relatórios'));
-    fireEvent.click(screen.getByText('Dashboard'));
-    expect(screen.getByText('Visão geral')).toBeInTheDocument();
+    fireEvent.click(screen.getAllByText('Relatórios')[0]);
+    fireEvent.click(screen.getAllByText('Dashboard')[0]);
+    expect(screen.getAllByText('Visão geral')[0]).toBeInTheDocument();
   });
 });

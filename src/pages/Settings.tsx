@@ -16,7 +16,9 @@ import {
   UserX,
   Lock,
   Eye,
-  Key
+  Key,
+  User as UserIcon,
+  Camera
 } from 'lucide-react';
 
 export interface User {
@@ -28,6 +30,7 @@ export interface User {
   status: 'ativo' | 'inativo';
   avatarColor: string;
   password?: string;
+  photo?: string;
 }
 
 const mockUsers: User[] = [
@@ -41,10 +44,12 @@ const mockUsers: User[] = [
 interface SettingsProps {
   theme?: 'light' | 'dark';
   setTheme?: (theme: 'light' | 'dark') => void;
+  loggedUser?: User | null;
+  onUpdateLoggedUser?: (user: User) => void;
 }
 
-export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme }) => {
-  const [activeTab, setActiveTab] = useState<'usuarios' | 'perfil' | 'seguranca' | 'notificacoes'>('usuarios');
+export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, loggedUser, onUpdateLoggedUser }) => {
+  const [activeTab, setActiveTab] = useState<'usuarios' | 'meu-perfil' | 'perfil' | 'seguranca' | 'notificacoes'>('usuarios');
   
   // --- ESTADOS DO CRUD DE USUÁRIOS ---
   const [users, setUsers] = useState<User[]>(() => {
@@ -82,6 +87,57 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
   const [formStatus, setFormStatus] = useState<'ativo' | 'inativo'>('ativo');
   const [formPassword, setFormPassword] = useState('');
   const [showFormPassword, setShowFormPassword] = useState(false);
+  const [formPhoto, setFormPhoto] = useState<string | undefined>(undefined);
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validar tamanho (opcional, ex: limite 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        alert('A imagem é muito grande. O limite máximo é 2MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormPhoto(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Estados do formulário do próprio perfil
+  const [profileMyName, setProfileMyName] = useState(loggedUser?.name || '');
+  const [profileMyEmail, setProfileMyEmail] = useState(loggedUser?.email || '');
+  const [profileMyUsername, setProfileMyUsername] = useState(loggedUser?.username || '');
+  const [profileMyPassword, setProfileMyPassword] = useState(loggedUser?.password || '1234');
+  const [profileMyPhoto, setProfileMyPhoto] = useState<string | undefined>(loggedUser?.photo);
+  const [showMyPassword, setShowMyPassword] = useState(false);
+
+  // Sincronizar dados do usuário logado
+  useEffect(() => {
+    if (loggedUser) {
+      setProfileMyName(loggedUser.name);
+      setProfileMyEmail(loggedUser.email);
+      setProfileMyUsername(loggedUser.username || loggedUser.email);
+      setProfileMyPassword(loggedUser.password || '1234');
+      setProfileMyPhoto(loggedUser.photo);
+    }
+  }, [loggedUser]);
+
+  const handleMyPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert('A imagem é muito grande. O limite máximo é 2MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfileMyPhoto(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Persistir usuários no LocalStorage sempre que houver alteração
   useEffect(() => {
@@ -103,6 +159,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
     setFormStatus('ativo');
     setFormPassword('1234');
     setShowFormPassword(false);
+    setFormPhoto(undefined);
     setIsAddModalOpen(true);
   };
 
@@ -132,7 +189,8 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
       role: formRole,
       status: formStatus,
       avatarColor: randomColor,
-      password: formPassword || '1234'
+      password: formPassword || '1234',
+      photo: formPhoto
     };
 
     setUsers(prev => [...prev, newUser]);
@@ -150,6 +208,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
     setFormStatus(user.status);
     setFormPassword(user.password || '1234');
     setShowFormPassword(false);
+    setFormPhoto(user.photo);
     setIsEditModalOpen(true);
   };
 
@@ -158,19 +217,58 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
     e.preventDefault();
     if (!selectedUser) return;
 
-    setUsers(prev => prev.map(u => u.id === selectedUser.id ? {
-      ...u,
+    const updatedUser: User = {
+      ...selectedUser,
       name: formName,
       email: formEmail,
       username: formUsername.trim() || formEmail.trim(),
       role: formRole,
       status: formStatus,
-      password: formPassword
-    } : u));
+      password: formPassword,
+      photo: formPhoto
+    };
+
+    setUsers(prev => prev.map(u => u.id === selectedUser.id ? updatedUser : u));
+
+    if (loggedUser && selectedUser.id === loggedUser.id) {
+      if (onUpdateLoggedUser) {
+        onUpdateLoggedUser(updatedUser);
+      }
+    }
 
     setIsEditModalOpen(false);
     setSelectedUser(null);
     showToast(`Dados de "${formName}" atualizados com sucesso!`);
+  };
+
+  // Executar atualização do próprio perfil
+  const handleUpdateMyProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!loggedUser) return;
+    
+    if (!profileMyName.trim() || !profileMyEmail.trim()) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    const updatedUser: User = {
+      ...loggedUser,
+      name: profileMyName,
+      email: profileMyEmail,
+      username: profileMyUsername.trim() || profileMyEmail.trim(),
+      password: profileMyPassword,
+      photo: profileMyPhoto
+    };
+
+    // Atualizar na lista global de usuários
+    setUsers(prev => prev.map(u => u.id === loggedUser.id ? updatedUser : u));
+
+    // Atualizar no contexto do usuário logado
+    if (onUpdateLoggedUser) {
+      onUpdateLoggedUser(updatedUser);
+    }
+
+    showToast('Seu perfil pessoal foi atualizado com sucesso!');
   };
 
   // Executar exclusão de usuário
@@ -230,6 +328,17 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
         {/* Menu de Abas Mobile (Scroll Horizontal) */}
         <div className="flex md:hidden overflow-x-auto scrollbar-hide py-1 mb-1 flex-row gap-2 shrink-0 select-none -mx-4 px-4">
           <button
+            onClick={() => setActiveTab('meu-perfil')}
+            className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+              activeTab === 'meu-perfil'
+                ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
+                : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
+            }`}
+          >
+            <UserIcon className="w-3.5 h-3.5 shrink-0" />
+            <span>Meu Perfil</span>
+          </button>
+          <button
             onClick={() => setActiveTab('usuarios')}
             className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
               activeTab === 'usuarios'
@@ -279,6 +388,17 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
         <aside className="w-64 bg-white border border-gray-100 rounded-3xl p-5 card-shadow flex-col gap-2 shrink-0 select-none hidden md:flex">
           <h3 className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2 px-3">Opções do Painel</h3>
           <button
+            onClick={() => setActiveTab('meu-perfil')}
+            className={`w-full flex items-center p-3 rounded-2xl text-xs font-bold transition-all cursor-pointer space-x-3 text-left ${
+              activeTab === 'meu-perfil'
+                ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
+                : 'text-gray-500 hover:bg-slate-50 hover:text-slate-700'
+            }`}
+          >
+            <UserIcon className="w-4 h-4 shrink-0" />
+            <span>Meu Perfil Pessoal</span>
+          </button>
+          <button
             onClick={() => setActiveTab('usuarios')}
             className={`w-full flex items-center p-3 rounded-2xl text-xs font-bold transition-all cursor-pointer space-x-3 text-left ${
               activeTab === 'usuarios'
@@ -327,6 +447,129 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
         {/* Conteúdo Dinâmico da Aba Selecionada */}
         <main className="flex-grow bg-white border border-gray-100 rounded-2xl md:rounded-3xl p-4 md:p-6 card-shadow flex flex-col overflow-hidden min-h-0">
           
+          {/* TAB 0: MEU PERFIL PESSOAL */}
+          {activeTab === 'meu-perfil' && loggedUser && (
+            <div className="flex flex-col h-full overflow-y-auto animate-fadeIn text-left select-none max-w-xl">
+              <h2 className="text-md font-extrabold text-slate-800 mb-1">Meu Perfil Pessoal</h2>
+              <p className="text-xs text-gray-400 mb-6">Atualize sua foto de perfil e dados cadastrais de acesso ao painel</p>
+
+              <form onSubmit={handleUpdateMyProfile} className="space-y-5">
+                {/* Upload de Imagem de Perfil */}
+                <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                  <div className="relative">
+                    {profileMyPhoto ? (
+                      <img
+                        src={profileMyPhoto}
+                        alt="Foto de Perfil"
+                        className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-md"
+                      />
+                    ) : (
+                      <div className={`w-16 h-16 rounded-full bg-gradient-to-tr ${loggedUser.avatarColor || 'from-pink-600 to-rose-400'} flex items-center justify-center font-extrabold text-lg text-white shadow-md border-2 border-white select-none`}>
+                        {getInitials(loggedUser.name)}
+                      </div>
+                    )}
+                    <label className="absolute bottom-0 right-0 w-6 h-6 bg-pink-700 hover:bg-pink-800 text-white rounded-full flex items-center justify-center shadow-md cursor-pointer transition-all hover:scale-110">
+                      <Camera className="w-3 h-3" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleMyPhotoChange}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  <div className="flex flex-col text-left">
+                    <span className="text-xs font-bold text-gray-700">Foto de Perfil</span>
+                    <span className="text-[10px] text-gray-400 mt-0.5">Formatos suportados: JPG, PNG. Máx 2MB.</span>
+                    {profileMyPhoto && (
+                      <button
+                        type="button"
+                        onClick={() => setProfileMyPhoto(undefined)}
+                        className="text-[10px] text-rose-600 hover:text-rose-800 font-bold uppercase tracking-wider transition-colors cursor-pointer w-fit mt-1.5"
+                      >
+                        Remover Foto
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-extrabold text-gray-400 uppercase">Nome Completo</label>
+                  <input
+                    type="text"
+                    required
+                    value={profileMyName}
+                    onChange={(e) => setProfileMyName(e.target.value)}
+                    className="px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-500 bg-white"
+                  />
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <label className="text-[10px] font-extrabold text-gray-400 uppercase">E-mail Corporativo</label>
+                    <input
+                      type="email"
+                      required
+                      value={profileMyEmail}
+                      onChange={(e) => setProfileMyEmail(e.target.value)}
+                      className="px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-500 bg-white"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <label className="text-[10px] font-extrabold text-gray-400 uppercase">Usuário de Acesso</label>
+                    <input
+                      type="text"
+                      required
+                      value={profileMyUsername}
+                      onChange={(e) => setProfileMyUsername(e.target.value)}
+                      className="px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-500 bg-white"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-4">
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <label className="text-[10px] font-extrabold text-gray-400 uppercase">Cargo / Função</label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={loggedUser.role}
+                      className="px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-bold text-slate-500 bg-slate-50 cursor-not-allowed"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <label className="text-[10px] font-extrabold text-gray-400 uppercase">Senha de Acesso</label>
+                    <div className="relative">
+                      <input
+                        type={showMyPassword ? 'text' : 'password'}
+                        required
+                        value={profileMyPassword}
+                        onChange={(e) => setProfileMyPassword(e.target.value)}
+                        className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-500 pr-10 bg-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowMyPassword(!showMyPassword)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  className="py-3 px-6 bg-gradient-to-r from-pink-700 to-pink-500 text-white font-extrabold rounded-xl text-xs uppercase tracking-wider shadow-md hover:scale-102 transition-transform cursor-pointer w-fit"
+                >
+                  Salvar Alterações
+                </button>
+              </form>
+            </div>
+          )}
+
           {/* TAB 1: GERENCIAMENTO DE USUÁRIOS */}
           {activeTab === 'usuarios' && (
             <div className="flex flex-col h-full overflow-hidden animate-fadeIn">
@@ -381,10 +624,18 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
                         {/* Membro Info */}
                         <td className="p-4">
                           <div className="flex items-center gap-3">
-                            {/* Avatar Dinâmico com Iniciais e Degradê Premium */}
-                            <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${user.avatarColor} flex items-center justify-center font-extrabold text-[13px] text-white shadow-sm flex-shrink-0 select-none`}>
-                              {getInitials(user.name)}
-                            </div>
+                            {/* Avatar Dinâmico com Iniciais e Degradê Premium ou Imagem de Perfil */}
+                            {user.photo ? (
+                              <img
+                                src={user.photo}
+                                alt={user.name}
+                                className="w-10 h-10 rounded-full object-cover shadow-sm flex-shrink-0 border border-slate-100"
+                              />
+                            ) : (
+                              <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${user.avatarColor} flex items-center justify-center font-extrabold text-[13px] text-white shadow-sm flex-shrink-0 select-none`}>
+                                {getInitials(user.name)}
+                              </div>
+                            )}
                             <div className="flex flex-col text-left">
                               <span className="font-bold text-gray-800 text-[13px]">{user.name}</span>
                               <span className="text-gray-400 font-medium text-[11px] flex items-center gap-1">
@@ -451,9 +702,17 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
                   {filteredUsers.map((user) => (
                     <div key={user.id} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col gap-3">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${user.avatarColor} flex items-center justify-center font-extrabold text-[13px] text-white shadow-sm shrink-0`}>
-                          {getInitials(user.name)}
-                        </div>
+                        {user.photo ? (
+                          <img
+                            src={user.photo}
+                            alt={user.name}
+                            className="w-10 h-10 rounded-full object-cover shadow-sm shrink-0 border border-slate-100"
+                          />
+                        ) : (
+                          <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${user.avatarColor} flex items-center justify-center font-extrabold text-[13px] text-white shadow-sm shrink-0`}>
+                            {getInitials(user.name)}
+                          </div>
+                        )}
                         <div className="flex flex-col min-w-0 text-left">
                           <span className="font-bold text-gray-800 text-sm truncate">{user.name}</span>
                           <span className="text-gray-400 font-medium text-[11px] flex items-center gap-1 truncate mt-0.5">
@@ -754,6 +1013,42 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
             </h3>
 
             <form onSubmit={handleCreateUser} className="w-full space-y-4 text-left">
+              {/* Upload de Imagem de Perfil */}
+              <div className="flex flex-col items-center gap-2 mb-2 select-none">
+                <div className="relative group/avatar">
+                  {formPhoto ? (
+                    <img
+                      src={formPhoto}
+                      alt="Preview"
+                      className="w-20 h-20 rounded-full object-cover border-2 border-pink-100 shadow-md"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center border border-dashed border-slate-300 text-slate-400">
+                      <UserIcon className="w-8 h-8 opacity-60" />
+                    </div>
+                  )}
+                  <label className="absolute bottom-0 right-0 w-7 h-7 bg-pink-700 hover:bg-pink-800 text-white rounded-full flex items-center justify-center shadow-md cursor-pointer transition-all hover:scale-110">
+                    <Camera className="w-3.5 h-3.5" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <span className="text-[9px] font-bold text-gray-400 uppercase">Foto de Perfil</span>
+                {formPhoto && (
+                  <button
+                    type="button"
+                    onClick={() => setFormPhoto(undefined)}
+                    className="text-[9px] text-rose-600 hover:text-rose-800 font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    Remover Foto
+                  </button>
+                )}
+              </div>
+
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Nome Completo</label>
                 <input
@@ -891,6 +1186,42 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme })
             </h3>
 
             <form onSubmit={handleUpdateUser} className="w-full space-y-4 text-left">
+              {/* Upload de Imagem de Perfil */}
+              <div className="flex flex-col items-center gap-2 mb-2 select-none">
+                <div className="relative group/avatar">
+                  {formPhoto ? (
+                    <img
+                      src={formPhoto}
+                      alt="Preview"
+                      className="w-20 h-20 rounded-full object-cover border-2 border-pink-100 shadow-md"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center border border-dashed border-slate-300 text-slate-400">
+                      <UserIcon className="w-8 h-8 opacity-60" />
+                    </div>
+                  )}
+                  <label className="absolute bottom-0 right-0 w-7 h-7 bg-pink-700 hover:bg-pink-800 text-white rounded-full flex items-center justify-center shadow-md cursor-pointer transition-all hover:scale-110">
+                    <Camera className="w-3.5 h-3.5" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                    />
+                  </label>
+                </div>
+                <span className="text-[9px] font-bold text-gray-400 uppercase">Foto de Perfil</span>
+                {formPhoto && (
+                  <button
+                    type="button"
+                    onClick={() => setFormPhoto(undefined)}
+                    className="text-[9px] text-rose-600 hover:text-rose-800 font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                  >
+                    Remover Foto
+                  </button>
+                )}
+              </div>
+
               <div className="flex flex-col gap-1">
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Nome Completo</label>
                 <input
