@@ -249,3 +249,57 @@ a {
 .dark .text-slate-600 {
   color: #CBD5E1 !important; /* slate-300 */
 }
+
+/* ==========================================
+   MOBILE — UTILITÁRIOS E SAFE AREA
+   ========================================== */
+
+/* Viewport altura correta no mobile (considera barra do browser) */
+:root {
+  --vh: 1vh;
+}
+
+/* Bottom Navigation Mobile — safe area */
+.mobile-bottom-nav {
+  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.06), 0 -4px 16px rgba(0, 0, 0, 0.04);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Scrollbar oculta para mobile — compatibilidade cross-browser */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Evita overflow horizontal em containers flex/grid */
+.min-w-0-children > * {
+  min-width: 0;
+}
+
+/* Suavizar toque em botões mobile */
+@media (hover: none) and (pointer: coarse) {
+  /* Remover hover de elevação em touch para não travar */
+  .card-shadow:hover {
+    transform: none;
+  }
+  
+  /* Aumentar área de toque para links e botões pequenos */
+  button, a {
+    min-height: 44px;
+  }
+
+  /* Fonte mínima no mobile para legibilidade */
+  p, span, td, th, label {
+    font-size: max(13px, 1em);
+  }
+}
+
+/* Dark mode — Bottom nav mobile */
+.dark .mobile-bottom-nav {
+  background-color: #1E293B !important;
+  border-color: #334155 !important;
+  box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3), 0 -4px 20px rgba(0, 0, 0, 0.2);
+}

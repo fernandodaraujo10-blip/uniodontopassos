@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
   return (
     <>
       <aside
-        className={`sidebar-gradient flex-shrink-0 flex flex-col text-white transition-all duration-300 ease-in-out relative ${
+        className={`sidebar-gradient hidden md:flex flex-shrink-0 flex-col text-white transition-all duration-300 ease-in-out relative ${
           isCollapsed ? 'w-[76px]' : 'w-64'
         }`}
       >

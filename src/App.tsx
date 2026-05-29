@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/layout/Sidebar';
+import MobileBottomNav from './components/layout/MobileBottomNav';
 import Dashboard from './pages/Dashboard';
 import Reports from './pages/Reports';
 import DataUpload from './pages/DataUpload';
@@ -70,17 +71,25 @@ export const App: React.FC = () => {
   return (
     <DashboardProvider>
       <div className="flex h-screen w-screen overflow-hidden bg-[#F8F9FA] font-sans antialiased">
-        {/* Sidebar Lateral */}
-        <Sidebar 
-          currentPage={currentPage} 
-          setCurrentPage={setCurrentPage} 
+        {/* Sidebar Lateral — visível apenas no desktop (md+), escondida no mobile */}
+        <Sidebar
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
           onLogout={handleLogout}
         />
 
         {/* Conteúdo Principal Dinâmico */}
-        <main className="flex-grow flex flex-col h-full min-h-0 overflow-hidden">
+        {/* pb-20 no mobile para não ficar atrás da bottom navigation (64px + margem) */}
+        <main className="flex-grow flex flex-col h-full min-h-0 overflow-hidden pb-20 md:pb-0">
           {renderPage()}
         </main>
+
+        {/* Bottom Navigation — visível apenas no mobile (< md) */}
+        <MobileBottomNav
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+          onLogout={handleLogout}
+        />
       </div>
     </DashboardProvider>
   );

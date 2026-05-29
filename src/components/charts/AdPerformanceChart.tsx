@@ -143,7 +143,7 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
   };
 
   return (
-    <div className="col-span-12 lg:col-span-7 bg-[#0D040A] text-white p-5 rounded-3xl shadow-xl flex flex-col justify-between h-full min-h-0">
+    <div className="col-span-12 lg:col-span-7 bg-[#0D040A] text-white p-4 md:p-5 rounded-3xl shadow-xl flex flex-col justify-between h-full min-h-0 w-full min-w-0 overflow-hidden">
       <div className="shrink-0">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-3">
           <h2 className="text-xl font-bold text-pink-500">Desempenho de Anúncios</h2>
@@ -179,8 +179,8 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
         <Bar data={data} options={options} />
       </div>
       
-      {/* Grid de métricas do anúncio */}
-      <div className="grid grid-cols-3 gap-2 mt-3 text-xs shrink-0 select-none">
+      {/* Grid de métricas do anúncio — 2 colunas no mobile, 3 no desktop */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-3 text-xs shrink-0 select-none">
         <div className="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
           <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Visualizações</p>
           <p className="text-sm font-bold text-white transition-all duration-300">{activePlatformData.views}</p>

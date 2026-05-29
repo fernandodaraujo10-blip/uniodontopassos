@@ -49,17 +49,17 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
   };
 
   return (
-    <div className="col-span-12 lg:col-span-5 bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex flex-col justify-between h-full min-h-0">
+    <div className="col-span-12 lg:col-span-5 bg-white p-4 rounded-2xl border border-gray-100 card-shadow flex flex-col justify-between h-full min-h-0 w-full min-w-0 overflow-hidden">
       
       {/* Abas Superiores */}
-      <div className="flex gap-1.5 mb-3 bg-gray-50 p-1 rounded-xl w-fit shrink-0 select-none">
+      <div className="flex gap-1 md:gap-1.5 mb-3 bg-gray-50 p-1 rounded-xl shrink-0 select-none overflow-x-auto scrollbar-hide">
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all duration-300 cursor-pointer ${
+              className={`px-2 md:px-3 py-1.5 text-[11px] md:text-xs font-bold rounded-lg transition-all duration-300 cursor-pointer whitespace-nowrap min-h-[34px] ${
                 isActive
                   ? 'bg-pink-700 text-white shadow-sm'
                   : 'text-gray-600 hover:bg-gray-100'
@@ -73,10 +73,10 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
 
       {/* Conteúdo 1: Funil de Conversão */}
       {activeTab === 'funnel' && (
-        <div className="flex-grow flex items-center justify-between gap-2 min-h-0 animate-fade-in-tab">
+        <div className="flex-grow flex items-center justify-between gap-1 md:gap-2 min-h-0 animate-fade-in-tab overflow-hidden">
           
           {/* Funil Métrica Esquerda (Absoluto) */}
-          <div className="flex flex-col justify-between h-full py-1 text-[10px] w-20 shrink-0 select-none">
+          <div className="flex flex-col justify-between h-full py-1 text-[10px] w-16 md:w-20 shrink-0 select-none">
             <div className="hover:scale-105 transition-transform duration-200">
               <p className="text-gray-400 font-medium leading-none">Impressões</p>
               <p className="font-bold text-gray-800 text-xs mt-0.5">{funnelData.impressoes}</p>
@@ -105,7 +105,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
           </div>
           
           {/* Representação Visual do Funil */}
-          <div className="flex-grow flex flex-col items-center gap-2 max-w-[200px] select-none">
+          <div className="flex-grow flex flex-col items-center gap-1.5 md:gap-2 min-w-0 select-none">
             {/* Step 1 - Impressões */}
             <div
               onMouseEnter={() => setHoveredStep(1)}
@@ -163,7 +163,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
           </div>
           
           {/* Funil Taxa Direita (Conversão Relativa) */}
-          <div className="flex flex-col justify-around h-full py-1 text-[9px] w-24 shrink-0 border-l border-gray-50 pl-2 select-none">
+          <div className="flex flex-col justify-around h-full py-1 text-[8px] md:text-[9px] w-20 md:w-24 shrink-0 border-l border-gray-50 pl-1.5 md:pl-2 select-none">
             <div>
               <p className="text-gray-400 font-medium leading-none">CTR (Cliques/Imp.)</p>
               <p className="font-bold text-gray-800 text-xs mt-0.5">{funnelData.txCtr}</p>

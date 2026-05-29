@@ -4,19 +4,20 @@ import KPICardGrid from '../components/cards/KPICardGrid';
 import AdPerformanceChart from '../components/charts/AdPerformanceChart';
 import ConversionFunnelTabs from '../components/charts/ConversionFunnelTabs';
 import InvestmentTable from '../components/tables/InvestmentTable';
+import MobileInvestmentList from '../components/tables/MobileInvestmentList';
 import { DashboardArea } from '../components/filters/FilterTabs';
 import { useDashboard } from '../hooks/useDashboard';
 import { adaptModernToLegacy } from '../utils/dashboardAdapter';
 
 export const Dashboard: React.FC = () => {
-  const { 
-    selectedMonth, 
-    setSelectedMonth, 
+  const {
+    selectedMonth,
+    setSelectedMonth,
     currentMonthData,
     allDashboardData,
-    investmentsData
+    investmentsData,
   } = useDashboard();
-  
+
   const [currentArea, setCurrentArea] = useState<DashboardArea>('geral');
 
   // Obter o mês anterior para cálculo de taxas de variação
@@ -56,51 +57,93 @@ export const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="flex-grow overflow-hidden p-5 bg-[#F8F9FA] scrollbar-hide flex flex-col h-full max-h-screen page-transition">
-      {/* Top Header Bar */}
-      <Header
-        title={getHeaderTitle()}
-        currentArea={currentArea}
-        onChangeArea={setCurrentArea}
-        currentMonthKey={selectedMonth}
-        onChangeMonth={setSelectedMonth}
-      />
+    <div className="flex-grow overflow-y-auto overflow-x-hidden bg-[#F8F9FA] page-transition h-full">
+      {/* ═══════════════════════════════════════════════
+          LAYOUT MOBILE (< md): coluna única empilhada
+          ═══════════════════════════════════════════════ */}
+      <div className="block md:hidden px-4 pt-4 pb-4 flex flex-col gap-4">
+        {/* Header compacto mobile */}
+        <Header
+          title={getHeaderTitle()}
+          currentArea={currentArea}
+          onChangeArea={setCurrentArea}
+          currentMonthKey={selectedMonth}
+          onChangeMonth={setSelectedMonth}
+        />
 
-      {/* Grid Principal */}
-      <div className="grid grid-cols-12 gap-4 items-stretch flex-grow min-h-0">
-        
-        {/* Coluna Esquerda: KPIs (Linha Superior) + Gráficos (Linha Inferior) */}
-        <div className="col-span-12 xl:col-span-9 flex flex-col gap-4 h-full min-h-0">
-          
-          {/* Linha dos KPIs (Carrossel ou Grid estático) */}
-          <KPICardGrid data={activeMonthData} area={currentArea} />
+        {/* KPIs */}
+        <KPICardGrid data={activeMonthData} area={currentArea} />
 
-          {/* Linha dos Gráficos */}
-          <div className="grid grid-cols-12 gap-4 flex-grow min-h-0">
-            {/* Gráfico de Desempenho de Anúncios */}
-            <AdPerformanceChart
-              anunciosData={activeMonthData.anuncios}
+        {/* Gráfico de Desempenho de Anúncios */}
+        <AdPerformanceChart
+          anunciosData={activeMonthData.anuncios}
+          monthLabel={currentMonthData?.summary.monthLabel || ''}
+        />
+
+        {/* Investimentos como lista de cards no mobile */}
+        <MobileInvestmentList
+          investimentos={activeMonthData.investimentosTabela}
+          timestamp={activeMonthData.timestamp}
+          monthLabel={currentMonthData?.summary.monthLabel || ''}
+        />
+
+        {/* Funil / Origem dos Leads */}
+        <ConversionFunnelTabs
+          funnelData={activeMonthData.funil}
+          leadsData={activeMonthData.leads}
+          cidadesData={activeMonthData.cidades}
+        />
+      </div>
+
+      {/* ═══════════════════════════════════════════════
+          LAYOUT DESKTOP (md+): grid de 12 colunas
+          ═══════════════════════════════════════════════ */}
+      <div className="hidden md:flex flex-col p-5 h-full max-h-screen gap-0">
+        {/* Top Header Bar */}
+        <Header
+          title={getHeaderTitle()}
+          currentArea={currentArea}
+          onChangeArea={setCurrentArea}
+          currentMonthKey={selectedMonth}
+          onChangeMonth={setSelectedMonth}
+        />
+
+        {/* Grid Principal */}
+        <div className="grid grid-cols-12 gap-4 items-stretch flex-grow min-h-0">
+
+          {/* Coluna Esquerda: KPIs (Linha Superior) + Gráficos (Linha Inferior) */}
+          <div className="col-span-12 xl:col-span-9 flex flex-col gap-4 h-full min-h-0">
+
+            {/* Linha dos KPIs (Carrossel ou Grid estático) */}
+            <KPICardGrid data={activeMonthData} area={currentArea} />
+
+            {/* Linha dos Gráficos */}
+            <div className="grid grid-cols-12 gap-4 flex-grow min-h-0">
+              {/* Gráfico de Desempenho de Anúncios */}
+              <AdPerformanceChart
+                anunciosData={activeMonthData.anuncios}
+                monthLabel={currentMonthData?.summary.monthLabel || ''}
+              />
+
+              {/* Abas do Funil de Conversão / Origens / Cidades */}
+              <ConversionFunnelTabs
+                funnelData={activeMonthData.funil}
+                leadsData={activeMonthData.leads}
+                cidadesData={activeMonthData.cidades}
+              />
+            </div>
+          </div>
+
+          {/* Coluna Direita: Tabela de Investimentos (Vertical Completo) */}
+          <div className="col-span-12 xl:col-span-3 flex flex-col h-full min-h-0">
+            <InvestmentTable
+              investimentos={activeMonthData.investimentosTabela}
+              timestamp={activeMonthData.timestamp}
               monthLabel={currentMonthData?.summary.monthLabel || ''}
             />
-
-            {/* Abas do Funil de Conversão / Origens / Cidades */}
-            <ConversionFunnelTabs
-              funnelData={activeMonthData.funil}
-              leadsData={activeMonthData.leads}
-              cidadesData={activeMonthData.cidades}
-            />
           </div>
-        </div>
 
-        {/* Coluna Direita: Tabela de Investimentos (Vertical Completo) */}
-        <div className="col-span-12 xl:col-span-3 flex flex-col h-full min-h-0">
-          <InvestmentTable
-            investimentos={activeMonthData.investimentosTabela}
-            timestamp={activeMonthData.timestamp}
-            monthLabel={currentMonthData?.summary.monthLabel || ''}
-          />
         </div>
-
       </div>
     </div>
   );
