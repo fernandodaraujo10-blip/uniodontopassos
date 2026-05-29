@@ -18,15 +18,20 @@ const GRAY_HEADER: [number, number, number] = [248, 249, 250];
 const GRAY_TEXT: [number, number, number] = [55, 65, 81];
 const GRAY_LIGHT: [number, number, number] = [120, 120, 130];
 
-// Helper de análise estratégica dinâmico (Modo CEO / Shark Tank)
+interface CEOInsight {
+  tipo: 'alerta' | 'oportunidade' | 'info' | 'sucesso';
+  texto: string;
+}
+
+// Helper de análise estratégica dinâmico (Modo CEO / Shark Tank) sem emojis multibyte
 const obterAnaliseCEOLocal = (report: ConsolidatedReport, filter: ReportFilter, allDashboardData: any) => {
   const type = filter.reportType || 'executive';
   const rows = report.rows;
   
   if (rows.length === 0) {
     return {
-      explicacao: 'Este relatório apresenta os principais indicadores operacionais do período.',
-      insights: ['Aguardando dados para consolidação de oportunidades.']
+      explicacao: 'Este relatorio apresenta os principais indicadores operacionais do periodo.',
+      insights: [{ tipo: 'info', texto: 'Aguardando dados para consolidacao de oportunidades.' }] as CEOInsight[]
     };
   }
 
@@ -40,30 +45,30 @@ const obterAnaliseCEOLocal = (report: ConsolidatedReport, filter: ReportFilter, 
   switch (type) {
     case 'commercial':
       return {
-        explicacao: 'Análise focada na saúde do funil de captação comercial. Avalia o fluxo desde a geração de leads até a conversão em novos beneficiários ativos.',
+        explicacao: 'Analise focada na saude do funil de captacao comercial. Avalia o fluxo desde a geracao de leads ate a conversao em novos beneficiarios ativos.',
         insights: [
-          `🚨 Ponto de Atenção: A taxa de conversão média está em ${mediaTxConversao.toFixed(1).replace('.', ',')}%: Há espaço para otimizar a abordagem de vendas nos leads mais frios.`,
-          `💡 Oportunidade (Shark Tank): O mês de ${menorCacRow.monthLabel} provou a máxima eficiência comercial com CAC de ${formatMoeda(menorCacRow.cac)}. Replicar a estratégia comercial deste período nos canais digitais imediatamente para escalar a captação.`
-        ]
+          { tipo: 'alerta', texto: `Ponto de Atencao: A taxa de conversao media esta em ${mediaTxConversao.toFixed(1).replace('.', ',')}%: Ha espaco para otimizar a abordagem de vendas nos leads mais frios.` },
+          { tipo: 'oportunidade', texto: `Oportunidade (Shark Tank): O mes de ${menorCacRow.monthLabel} provou a maxima eficiencia comercial com CAC de ${formatMoeda(menorCacRow.cac)}. Replicar a estrategia comercial deste periodo nos canais digitais imediatamente para escalar a captacao.` }
+        ] as CEOInsight[]
       };
     case 'churn':
       const totalCancelados = rows.reduce((acc, curr) => acc + curr.canceledBeneficiaries, 0);
       return {
-        explicacao: 'Visão de crescimento líquido da carteira. Analisa a entrada de novos clientes versus a evasão (cancelamentos) para medir a retenção geral.',
+        explicacao: 'Visao de crescimento liquido da carteira. Analisa a entrada de novos clientes versus a evasao (cancelamentos) para medir a retencao geral.',
         insights: [
-          `📈 Análise CEO: Tivemos um total de ${formatNum(totalBenefs)} novas entradas e ${formatNum(totalCancelados)} cancelamentos no período.`,
-          `⚠️ Risco de Evasão: O pico de evasão ocorreu em ${maiorChurnRow.monthLabel} com churn de ${maiorChurnRow.churnRate.toFixed(2).replace('.', ',')}%. Oportunidade de estruturar um comitê de sucesso do cliente (CS) para blindar a carteira corporativa ativa.`
-        ]
+          { tipo: 'info', texto: `Analise CEO: Tivemos um total de ${formatNum(totalBenefs)} novas entradas e ${formatNum(totalCancelados)} cancelamentos no periodo.` },
+          { tipo: 'alerta', texto: `Risco de Evasao: O pico de evasao ocorreu em ${maiorChurnRow.monthLabel} com churn de ${maiorChurnRow.churnRate.toFixed(2).replace('.', ',')}%. Oportunidade de estruturar um comite de sucesso do cliente (CS) para blindar a carteira corporativa ativa.` }
+        ] as CEOInsight[]
       };
     case 'financial':
       const totalMkt = rows.reduce((acc, curr) => acc + curr.marketingSpend, 0);
       const totalSales = rows.reduce((acc, curr) => acc + curr.salesSpend, 0);
       return {
-        explicacao: 'Demonstrativo de eficiência sobre o capital investido. Examina o retorno de gastos com mídia, ferramentas e comissões operacionais sobre o custo de aquisição.',
+        explicacao: 'Demonstrativo de eficiencia sobre o capital investido. Examina o retorno de gastos com midia, ferramentas e comissoes operacionais sobre o custo de aquisicao.',
         insights: [
-          `💰 Alocação de Recursos: Investido ${formatMoeda(totalMkt)} em marketing e ${formatMoeda(totalSales)} no operacional de vendas.`,
-          `🚨 Alerta Shark Tank: O pico de CAC em ${maiorCacRow.monthLabel} de ${formatMoeda(maiorCacRow.cac)} indica saturação de campanhas ou custos comerciais inflados. Oportunidade de cortar 15% do orçamento offline ineficiente e migrar para canais com CPL mais baixo.`
-        ]
+          { tipo: 'info', texto: `Alocacao de Recursos: Investido ${formatMoeda(totalMkt)} em marketing e ${formatMoeda(totalSales)} no operacional de vendas.` },
+          { tipo: 'alerta', texto: `Alerta Shark Tank: O pico de CAC em ${maiorCacRow.monthLabel} de ${formatMoeda(maiorCacRow.cac)} indica saturacao de campanhas ou custos comerciais inflados. Oportunidade de cortar 15% do orcamento offline ineficiente e migrar para canais com CPL mais baixo.` }
+        ] as CEOInsight[]
       };
     case 'satisfaction':
       let npsAcumulado = 0;
@@ -81,20 +86,20 @@ const obterAnaliseCEOLocal = (report: ConsolidatedReport, filter: ReportFilter, 
       const ltvMedio = count > 0 ? Math.round(ltvAcumulado / count) : 1250;
       const ratio = ltvMedio / (report.totals.averageCac || 99);
       return {
-        explicacao: 'Métricas de satisfação, qualidade e valor do cliente a longo prazo (LTV). Compara a percepção da marca (NPS) com o valor financeiro do beneficiário.',
+        explicacao: 'Metricas de satisfacao, qualidade e valor do cliente a longo prazo (LTV). Compara a percepcao da marca (NPS) com o valor financeiro do beneficiario.',
         insights: [
-          `⭐️ Qualidade de Marca: NPS médio em ${npsMedio} pontos posiciona a cooperativa na Zona de Excelência. A satisfação é o principal motor de indicação orgânica.`,
-          `📈 LTV/CAC Ratio: O LTV médio de ${formatMoeda(ltvMedio)} comparado ao CAC de ${formatMoeda(report.totals.averageCac)} gera um multiplicador de ${ratio.toFixed(1).replace('.', ',')}x. Oportunidade de ouro de acelerar agressivamente o investimento de aquisição, pois o valor retornado do cliente paga o custo de entrada com folga.`
-        ]
+          { tipo: 'sucesso', texto: `Qualidade de Marca: NPS medio em ${npsMedio} pontos posiciona a cooperativa na Zona de Excelencia. A satisfacao e o principal motor de indicacao organica.` },
+          { tipo: 'oportunidade', texto: `LTV/CAC Ratio: O LTV medio de ${formatMoeda(ltvMedio)} comparado ao CAC de ${formatMoeda(report.totals.averageCac)} gera um multiplicador de ${ratio.toFixed(1).replace('.', ',')}x. Oportunidade de ouro de acelerar agressivamente o investimento de aquisicao, pois o valor retornado do cliente paga o custo de entrada com folga.` }
+        ] as CEOInsight[]
       };
     case 'executive':
     default:
       return {
-        explicacao: 'Sumário executivo de captação de clientes, investimentos gerais e métricas de eficiência operacional e financeira consolidadas no período.',
+        explicacao: 'Sumario executivo de captacao de clientes, investimentos gerais e metricas de eficiencia operacional e financeira consolidadas no periodo.',
         insights: [
-          `🏆 Visão Geral do CEO: Captação consolidada de ${formatNum(totalBenefs)} beneficiários com CAC médio controlado em ${formatMoeda(report.totals.averageCac)}.`,
-          `💡 Oportunidade Shark Tank: Identificada alta sensibilidade ao canal Meta Ads. Sugere-se realocação de 20% do budget de canais offline para aumentar a receita previsível e reduzir o CAC geral em até 12%.`
-        ]
+          { tipo: 'info', texto: `Visao Geral do CEO: Captacao consolidada de ${formatNum(totalBenefs)} beneficiarios com CAC medio controlado em ${formatMoeda(report.totals.averageCac)}.` },
+          { tipo: 'oportunidade', texto: `Oportunidade Shark Tank: Identificada alta sensibilidade ao canal Meta Ads. Sugere-se realocacao de 20% do budget de canais offline para aumentar a receita previsivel e reduzir o CAC geral em ate 12%.` }
+        ] as CEOInsight[]
       };
   }
 };
@@ -134,11 +139,11 @@ export const exportarPDF = (
 
   const obterTituloRelatorioLocal = () => {
     switch (filter.reportType) {
-      case 'commercial': return 'RELATÓRIO DE DESEMPENHO COMERCIAL';
-      case 'churn': return 'RELATÓRIO DE EVOLUÇÃO E CHURN';
-      case 'financial': return 'RELATÓRIO DE EFICIÊNCIA FINANCEIRA';
-      case 'satisfaction': return 'RELATÓRIO DE SATISFAÇÃO E NPS';
-      default: return 'RELATÓRIO EXECUTIVO DE CAPTAÇÃO';
+      case 'commercial': return 'RELATORIO DE DESEMPENHO COMERCIAL';
+      case 'churn': return 'RELATORIO DE EVOLUCAO E CHURN';
+      case 'financial': return 'RELATORIO DE EFICIENCIA FINANCEIRA';
+      case 'satisfaction': return 'RELATORIO DE SATISFACAO E NPS';
+      default: return 'RELATORIO EXECUTIVO DE CAPTACAO';
     }
   };
 
@@ -149,8 +154,8 @@ export const exportarPDF = (
 
   // Data e Período (Direita)
   const now = new Date();
-  const dataHora = `${now.toLocaleDateString('pt-BR')} às ${now.toLocaleTimeString('pt-BR')}`;
-  const periodo = `Período: ${filter.startMonth} a ${filter.endMonth}`;
+  const dataHora = `${now.toLocaleDateString('pt-BR')} as ${now.toLocaleTimeString('pt-BR')}`;
+  const periodo = `Periodo: ${filter.startMonth} a ${filter.endMonth}`;
 
   doc.setFontSize(7);
   doc.setTextColor(255, 230, 240);
@@ -186,39 +191,39 @@ export const exportarPDF = (
     switch (type) {
       case 'commercial':
         return [
-          { label: 'Novos Beneficiários', value: formatNum(report.totals.totalNewBeneficiaries) },
+          { label: 'Novos Beneficiarios', value: formatNum(report.totals.totalNewBeneficiaries) },
           { label: 'Leads Totais', value: formatNum(report.totals.totalLeads) },
-          { label: 'Conversões', value: formatNum(report.totals.totalConversions) },
-          { label: 'Taxa de Conversão', value: formatPct(report.totals.averageConversionRate) },
+          { label: 'Conversoes', value: formatNum(report.totals.totalConversions) },
+          { label: 'Taxa de Conversao', value: formatPct(report.totals.averageConversionRate) },
         ];
       case 'churn':
         return [
-          { label: 'Beneficiários Ativos', value: formatNum(activeBenefs) },
-          { label: 'Novos Beneficiários', value: formatNum(report.totals.totalNewBeneficiaries) },
+          { label: 'Beneficiarios Ativos', value: formatNum(activeBenefs) },
+          { label: 'Novos Beneficiarios', value: formatNum(report.totals.totalNewBeneficiaries) },
           { label: 'Cancelamentos', value: formatNum(canceledBenefs) },
-          { label: 'Churn Rate Médio', value: formatPct(report.totals.averageChurnRate) },
+          { label: 'Churn Rate Medio', value: formatPct(report.totals.averageChurnRate) },
         ];
       case 'financial':
         return [
           { label: 'Total Investido', value: formatMoeda(report.totals.totalSpend) },
           { label: 'Marketing Spend', value: formatMoeda(marketingTotal) },
           { label: 'Sales Spend', value: formatMoeda(salesTotal) },
-          { label: 'CAC Médio', value: formatMoeda(report.totals.averageCac) },
+          { label: 'CAC Medio', value: formatMoeda(report.totals.averageCac) },
         ];
       case 'satisfaction':
         return [
-          { label: 'NPS Médio', value: `${mediaNps} pts` },
-          { label: 'LTV Médio', value: formatMoeda(mediaLtv) },
-          { label: 'Conversões', value: formatNum(report.totals.totalConversions) },
-          { label: 'Churn Rate Médio', value: formatPct(report.totals.averageChurnRate) },
+          { label: 'NPS Medio', value: `${mediaNps} pts` },
+          { label: 'LTV Medio', value: formatMoeda(mediaLtv) },
+          { label: 'Conversoes', value: formatNum(report.totals.totalConversions) },
+          { label: 'Churn Rate Medio', value: formatPct(report.totals.averageChurnRate) },
         ];
       case 'executive':
       default:
         return [
-          { label: 'Novos Beneficiários', value: formatNum(report.totals.totalNewBeneficiaries) },
+          { label: 'Novos Beneficiarios', value: formatNum(report.totals.totalNewBeneficiaries) },
           { label: 'Total Investido', value: formatMoeda(report.totals.totalSpend) },
-          { label: 'CAC Médio', value: formatMoeda(report.totals.averageCac) },
-          { label: 'Taxa de Conversão', value: formatPct(report.totals.averageConversionRate) },
+          { label: 'CAC Medio', value: formatMoeda(report.totals.averageCac) },
+          { label: 'Taxa de Conversao', value: formatPct(report.totals.averageConversionRate) },
         ];
     }
   };
@@ -262,13 +267,12 @@ export const exportarPDF = (
     doc.addImage(chartImages[0], 'PNG', margin, chartY, chartW, chartH);
     doc.addImage(chartImages[1], 'PNG', margin + chartW + 4, chartY, chartW, chartH);
   } else {
-    // Fallback elegante se os canvas não forem capturados
     doc.setFillColor(248, 250, 252);
     doc.roundedRect(margin, chartY, contentWidth, 24, 2, 2, 'F');
     doc.setFontSize(7.5);
     doc.setFont('helvetica', 'italic');
     doc.setTextColor(...GRAY_LIGHT);
-    doc.text('Gráficos analíticos consolidados no sistema.', margin + (contentWidth / 2), chartY + 13, { align: 'center' });
+    doc.text('Graficos analiticos consolidados no sistema.', margin + (contentWidth / 2), chartY + 13, { align: 'center' });
   }
 
   const analysisY = chartY + (chartImages && chartImages.length >= 2 ? 37 : 27);
@@ -293,7 +297,7 @@ export const exportarPDF = (
   doc.setFontSize(7);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...BRAND_DARK);
-  doc.text('ANÁLISE ESTRATÉGICA OPERACIONAL (MODO CEO / SHARK TANK)', margin + 4, analysisY + 5);
+  doc.text('ANALISE ESTRATEGICA OPERACIONAL (MODO CEO / SHARK TANK)', margin + 4, analysisY + 5);
 
   // Texto de Explicação
   doc.setFontSize(6.5);
@@ -302,7 +306,7 @@ export const exportarPDF = (
   const explicacaoLinhas = doc.splitTextToSize(analise.explicacao, contentWidth - 8);
   doc.text(explicacaoLinhas, margin + 4, analysisY + 9);
 
-  // Renderização dinâmica de Insights
+  // Renderização dinâmica de Insights (sem emojis multibyte)
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...GRAY_TEXT);
@@ -314,7 +318,9 @@ export const exportarPDF = (
     doc.circle(margin + 5, insightY - 1, 0.6, 'F');
 
     // Texto do insight quebrado
-    const insightLinhas = doc.splitTextToSize(insight, contentWidth - 10);
+    const prefixo = insight.tipo === 'alerta' ? 'ATENCAO: ' : insight.tipo === 'oportunidade' ? 'OPORTUNIDADE: ' : insight.tipo === 'sucesso' ? 'SUCESSO: ' : 'INFO: ';
+    const textoInsight = `${prefixo}${insight.texto}`;
+    const insightLinhas = doc.splitTextToSize(textoInsight, contentWidth - 10);
     doc.text(insightLinhas, margin + 7, insightY);
     insightY += insightLinhas.length * 3 + 1;
   });
@@ -330,7 +336,7 @@ export const exportarPDF = (
   doc.setFontSize(7);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...BRAND_DARK);
-  doc.text('ANÁLISE ESTRATÉGICA OPERACIONAL (MODO CEO / SHARK TANK)', margin + 4, analysisY + 5);
+  doc.text('ANALISE ESTRATEGICA OPERACIONAL (MODO CEO / SHARK TANK)', margin + 4, analysisY + 5);
 
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'italic');
@@ -345,7 +351,9 @@ export const exportarPDF = (
     doc.setFontSize(6.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...GRAY_TEXT);
-    const insightLinhas = doc.splitTextToSize(insight, contentWidth - 10);
+    const prefixo = insight.tipo === 'alerta' ? 'ATENCAO: ' : insight.tipo === 'oportunidade' ? 'OPORTUNIDADE: ' : insight.tipo === 'sucesso' ? 'SUCESSO: ' : 'INFO: ';
+    const textoInsight = `${prefixo}${insight.texto}`;
+    const insightLinhas = doc.splitTextToSize(textoInsight, contentWidth - 10);
     doc.text(insightLinhas, margin + 7, tempInsightY);
     tempInsightY += insightLinhas.length * 3 + 1;
   });
@@ -366,7 +374,7 @@ export const exportarPDF = (
 
   switch (type) {
     case 'commercial':
-      fullHead = ['Mês', 'Novos Benef.', 'Leads', 'Conversões', 'Tx. Conversão', 'CAC'];
+      fullHead = ['Mes', 'Novos Benef.', 'Leads', 'Conversoes', 'Tx. Conversao', 'CAC'];
       bodyRows = report.rows.map(row => [
         row.monthLabel,
         formatNum(row.newBeneficiaries),
@@ -376,7 +384,7 @@ export const exportarPDF = (
         formatMoeda(row.cac)
       ]);
       totalsRow = [
-        'Total / Média',
+        'Total / Media',
         formatNum(report.totals.totalNewBeneficiaries),
         formatNum(report.totals.totalLeads),
         formatNum(report.totals.totalConversions),
@@ -386,7 +394,7 @@ export const exportarPDF = (
       break;
 
     case 'churn':
-      fullHead = ['Mês', 'Benef. Ativos', 'Novos Benef.', 'Cancelados', 'Taxa de Churn'];
+      fullHead = ['Mes', 'Benef. Ativos', 'Novos Benef.', 'Cancelados', 'Taxa de Churn'];
       bodyRows = report.rows.map(row => [
         row.monthLabel,
         formatNum(row.activeBeneficiaries),
@@ -395,7 +403,7 @@ export const exportarPDF = (
         row.churnRate > 0 ? formatPct(row.churnRate) : '—'
       ]);
       totalsRow = [
-        'Total / Média',
+        'Total / Media',
         formatNum(report.rows[report.rows.length - 1]?.activeBeneficiaries || 10450),
         formatNum(report.totals.totalNewBeneficiaries),
         formatNum(report.rows.reduce((acc, curr) => acc + curr.canceledBeneficiaries, 0)),
@@ -406,7 +414,7 @@ export const exportarPDF = (
     case 'financial':
       const totalMkt = report.rows.reduce((acc, curr) => acc + curr.marketingSpend, 0);
       const totalSales = report.rows.reduce((acc, curr) => acc + curr.salesSpend, 0);
-      fullHead = ['Mês', 'Mkt Spend', 'Sales Spend', 'Total Investido', 'CAC', 'CPL'];
+      fullHead = ['Mes', 'Mkt Spend', 'Sales Spend', 'Total Investido', 'CAC', 'CPL'];
       bodyRows = report.rows.map(row => [
         row.monthLabel,
         formatMoeda(row.marketingSpend),
@@ -416,7 +424,7 @@ export const exportarPDF = (
         formatMoeda(row.cpl)
       ]);
       totalsRow = [
-        'Total / Média',
+        'Total / Media',
         formatMoeda(totalMkt),
         formatMoeda(totalSales),
         formatMoeda(report.totals.totalSpend),
@@ -426,7 +434,7 @@ export const exportarPDF = (
       break;
 
     case 'satisfaction':
-      fullHead = ['Mês', 'NPS', 'LTV', 'Conversões', 'Taxa de Churn'];
+      fullHead = ['Mes', 'NPS', 'LTV', 'Conversoes', 'Taxa de Churn'];
       bodyRows = report.rows.map(row => {
         const md = allDashboardData ? allDashboardData[row.month] : null;
         const nps = md ? (md.summary.nps ?? 78) : 78;
@@ -455,7 +463,7 @@ export const exportarPDF = (
       const ltvMedio = count > 0 ? Math.round(ltvAcumulado / count) : 1250;
 
       totalsRow = [
-        'Total / Média',
+        'Total / Media',
         `${npsMedio} pts`,
         formatMoeda(ltvMedio),
         formatNum(report.totals.totalConversions),
@@ -466,8 +474,8 @@ export const exportarPDF = (
     case 'executive':
     default:
       fullHead = showChannelDetails && filter.channel === 'all'
-        ? ['Mês', 'Novos Benef.', 'Leads', 'Conversões', 'Tx. Conv.', 'Google Ads', 'Meta Ads', 'Offline', 'Total Investido', 'CAC', 'Churn']
-        : ['Mês', 'Novos Benef.', 'Leads', 'Conversões', 'Tx. Conv.', 'Total Investido', 'CAC', 'Churn'];
+        ? ['Mes', 'Novos Benef.', 'Leads', 'Conversoes', 'Tx. Conv.', 'Google Ads', 'Meta Ads', 'Offline', 'Total Investido', 'CAC', 'Churn']
+        : ['Mes', 'Novos Benef.', 'Leads', 'Conversoes', 'Tx. Conv.', 'Total Investido', 'CAC', 'Churn'];
 
       bodyRows = report.rows.map(row => {
         const base = [
@@ -489,7 +497,7 @@ export const exportarPDF = (
       });
 
       const totalsBase = [
-        'Total / Média',
+        'Total / Media',
         formatNum(report.totals.totalNewBeneficiaries),
         formatNum(report.totals.totalLeads),
         formatNum(report.totals.totalConversions),
@@ -557,7 +565,7 @@ export const exportarPDF = (
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...GRAY_LIGHT);
     doc.text('Uniodonto Passos Ltda. • Departamento Comercial', margin, footerY);
-    doc.text(`Página ${i} de ${pageCount}`, pageWidth - margin, footerY, { align: 'right' });
+    doc.text(`Pagina ${i} de ${pageCount}`, pageWidth - margin, footerY, { align: 'right' });
   }
 
   // ─── DOWNLOAD DO PDF ─────────────────────────────────────────────────
