@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { hashPassword, maskEmail } from '../utils/security';
+import { PrivacyModal } from '../components/modals/PrivacyModal';
 import { 
   Users, 
   Building2, 
@@ -34,11 +36,11 @@ export interface User {
 }
 
 const mockUsers: User[] = [
-  { id: '1', name: 'FerTaise Tech Admin', email: 'fertaisetech@gmail.com', username: 'fertaisetech@gmail.com', role: 'Tech FerTaise', status: 'ativo', avatarColor: 'from-pink-600 to-rose-400', password: '1234' },
-  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-blue-600 to-teal-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
-  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-purple-600 to-indigo-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
-  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-amber-600 to-orange-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
-  { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'inativo', avatarColor: 'from-emerald-600 to-green-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FJanaina.png?alt=media&token=82b39f8c-d63d-4f8a-96e9-681337df67c7' }
+  { id: '1', name: 'FerTaise Tech Admin', email: 'fertaisetech@gmail.com', username: 'fertaisetech@gmail.com', role: 'Tech FerTaise', status: 'ativo', avatarColor: 'from-pink-600 to-rose-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4' },
+  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-blue-600 to-teal-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
+  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-purple-600 to-indigo-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
+  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-amber-600 to-orange-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
+  { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'ativo', avatarColor: 'from-emerald-600 to-green-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FJanaina.png?alt=media&token=82b39f8c-d63d-4f8a-96e9-681337df67c7' }
 ];
 
 interface SettingsProps {
@@ -62,7 +64,8 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                           !parsed.some(u => u.name === 'FerTaise Tech Admin') || 
                           parsed.some(u => !u.hasOwnProperty('password')) ||
                           parsed.some(u => !u.hasOwnProperty('username')) ||
-                          parsed.some(u => (u.id === '2' || u.id === '3' || u.id === '4' || u.id === '5') && !u.photo);
+                          parsed.some(u => (u.id === '2' || u.id === '3' || u.id === '4' || u.id === '5') && !u.photo) ||
+                          parsed.some(u => u.id !== '1' && u.status === 'inativo');
         if (isOldData) {
           return mockUsers;
         }
@@ -79,6 +82,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [successToast, setSuccessToast] = useState('');
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   // Estados do formulário (compartilhado entre adicionar e editar)
   const [formName, setFormName] = useState('');
@@ -110,7 +114,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
   const [profileMyName, setProfileMyName] = useState(loggedUser?.name || '');
   const [profileMyEmail, setProfileMyEmail] = useState(loggedUser?.email || '');
   const [profileMyUsername, setProfileMyUsername] = useState(loggedUser?.username || '');
-  const [profileMyPassword, setProfileMyPassword] = useState(loggedUser?.password || '1234');
+  const [profileMyPassword, setProfileMyPassword] = useState('');
   const [profileMyPhoto, setProfileMyPhoto] = useState<string | undefined>(loggedUser?.photo);
   const [showMyPassword, setShowMyPassword] = useState(false);
 
@@ -120,7 +124,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
       setProfileMyName(loggedUser.name);
       setProfileMyEmail(loggedUser.email);
       setProfileMyUsername(loggedUser.username || loggedUser.email);
-      setProfileMyPassword(loggedUser.password || '1234');
+      setProfileMyPassword('');
       setProfileMyPhoto(loggedUser.photo);
     }
   }, [loggedUser]);
@@ -158,14 +162,14 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
     setFormUsername('');
     setFormRole('Tech FerTaise');
     setFormStatus('ativo');
-    setFormPassword('1234');
+    setFormPassword('');
     setShowFormPassword(false);
     setFormPhoto(undefined);
     setIsAddModalOpen(true);
   };
 
   // Executar criação de usuário
-  const handleCreateUser = (e: React.FormEvent) => {
+  const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formName.trim() || !formEmail.trim()) {
       alert('Por favor, preencha todos os campos obrigatórios.');
@@ -182,6 +186,10 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
     ];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
+    const hashedPassword = formPassword 
+      ? await hashPassword(formPassword) 
+      : '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4'; // hash de '1234'
+
     const newUser: User = {
       id: String(Date.now()),
       name: formName,
@@ -190,7 +198,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
       role: formRole,
       status: formStatus,
       avatarColor: randomColor,
-      password: formPassword || '1234',
+      password: hashedPassword,
       photo: formPhoto
     };
 
@@ -207,16 +215,20 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
     setFormUsername(user.username || user.email);
     setFormRole(user.role);
     setFormStatus(user.status);
-    setFormPassword(user.password || '1234');
+    setFormPassword('');
     setShowFormPassword(false);
     setFormPhoto(user.photo);
     setIsEditModalOpen(true);
   };
 
   // Executar salvamento de edição
-  const handleUpdateUser = (e: React.FormEvent) => {
+  const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUser) return;
+
+    const hashedPassword = formPassword 
+      ? await hashPassword(formPassword) 
+      : selectedUser.password;
 
     const updatedUser: User = {
       ...selectedUser,
@@ -225,7 +237,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
       username: formUsername.trim() || formEmail.trim(),
       role: formRole,
       status: formStatus,
-      password: formPassword,
+      password: hashedPassword,
       photo: formPhoto
     };
 
@@ -243,7 +255,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
   };
 
   // Executar atualização do próprio perfil
-  const handleUpdateMyProfile = (e: React.FormEvent) => {
+  const handleUpdateMyProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!loggedUser) return;
     
@@ -252,12 +264,16 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
       return;
     }
 
+    const hashedPassword = profileMyPassword 
+      ? await hashPassword(profileMyPassword) 
+      : loggedUser.password;
+
     const updatedUser: User = {
       ...loggedUser,
       name: profileMyName,
       email: profileMyEmail,
       username: profileMyUsername.trim() || profileMyEmail.trim(),
-      password: profileMyPassword,
+      password: hashedPassword,
       photo: profileMyPhoto
     };
 
@@ -549,7 +565,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                     <div className="relative">
                       <input
                         type={showMyPassword ? 'text' : 'password'}
-                        required
+                        placeholder="Deixe em branco para manter a senha atual"
                         value={profileMyPassword}
                         onChange={(e) => setProfileMyPassword(e.target.value)}
                         className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-500 pr-10 bg-white"
@@ -644,7 +660,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                             <div className="flex flex-col text-left">
                               <span className="font-bold text-gray-800 text-[13px]">{user.name}</span>
                               <span className="text-gray-400 font-medium text-[11px] flex items-center gap-1">
-                                <Mail className="w-3 h-3" /> {user.email}
+                                <Mail className="w-3 h-3" /> {maskEmail(user.email)}
                               </span>
                             </div>
                           </div>
@@ -721,7 +737,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                         <div className="flex flex-col min-w-0 text-left">
                           <span className="font-bold text-gray-800 text-sm truncate">{user.name}</span>
                           <span className="text-gray-400 font-medium text-[11px] flex items-center gap-1 truncate mt-0.5">
-                            <Mail className="w-3.5 h-3.5 shrink-0 text-slate-400" /> {user.email}
+                            <Mail className="w-3.5 h-3.5 shrink-0 text-slate-400" /> {maskEmail(user.email)}
                           </span>
                         </div>
                       </div>
@@ -906,9 +922,27 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                   <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wide flex items-center gap-1.5">
                     <Lock className="w-4 h-4 text-pink-700" /> Política de Senhas de Acesso
                   </h3>
-                  <p className="text-xs text-gray-400 leading-relaxed">
+                  <p className="text-xs text-gray-400 leading-relaxed font-semibold">
                     Sua conta está integrada com o provedor de identidade Microsoft Active Directory (AD) corporativo. Para alterar sua senha mestra, solicite a alteração junto ao suporte de TI da Uniodonto.
                   </p>
+                </div>
+
+                {/* Proteção de Dados & Privacidade (LGPD) */}
+                <div className="p-5 border border-slate-200 bg-white rounded-2xl flex flex-col gap-4 shadow-sm">
+                  <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wide flex items-center gap-1.5 border-b border-slate-100 pb-2.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 inline-block"></span>
+                    Proteção de Dados & Privacidade (LGPD)
+                  </h3>
+                  <p className="text-xs text-gray-400 leading-relaxed font-semibold">
+                    Cooperativa Odontológica Uniodonto Passos está em plena conformidade com a Lei Geral de Proteção de Dados (LGPD). Todos os acessos e logs de credenciais são estritamente protegidos localmente e os dados de beneficiários em planilhas são 100% anonimizados.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setIsPrivacyOpen(true)}
+                    className="py-2.5 px-5 border border-slate-200 hover:border-pink-500 hover:bg-pink-50/20 text-slate-700 hover:text-pink-700 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 cursor-pointer transition-colors w-fit select-none"
+                  >
+                    <ShieldAlert className="w-4 h-4 text-pink-700 shrink-0" /> Visualizar Política de Privacidade
+                  </button>
                 </div>
 
                 {/* API Keys */}
@@ -1118,8 +1152,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                 <div className="relative">
                   <input
                     type={showFormPassword ? 'text' : 'password'}
-                    required
-                    placeholder="Senha do usuário"
+                    placeholder="Deixe em branco para usar o padrão 1234"
                     value={formPassword}
                     onChange={(e) => setFormPassword(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-500 pr-10"
@@ -1289,8 +1322,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                 <div className="relative">
                   <input
                     type={showFormPassword ? 'text' : 'password'}
-                    required
-                    placeholder="Senha do usuário"
+                    placeholder="Deixe em branco para manter a senha atual"
                     value={formPassword}
                     onChange={(e) => setFormPassword(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-500 pr-10"
@@ -1356,6 +1388,8 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
         </div>
       )}
 
+      {/* Modal de Politica de Privacidade LGPD */}
+      <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
     </div>
   );
 };

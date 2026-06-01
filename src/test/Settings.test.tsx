@@ -1,10 +1,9 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import Settings from '../pages/Settings';
 
 describe('Painel de Configurações - Testes de Gestão de Usuários e Senhas', () => {
   beforeEach(() => {
-    // Limpa o localStorage antes de cada teste para garantir isolamento
     localStorage.clear();
   });
 
@@ -18,12 +17,12 @@ describe('Painel de Configurações - Testes de Gestão de Usuários e Senhas', 
     expect(screen.getAllByText('Dr. Mateus José')[0]).toBeInTheDocument();
     expect(screen.getAllByText('Janaína Pádua')[0]).toBeInTheDocument();
 
-    // Verifica se os emails estão corretos
-    expect(screen.getAllByText('fertaisetech@gmail.com')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('elcio@uniodonto.com')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('luiz@uniodonto.com')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('mateus@uniodonto.com')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('gerente@uniodonto.com')[0]).toBeInTheDocument();
+    // Verifica se os emails estão corretos (mascarados na listagem pública sob as regras da LGPD)
+    expect(screen.getAllByText('fe**********@gmail.com')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('el***@uniodonto.com')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('lu**@uniodonto.com')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('ma****@uniodonto.com')[0]).toBeInTheDocument();
+    expect(screen.getAllByText('ge*****@uniodonto.com')[0]).toBeInTheDocument();
 
     // Verifica os novos cargos atribuídos
     const techRoles = screen.getAllByText('Tech FerTaise');
@@ -35,7 +34,7 @@ describe('Painel de Configurações - Testes de Gestão de Usuários e Senhas', 
     expect(managerRoles.length).toBeGreaterThan(0);
   });
 
-  it('2. Deve abrir o modal de Novo Usuário, permitir digitar uma senha customizada, selecionar e-mail como usuário e criar o usuário', () => {
+  it('2. Deve abrir o modal de Novo Usuário, permitir digitar uma senha customizada, selecionar e-mail como usuário e criar o usuário', async () => {
     render(<Settings />);
 
     // Clica no botão de criar novo usuário
@@ -48,7 +47,7 @@ describe('Painel de Configurações - Testes de Gestão de Usuários e Senhas', 
     // Preenche os campos do formulário usando placeholders
     const inputNome = screen.getByPlaceholderText('Ex: Mariana Costa');
     const inputEmail = screen.getByPlaceholderText('mariana.costa@uniodontopassos.com.br');
-    const inputSenha = screen.getByPlaceholderText('Senha do usuário');
+    const inputSenha = screen.getByPlaceholderText('Deixe em branco para usar o padrão 1234');
     const inputUsuario = screen.getByPlaceholderText('Nome de usuário ou e-mail');
 
     fireEvent.change(inputNome, { target: { value: 'Mariana Costa' } });
@@ -64,15 +63,23 @@ describe('Painel de Configurações - Testes de Gestão de Usuários e Senhas', 
 
     // Submete o formulário
     const btnCriar = screen.getByRole('button', { name: /Criar Conta/i });
-    fireEvent.click(btnCriar);
+    await act(async () => {
+      fireEvent.click(btnCriar);
+    });
 
-    // Verifica se o modal fechou e o usuário foi criado na listagem
-    expect(screen.getAllByText('Mariana Costa')[0]).toBeInTheDocument();
-    expect(screen.getAllByText('mariana.costa@uniodonto.com')[0]).toBeInTheDocument();
+    // Flushing total das microtasks e renderizações assíncronas do React 18
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    });
+
+    // Verifica se o modal fechou e o usuário foi criado na listagem (aguarda de forma assíncrona)
+    const marianaTexts = await screen.findAllByText(/Mariana Costa/i);
+    expect(marianaTexts[0]).toBeInTheDocument();
+    expect(screen.getAllByText('ma***********@uniodonto.com')[0]).toBeInTheDocument();
     expect(screen.getAllByText('Tech FerTaise').length).toBeGreaterThan(1); // Múltiplos usuários com cargo Tech FerTaise
   });
 
-  it('3. Deve abrir o modal de edição de um usuário, carregar a senha atual 1234, permitir alterá-la e salvar', () => {
+  it('3. Deve abrir o modal de edição de um usuário, iniciar com a senha em branco para privacidade, permitir digitá-la e salvar', async () => {
     render(<Settings />);
 
     // Clica no ícone de editar (lápis) do primeiro usuário (FerTaise Tech Admin)
@@ -82,23 +89,30 @@ describe('Painel de Configurações - Testes de Gestão de Usuários e Senhas', 
     // Verifica se o modal de edição abriu
     expect(screen.getByRole('heading', { name: /Editar Usuário/i })).toBeInTheDocument();
 
-    // Verifica se a senha inicial "1234" é mostrada no campo de senha
-    const inputSenha = screen.getByPlaceholderText('Senha do usuário');
-    expect(inputSenha).toHaveValue('1234');
+    // Verifica se o campo de senha inicia em branco por motivos de privacidade/LGPD
+    const inputSenha = screen.getByPlaceholderText('Deixe em branco para manter a senha atual');
+    expect(inputSenha).toHaveValue('');
 
     // Altera a senha para "9999"
     fireEvent.change(inputSenha, { target: { value: '9999' } });
 
     // Salva a edição
     const btnSalvar = screen.getByRole('button', { name: /Salvar/i });
-    fireEvent.click(btnSalvar);
+    await act(async () => {
+      fireEvent.click(btnSalvar);
+    });
 
-    // Reabre o modal de edição do mesmo usuário para verificar se a nova senha foi salva
+    // Flushing total das microtasks e renderizações assíncronas do React 18
+    await act(async () => {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    });
+
+    // Reabre o modal de edição do mesmo usuário para verificar se o campo de senha continua vazio (não expõe o hash)
     const botoesEditarReabrir = screen.getAllByTitle('Editar Usuário');
     fireEvent.click(botoesEditarReabrir[0]);
 
-    const inputSenhaAtualizada = screen.getByPlaceholderText('Senha do usuário');
-    expect(inputSenhaAtualizada).toHaveValue('9999');
+    const inputSenhaAtualizada = screen.getByPlaceholderText('Deixe em branco para manter a senha atual');
+    expect(inputSenhaAtualizada).toHaveValue('');
   });
 
   it('4. Deve alternar a visibilidade da senha entre texto e oculto ao clicar no botão de olho', () => {
@@ -108,7 +122,7 @@ describe('Painel de Configurações - Testes de Gestão de Usuários e Senhas', 
     const btnNovo = screen.getByRole('button', { name: /Novo Usuário/i });
     fireEvent.click(btnNovo);
 
-    const inputSenha = screen.getByPlaceholderText('Senha do usuário');
+    const inputSenha = screen.getByPlaceholderText('Deixe em branco para usar o padrão 1234');
     // Por padrão o tipo deve ser password
     expect(inputSenha).toHaveAttribute('type', 'password');
 

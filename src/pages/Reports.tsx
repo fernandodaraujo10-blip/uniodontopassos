@@ -854,7 +854,7 @@ export const Reports: React.FC = () => {
                 <label className="block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1">Canal Comercial</label>
                 <select 
                   value={reportFilter.channel || 'all'}
-                  onChange={(e) => setReportFilter({ ...reportFilter, channel: e.target.value as any })}
+                  onChange={(e) => setReportFilter({ ...reportFilter, channel: e.target.value as 'all' | 'google' | 'meta' | 'offline' })}
                   className="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 focus:outline-none focus:border-pink-200 text-gray-700 font-semibold cursor-pointer"
                 >
                   <option value="all">Todos os Canais</option>
@@ -993,7 +993,7 @@ export const Reports: React.FC = () => {
                 <label className="block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1">Canal Comercial</label>
                 <select 
                   value={reportFilter.channel || 'all'}
-                  onChange={(e) => setReportFilter({ ...reportFilter, channel: e.target.value as any })}
+                  onChange={(e) => setReportFilter({ ...reportFilter, channel: e.target.value as 'all' | 'google' | 'meta' | 'offline' })}
                   className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold cursor-pointer"
                 >
                   <option value="all">Todos os Canais</option>

@@ -1110,7 +1110,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                   <div className="flex items-center justify-between sm:justify-end gap-2 w-full sm:w-auto">
                     <input
                       type="number"
-                      value={(formSummary as any)[key]}
+                      value={formSummary[key]}
                       min={min}
                       max={max}
                       onChange={(e) => setFormSummary(prev => ({ ...prev, [key]: Number(e.target.value) }))}

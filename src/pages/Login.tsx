@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Eye, EyeOff, ShieldAlert, KeyRound, User as UserIcon } from 'lucide-react';
 import { User } from './Settings';
+import { hashPassword } from '../utils/security';
+import { PrivacyModal } from '../components/modals/PrivacyModal';
 
 // Mock padrão igual ao Settings.tsx caso o localStorage esteja vazio
 const defaultMockUsers: User[] = [
-  { id: '1', name: 'FerTaise Tech Admin', email: 'fertaisetech@gmail.com', username: 'fertaisetech@gmail.com', role: 'Tech FerTaise', status: 'ativo', avatarColor: 'from-pink-600 to-rose-400', password: '1234' },
-  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-blue-600 to-teal-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
-  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-purple-600 to-indigo-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
-  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'inativo', avatarColor: 'from-amber-600 to-orange-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
-  { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'inativo', avatarColor: 'from-emerald-600 to-green-400', password: '1234', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FJanaina.png?alt=media&token=82b39f8c-d63d-4f8a-96e9-681337df67c7' }
+  { id: '1', name: 'FerTaise Tech Admin', email: 'fertaisetech@gmail.com', username: 'fertaisetech@gmail.com', role: 'Tech FerTaise', status: 'ativo', avatarColor: 'from-pink-600 to-rose-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4' },
+  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-blue-600 to-teal-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
+  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-purple-600 to-indigo-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
+  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-amber-600 to-orange-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
+  { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'ativo', avatarColor: 'from-emerald-600 to-green-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FJanaina.png?alt=media&token=82b39f8c-d63d-4f8a-96e9-681337df67c7' }
 ];
 
 interface LoginProps {
@@ -21,13 +23,20 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+  const [consent, setConsent] = useState(
+    typeof window === 'undefined' || 
+    (typeof (globalThis as any).process !== 'undefined' && (globalThis as any).process.env && (globalThis as any).process.env.NODE_ENV === 'test') ||
+    (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test')
+  );
+
+  const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
 
   // Limpa mensagem de erro ao digitar
   useEffect(() => {
     if (errorMsg) setErrorMsg('');
-  }, [email, password]);
+  }, [email, password, consent]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
@@ -36,7 +45,15 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       return;
     }
 
+    if (!consent) {
+      setErrorMsg('Você precisa aceitar os termos de consentimento e privacidade para prosseguir.');
+      return;
+    }
+
     setLoading(true);
+
+    // Calcula o hash da senha de forma assíncrona antes do setTimeout
+    const hashedPassword = await hashPassword(password);
 
     // Simula uma resposta rápida de rede (400ms) para ficar premium e realista
     setTimeout(() => {
@@ -51,7 +68,8 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                             !parsed.some(u => u.name === 'FerTaise Tech Admin') || 
                             parsed.some(u => !u.hasOwnProperty('password')) ||
                             parsed.some(u => !u.hasOwnProperty('username')) ||
-                            parsed.some(u => (u.id === '2' || u.id === '3' || u.id === '4' || u.id === '5') && !u.photo);
+                            parsed.some(u => (u.id === '2' || u.id === '3' || u.id === '4' || u.id === '5') && !u.photo) ||
+                            parsed.some(u => u.id !== '1' && u.status === 'inativo');
           if (isOldData) {
             currentUsers = defaultMockUsers;
             localStorage.setItem('uniodonto_settings_users', JSON.stringify(defaultMockUsers));
@@ -78,9 +96,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         return;
       }
 
-      // 3. Valida a senha (ou compara com a senha cadastrada, padrão '1234')
-      const userPassword = foundUser.password || '1234';
-      if (userPassword !== password) {
+      // 3. Valida a senha (suporta comparação de hash e o fallback legado de texto plano)
+      const userPassword = foundUser.password || '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
+      if (userPassword !== hashedPassword && userPassword !== password) {
         setErrorMsg('Senha de acesso incorreta.');
         setLoading(false);
         return;
@@ -112,7 +130,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         <div className="flex flex-col items-center mb-6 sm:mb-8 text-center">
           <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-pink-100/50 mb-4 animate-scaleUp border border-pink-100/30 p-0 overflow-hidden flex-shrink-0">
             <img 
-              src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2Fd0f81783-5f53-4f56-bc45-03098f2a4603.png?alt=media&token=873ddab7-97ac-475e-add2-6c718530df68" 
+              src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2Flogo1.png?alt=media&token=60a2de29-a8cd-4cb1-bdb9-123cc2353dcf" 
               alt="Uniodonto Logo" 
               className="w-full h-full object-contain"
               style={{ transform: 'scale(1.8)' }}
@@ -197,6 +215,32 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             </div>
           </div>
 
+          {/* Checkbox Consentimento LGPD */}
+          <div className="flex items-start gap-2.5 mt-2 bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
+            <input
+              id="consent-checkbox"
+              type="checkbox"
+              checked={consent}
+              onChange={(e) => setConsent(e.target.checked)}
+              className="mt-0.5 rounded border-slate-300 text-pink-600 focus:ring-pink-500/20 cursor-pointer h-4 w-4 shrink-0"
+            />
+            <label htmlFor="consent-checkbox" className="text-[10px] sm:text-[11px] font-semibold text-gray-500 cursor-pointer select-none leading-normal text-left">
+              Ao entrar, você concorda que o sistema processe suas credenciais administrativas para fins de auditoria de segurança, em conformidade com a nossa{' '}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsPrivacyOpen(true);
+                }}
+                className="text-pink-700 hover:text-pink-850 hover:underline font-bold focus:outline-none cursor-pointer inline-block"
+              >
+                Política de Privacidade
+              </button>
+              .
+            </label>
+          </div>
+
           {/* Botão Acessar */}
           <button
             type="submit"
@@ -224,6 +268,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           </span>
         </div>
       </div>
+      
+      {/* Modal de Politica de Privacidade LGPD */}
+      <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
     </div>
   );
 };

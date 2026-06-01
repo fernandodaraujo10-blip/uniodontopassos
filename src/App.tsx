@@ -1,19 +1,19 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import Sidebar from './components/layout/Sidebar';
-import MobileBottomNav from './components/layout/MobileBottomNav';
-import Dashboard from './pages/Dashboard';
-import { DashboardProvider } from './context/DashboardContext';
-import Login from './pages/Login';
+import Sidebar from '@/components/layout/Sidebar';
+import MobileBottomNav from '@/components/layout/MobileBottomNav';
+import Dashboard from '@/pages/Dashboard';
+import { DashboardProvider } from '@/context/DashboardContext';
+import Login from '@/pages/Login';
 
 // Importação síncrona apenas para o tipo User (não carrega o módulo completo)
-import type { User } from './pages/Settings';
+import type { User } from '@/pages/Settings';
 
 // ── Code Splitting: carregamento lazy das páginas pesadas ──────────────────
 // Cada página só é baixada quando o usuário navega até ela,
 // reduzindo o bundle inicial de ~1,5 MB para ~300 kB.
-const Reports  = lazy(() => import('./pages/Reports'));
-const DataUpload = lazy(() => import('./pages/DataUpload'));
-const Settings = lazy(() => import('./pages/Settings'));
+const Reports  = lazy(() => import('@/pages/Reports'));
+const DataUpload = lazy(() => import('@/pages/DataUpload'));
+const Settings = lazy(() => import('@/pages/Settings'));
 
 // Componente de loading inline enquanto o chunk carrega
 const PageLoader: React.FC = () => (

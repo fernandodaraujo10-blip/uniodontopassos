@@ -28,7 +28,7 @@ export const mockDashboardData: MonthDataMap = {
       { channel: 'Digital (Inbound)', channelType: 'digital', leads: 1200, conversions: 144, conversionRate: 12.0 },
       { channel: 'Venda Direta (Outbound)', channelType: 'direct', leads: 180, conversions: 20, conversionRate: 11.11 },
       { channel: 'Canais / Corretores', channelType: 'partners', leads: 120, conversions: 16, conversionRate: 13.33 }
-    ] as any,
+    ],
     cityDistribution: [
       { city: 'Passos', beneficiaries: 7000, leads: 600, conversions: 70 },
       { city: 'Itaú de Minas', beneficiaries: 5800, leads: 350, conversions: 42 },
@@ -70,7 +70,7 @@ export const mockDashboardData: MonthDataMap = {
       { channel: 'Digital (Inbound)', channelType: 'digital', leads: 1340, conversions: 168, conversionRate: 12.54 },
       { channel: 'Venda Direta (Outbound)', channelType: 'direct', leads: 200, conversions: 24, conversionRate: 12.0 },
       { channel: 'Canais / Corretores', channelType: 'partners', leads: 140, conversions: 18, conversionRate: 12.86 }
-    ] as any,
+    ],
     cityDistribution: [
       { city: 'Passos', beneficiaries: 7200, leads: 680, conversions: 85 },
       { city: 'Itaú de Minas', beneficiaries: 5950, leads: 380, conversions: 48 },
@@ -112,7 +112,7 @@ export const mockDashboardData: MonthDataMap = {
       { channel: 'Digital (Inbound)', channelType: 'digital', leads: 1480, conversions: 192, conversionRate: 12.97 },
       { channel: 'Venda Direta (Outbound)', channelType: 'direct', leads: 220, conversions: 28, conversionRate: 12.72 },
       { channel: 'Canais / Corretores', channelType: 'partners', leads: 150, conversions: 20, conversionRate: 13.33 }
-    ] as any,
+    ],
     cityDistribution: [
       { city: 'Passos', beneficiaries: 7400, leads: 740, conversions: 96 },
       { city: 'Itaú de Minas', beneficiaries: 6100, leads: 420, conversions: 55 },
@@ -154,7 +154,7 @@ export const mockDashboardData: MonthDataMap = {
       { channel: 'Digital (Inbound)', channelType: 'digital', leads: 82, conversions: 10, conversionRate: 12.19 },
       { channel: 'Venda Direta (Outbound)', channelType: 'direct', leads: 30, conversions: 3, conversionRate: 10.0 },
       { channel: 'Canais / Corretores', channelType: 'partners', leads: 20, conversions: 2, conversionRate: 10.0 }
-    ] as any,
+    ],
     cityDistribution: [
       { city: 'Passos', beneficiaries: 7980, leads: 70, conversions: 8 },
       { city: 'Itaú de Minas', beneficiaries: 6610, leads: 30, conversions: 3 },
@@ -196,7 +196,7 @@ export const mockDashboardData: MonthDataMap = {
       { channel: 'Digital (Inbound)', channelType: 'digital', leads: 85, conversions: 11, conversionRate: 12.9 },
       { channel: 'Venda Direta (Outbound)', channelType: 'direct', leads: 35, conversions: 4, conversionRate: 11.4 },
       { channel: 'Canais / Corretores', channelType: 'partners', leads: 25, conversions: 3, conversionRate: 12.0 }
-    ] as any,
+    ],
     cityDistribution: [
       { city: 'Passos', beneficiaries: 8125, leads: 75, conversions: 9 },
       { city: 'Itaú de Minas', beneficiaries: 6732, leads: 32, conversions: 4 },
@@ -238,7 +238,7 @@ export const mockDashboardData: MonthDataMap = {
       { channel: 'Digital (Inbound)', channelType: 'digital', leads: 96, conversions: 12, conversionRate: 12.5 },
       { channel: 'Venda Direta (Outbound)', channelType: 'direct', leads: 39, conversions: 5, conversionRate: 12.82 },
       { channel: 'Canais / Corretores', channelType: 'partners', leads: 25, conversions: 4, conversionRate: 16.0 }
-    ] as any,
+    ],
     cityDistribution: [
       { city: 'Passos', beneficiaries: 8310, leads: 82, conversions: 11 },
       { city: 'Itaú de Minas', beneficiaries: 6850, leads: 35, conversions: 5 },

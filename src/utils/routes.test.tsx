@@ -34,8 +34,16 @@ vi.mock('chart.js', () => ({
   LineElement: vi.fn(), PointElement: vi.fn(), Filler: vi.fn(),
 }));
 
+const defaultTestUsers = [
+  { id: '1', name: 'FerTaise Tech Admin', email: 'fertaisetech@gmail.com', username: 'fertaisetech@gmail.com', role: 'Tech FerTaise', status: 'ativo', avatarColor: 'from-pink-600 to-rose-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4' },
+  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-blue-600 to-teal-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
+  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-purple-600 to-indigo-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
+  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-amber-600 to-orange-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
+  { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'ativo', avatarColor: 'from-emerald-600 to-green-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FJanaina.png?alt=media&token=82b39f8c-d63d-4f8a-96e9-681337df67c7' }
+];
+
 beforeEach(() => {
-  localStorage.clear();
+  localStorage.setItem('uniodonto_settings_users', JSON.stringify(defaultTestUsers));
   vi.useFakeTimers();
 });
 afterEach(() => {
@@ -171,9 +179,12 @@ describe('Rota — Fluxo Login → Dashboard (Integração)', () => {
     fireEvent.change(screen.getByLabelText(/Senha de Acesso/i), {
       target: { value: '1234' }
     });
+    fireEvent.change(screen.getByRole('checkbox'), { target: { checked: true } });
     fireEvent.click(screen.getByRole('button', { name: /Entrar no Painel/i }));
 
-    act(() => { vi.advanceTimersByTime(400); });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(400);
+    });
 
     expect(screen.getAllByText('Visão geral')[0]).toBeInTheDocument();
   });
@@ -188,8 +199,12 @@ describe('Rota — Fluxo Login → Dashboard (Integração)', () => {
     fireEvent.change(screen.getByLabelText(/Senha de Acesso/i), {
       target: { value: '1234' }
     });
+    fireEvent.change(screen.getByRole('checkbox'), { target: { checked: true } });
     fireEvent.click(screen.getByRole('button', { name: /Entrar no Painel/i }));
-    act(() => { vi.advanceTimersByTime(400); });
+    
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(400);
+    });
 
     // Navegar para Relatórios — com React.lazy, o Suspense exibe o loader
     // enquanto o chunk carrega. Verificamos que a navegação foi acionada
@@ -215,8 +230,12 @@ describe('Rota — Fluxo Login → Dashboard (Integração)', () => {
     fireEvent.change(screen.getByLabelText(/Senha de Acesso/i), {
       target: { value: '1234' }
     });
+    fireEvent.change(screen.getByRole('checkbox'), { target: { checked: true } });
     fireEvent.click(screen.getByRole('button', { name: /Entrar no Painel/i }));
-    act(() => { vi.advanceTimersByTime(400); });
+    
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(400);
+    });
 
     fireEvent.click(screen.getAllByText('Relatórios')[0]);
     fireEvent.click(screen.getAllByText('Dashboard')[0]);

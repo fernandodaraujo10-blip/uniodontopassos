@@ -6,6 +6,14 @@ import { mockDashboardData } from '../data/mockDashboardData';
 import { mockInvestmentsData } from '../data/mockInvestments';
 import { generateConsolidatedReport } from '../data/mockReports';
 import { safeDivide } from '../utils/dataValidator';
+import { 
+  calcularTaxaConversao, 
+  calcularCAC, 
+  calcularChurn, 
+  calcularLTV, 
+  processarInvestimentos, 
+  formatarMonthLabel 
+} from '../utils/dashboardCalculations';
 
 interface DashboardContextProps {
   selectedMonth: string;
@@ -145,20 +153,8 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
       }
     });
     
-    let totalMarketing = 0;
-    let totalSales = 0;
-    let totalOperational = 0;
-
-    investmentsInput.forEach(inv => {
-      const cat = categories.find(c => c.id === inv.categoryId);
-      if (cat) {
-        if (cat.type === 'marketing') totalMarketing += inv.amount;
-        else if (cat.type === 'sales') totalSales += inv.amount;
-        else if (cat.type === 'operational') totalOperational += inv.amount;
-      }
-    });
-
-    const totalAmount = totalMarketing + totalSales + totalOperational;
+    // Processar usando a biblioteca de cálculos centralizada
+    const { totalMarketing, totalSales, totalOperational, totalAmount } = processarInvestimentos(investmentsInput, categories);
 
     const newMonthlyInvestmentDetail = {
       month,
@@ -181,10 +177,10 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
 
     setInvestmentsData(nextInvestmentsData);
 
-    // 2. Calcular KPIs para o Dashboard usando divisão segura
-    const conversionRate = safeDivide(summaryInput.conversions, summaryInput.leads) * 100;
-    const cac = safeDivide(totalAmount, summaryInput.newBeneficiaries);
-    const churnRate = safeDivide(summaryInput.canceledBeneficiaries, summaryInput.activeBeneficiaries) * 100;
+    // 2. Calcular KPIs usando a central de cálculos
+    const conversionRate = calcularTaxaConversao(summaryInput.conversions, summaryInput.leads);
+    const cac = calcularCAC(totalAmount, summaryInput.newBeneficiaries);
+    const churnRate = calcularChurn(summaryInput.canceledBeneficiaries, summaryInput.activeBeneficiaries);
 
     // Calcular taxa de crescimento comparando com o mês anterior
     let growthRate = 0;
@@ -201,17 +197,10 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
 
     const ticketMedio = 120; // Ticket médio hipotético padrão
     const totalRevenue = summaryInput.activeBeneficiaries * ticketMedio;
-    const ltv = summaryInput.ltv || (ticketMedio * safeDivide(1, churnRate / 100 || 0.01));
+    const ltv = calcularLTV(ticketMedio, churnRate, summaryInput.ltv);
 
-    // Formatar rótulo do mês (Ex: '2026-06' -> 'Junho/2026')
-    const parts = month.split('-');
-    const year = parts[0];
-    const monthIndex = parseInt(parts[1], 10) - 1;
-    const monthsNames = [
-      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-    ];
-    const monthLabel = `${monthsNames[monthIndex]}/${year}`;
+    // Formatar rótulo do mês usando a central
+    const monthLabel = formatarMonthLabel(month);
 
     const summary: MonthlySummary = {
       month,

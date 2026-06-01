@@ -21,6 +21,66 @@ export interface ParsedExcelData {
 }
 
 /**
+ * Higieniza e anonimiza dados sensíveis (LGPD) de qualquer linha de planilha importada.
+ * Remove CPF, RG, Telefone, Email de Pacientes/Clientes e mascara nomes.
+ */
+export const sanitizeExcelRows = (rows: any[]): any[] => {
+  if (!Array.isArray(rows)) return [];
+  
+  return rows.map(row => {
+    const cleanRow = { ...row };
+    
+    // Varre todas as propriedades do objeto da linha da planilha
+    Object.keys(cleanRow).forEach(key => {
+      const normalizedKey = key.toLowerCase().trim().replace(/\s/g, '');
+      const value = String(cleanRow[key]);
+      
+      // 1. Detecta e remove colunas de dados pessoais diretos (PII) desnecessários
+      if (
+        normalizedKey.includes('cpf') ||
+        normalizedKey.includes('cnpj') ||
+        normalizedKey.includes('rg') ||
+        normalizedKey.includes('telefone') ||
+        normalizedKey.includes('celular') ||
+        normalizedKey.includes('contato') ||
+        normalizedKey.includes('email') ||
+        normalizedKey.includes('e-mail') ||
+        normalizedKey.includes('endereco') ||
+        normalizedKey.includes('endereço') ||
+        normalizedKey.includes('documento')
+      ) {
+        delete cleanRow[key];
+        return;
+      }
+      
+      // 2. Detecta e anonimiza nomes de pessoas/pacientes
+      if (
+        normalizedKey.includes('nome') ||
+        normalizedKey.includes('paciente') ||
+        normalizedKey.includes('cliente') ||
+        normalizedKey.includes('usuario') ||
+        normalizedKey.includes('usuário')
+      ) {
+        cleanRow[key] = 'Paciente Anonimizado';
+        return;
+      }
+
+      // 3. Mascara CPFs ou Emails acidentais que possam estar dentro de valores de outras colunas
+      if (typeof cleanRow[key] === 'string') {
+        if (/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/.test(value)) {
+          cleanRow[key] = '***.***.***-**';
+        }
+        else if (value.includes('@') && value.includes('.')) {
+          cleanRow[key] = 'contato***@uniodontopassos.com.br';
+        }
+      }
+    });
+    
+    return cleanRow;
+  });
+};
+
+/**
  * Utilitário para ler planilhas XLSX, XLS ou CSV do navegador usando SheetJS (XLSX).
  * Mapeia as diferentes abas estruturadas para o nosso modelo de dados.
  */
@@ -62,7 +122,7 @@ export const parseSpreadsheet = async (file: File): Promise<ParsedExcelData> => 
           ? sheetNames.find(name => name.toLowerCase().includes('resumo'))! 
           : firstSheetName;
           
-        const summaryRows = XLSX.utils.sheet_to_json<any>(workbook.Sheets[summarySheetName]);
+        const summaryRows = sanitizeExcelRows(XLSX.utils.sheet_to_json<any>(workbook.Sheets[summarySheetName]));
         
         if (summaryRows.length > 0) {
           const row = summaryRows[0];
@@ -98,7 +158,7 @@ export const parseSpreadsheet = async (file: File): Promise<ParsedExcelData> => 
         sheetNames.forEach(sheetName => {
           const normalized = sheetName.toLowerCase();
           const sheet = workbook.Sheets[sheetName];
-          const rows = XLSX.utils.sheet_to_json<any>(sheet);
+          const rows = sanitizeExcelRows(XLSX.utils.sheet_to_json<any>(sheet));
 
           if (normalized.includes('trafego') || normalized.includes('tráfego')) {
             trafficInput = rows.map(r => ({

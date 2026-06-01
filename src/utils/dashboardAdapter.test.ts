@@ -7,13 +7,13 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { adaptModernToLegacy } from './dashboardAdapter';
 import {
   formatarNumero,
   formatarMoeda,
   formatarPorcentagem,
   formatarMilharMoeda,
-  adaptModernToLegacy,
-} from './dashboardAdapter';
+} from './formatters';
 import { mockDashboardData } from '../data/mockDashboardData';
 
 // ─── Testes: Funções de Formatação ────────────────────────────────────────────
