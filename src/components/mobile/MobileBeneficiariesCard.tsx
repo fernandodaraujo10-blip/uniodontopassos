@@ -11,7 +11,7 @@ export const MobileBeneficiariesCard: React.FC<MobileBeneficiariesCardProps> = (
   const isUp = data.percentType === 'up';
 
   return (
-    <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] relative flex flex-col justify-between w-full h-[335px] select-none">
+    <div className="bg-slate-200 p-5 rounded-3xl border-2 border-slate-400 shadow-[0_4px_20px_rgba(136,14,79,0.03)] relative flex flex-col justify-between w-full h-[335px] select-none">
       {/* Botão de Ajuda */}
       <button 
         onClick={(e) => { e.stopPropagation(); setShowHelp(true); }}

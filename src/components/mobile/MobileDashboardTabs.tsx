@@ -17,7 +17,7 @@ export const MobileDashboardTabs: React.FC<MobileDashboardTabsProps> = ({
   ];
 
   return (
-    <div className="w-full bg-white rounded-2xl p-1.5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 flex items-center h-14 select-none">
+    <div className="w-full bg-pink-50/50 rounded-2xl p-1.5 flex items-center h-14 select-none">
       {tabs.map((tab) => {
         const active = currentArea === tab.id;
         return (

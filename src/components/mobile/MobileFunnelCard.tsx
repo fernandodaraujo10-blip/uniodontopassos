@@ -37,7 +37,7 @@ export const MobileFunnelCard: React.FC<MobileFunnelCardProps> = ({
   };
 
   return (
-    <div className="bg-white p-4 rounded-3xl border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between w-full h-[335px] select-none overflow-hidden">
+    <div className="bg-white p-5 rounded-3xl border border-pink-200 shadow-[0_4px_20px_rgba(136,14,79,0.03)] flex flex-col justify-between w-full h-[385px] select-none overflow-hidden">
       {/* Abas Superiores Compactas */}
       <div className="flex gap-1 mb-3.5 bg-slate-50 border border-slate-100 p-0.5 rounded-xl shrink-0 overflow-x-auto scrollbar-hide">
         {tabs.map((tab) => {
@@ -62,7 +62,7 @@ export const MobileFunnelCard: React.FC<MobileFunnelCardProps> = ({
       {activeTab === 'funnel' && (
         <div className="flex-grow flex items-center justify-between gap-1.5 min-h-0">
           {/* Métricas da Esquerda (Volumes) */}
-          <div className="flex flex-col justify-between h-[215px] py-1 text-[9px] w-[65px] shrink-0">
+          <div className="flex flex-col justify-between h-[265px] py-1 text-[9px] w-[65px] shrink-0">
             <div>
               <p className="text-gray-400 font-medium leading-none">Impressões</p>
               <p className="font-extrabold text-slate-700 text-[11px] mt-0.5 leading-none">{funnelData.impressoes}</p>
@@ -81,30 +81,30 @@ export const MobileFunnelCard: React.FC<MobileFunnelCardProps> = ({
           </div>
 
           {/* Gráfico do Funil de Conversão (Design Pirâmide Invertida Rosa/Magenta) */}
-          <div className="flex-grow flex flex-col items-center gap-1.5 max-w-[125px]">
+          <div className="flex-grow flex flex-col items-center gap-2 max-w-[125px]">
             {/* Bloco 1 - Impressões */}
-            <div className="w-full h-[42px] bg-pink-50 rounded-lg flex items-center justify-center text-pink-700 border border-pink-100 shadow-2xs hover:scale-102 transition-transform select-none">
+            <div className="w-full h-[52px] bg-pink-50 rounded-lg flex items-center justify-center text-pink-700 border border-pink-100 shadow-2xs hover:scale-102 transition-transform select-none">
               <Eye className="w-4 h-4 stroke-[2.2]" />
             </div>
 
             {/* Bloco 2 - Cliques */}
-            <div className="w-[82%] h-[42px] bg-pink-100 rounded-lg flex items-center justify-center text-pink-700 border border-pink-200/50 shadow-2xs hover:scale-102 transition-transform select-none">
+            <div className="w-[82%] h-[52px] bg-pink-100 rounded-lg flex items-center justify-center text-pink-700 border border-pink-200/50 shadow-2xs hover:scale-102 transition-transform select-none">
               <MousePointerClick className="w-4 h-4 stroke-[2.2]" />
             </div>
 
             {/* Bloco 3 - Leads */}
-            <div className="w-[64%] h-[42px] bg-pink-200 rounded-lg flex items-center justify-center text-pink-700 border border-pink-300/40 shadow-2xs hover:scale-102 transition-transform select-none">
+            <div className="w-[64%] h-[52px] bg-pink-200 rounded-lg flex items-center justify-center text-pink-700 border border-pink-300/40 shadow-2xs hover:scale-102 transition-transform select-none">
               <Users className="w-4 h-4 stroke-[2.2]" />
             </div>
 
             {/* Bloco 4 - Vendas */}
-            <div className="w-[46%] h-[42px] bg-pink-500 rounded-lg flex items-center justify-center text-white shadow-2xs hover:scale-102 transition-transform select-none">
+            <div className="w-[46%] h-[52px] bg-pink-500 rounded-lg flex items-center justify-center text-white shadow-2xs hover:scale-102 transition-transform select-none">
               <ShoppingCart className="w-4 h-4 stroke-[2.2]" />
             </div>
           </div>
 
           {/* Métricas da Direita (Taxas de Conversão) */}
-          <div className="flex flex-col justify-between h-[215px] py-1 text-[8.5px] w-[80px] shrink-0 border-l border-slate-50 pl-2">
+          <div className="flex flex-col justify-between h-[265px] py-1 text-[8.5px] w-[80px] shrink-0 border-l border-slate-50 pl-2">
             <div>
               <p className="text-gray-400 font-medium leading-none">CTR (Cliques/Imp.)</p>
               <p className="font-extrabold text-slate-700 text-[10px] mt-0.5 leading-none">{funnelData.txCtr}</p>

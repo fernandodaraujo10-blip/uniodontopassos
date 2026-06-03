@@ -4,14 +4,15 @@ import { ConversoesData } from '../../types/dashboard';
 
 interface ConversoesCardProps {
   data: ConversoesData;
+  className?: string;
 }
 
-export const ConversoesCard: React.FC<ConversoesCardProps> = ({ data }) => {
+export const ConversoesCard: React.FC<ConversoesCardProps> = ({ data, className }) => {
   const [showHelp, setShowHelp] = useState(false);
   const isUp = data.percentType === 'up';
 
   return (
-    <div className="bg-white p-4 rounded-2xl border border-gray-100 relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full">
+    <div className={className || "bg-white p-4 rounded-2xl border border-gray-100 relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full"}>
       <button 
         onClick={(e) => { e.stopPropagation(); setShowHelp(true); }}
         className="absolute top-3.5 right-3.5 text-gray-400 hover:text-pink-700 transition-colors p-1 rounded-full hover:bg-gray-50 focus:outline-none shrink-0 cursor-pointer z-20"

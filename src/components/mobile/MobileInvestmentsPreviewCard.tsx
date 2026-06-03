@@ -65,10 +65,10 @@ export const MobileInvestmentsPreviewCard: React.FC<MobileInvestmentsPreviewCard
   const hasMore = filteredInvestments.length > INITIAL_LIMIT;
 
   return (
-    <div className="bg-white rounded-3xl border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.02)] overflow-hidden w-full select-none">
+    <div className="bg-white rounded-3xl border border-pink-200 shadow-[0_4px_20px_rgba(136,14,79,0.03)] overflow-hidden w-full select-none">
       {/* Cabeçalho */}
-      <div className="p-4 pb-3 border-b border-slate-50">
-        <div className="flex items-center justify-between mb-3.5">
+      <div className="p-3 pb-2 border-b border-slate-50">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-1.5">
             <BarChart3 className="w-4 h-4 text-slate-700 shrink-0" />
             <h2 className="text-[12px] font-black text-slate-800 uppercase tracking-tight">
@@ -109,26 +109,26 @@ export const MobileInvestmentsPreviewCard: React.FC<MobileInvestmentsPreviewCard
 
       {/* Lista de Rows */}
       <div className="divide-y divide-slate-50/80">
-        {displayedItems.length === 0 ? (
-          <div className="px-4 py-6 text-center text-slate-400 text-[10px] italic">
+        {filteredInvestments.length === 0 ? (
+          <div className="px-3 py-4 text-center text-slate-400 text-[10px] italic">
             Nenhum investimento nesta categoria.
           </div>
         ) : (
-          displayedItems.map((item, index) => (
+          filteredInvestments.map((item, index) => (
             <div
               key={`${activeCategory}-${item.metric}-${index}`}
-              className="px-4 py-2.5 flex items-center justify-between gap-3 hover:bg-slate-50/30 transition-colors"
+              className="px-3 py-1.5 flex items-center justify-between gap-3 hover:bg-slate-50/30 transition-colors"
             >
               <div className="flex items-center gap-2 min-w-0 flex-grow">
                 {/* Marcador colorido */}
                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${getTagColorClass(item.categoria)}`} />
                 
                 <div className="min-w-0">
-                  <p className="text-[11.5px] font-bold text-slate-700 truncate leading-tight mb-0.5">
+                  <p className="text-[11px] font-bold text-slate-700 truncate leading-tight mb-0.5">
                     {item.metric}
                   </p>
                   <div className="flex items-center gap-1.5">
-                    <span className={`inline-flex px-1.5 py-0.5 rounded-md text-[8px] font-bold border ${getCategoryBadge(item.categoria)}`}>
+                    <span className={`inline-flex px-1 py-0.5 rounded-md text-[8px] font-bold border ${getCategoryBadge(item.categoria)}`}>
                       {item.categoria}
                     </span>
                     <span className="text-[9px] text-slate-400 font-medium">{monthLabel}</span>
@@ -138,28 +138,15 @@ export const MobileInvestmentsPreviewCard: React.FC<MobileInvestmentsPreviewCard
 
               {/* Valor */}
               <div className="text-right shrink-0">
-                <p className="text-[12px] font-black text-slate-800 leading-none">{item.valor}</p>
+                <p className="text-[11.5px] font-black text-slate-800 leading-none">{item.valor}</p>
               </div>
             </div>
           ))
         )}
       </div>
 
-      {/* Botão Ver todos / Ver menos */}
-      {hasMore && (
-        <div className="px-4 py-2.5 border-t border-slate-50/80 flex justify-end">
-          <button
-            onClick={() => setShowAll((prev) => !prev)}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-full text-[9px] font-bold text-pink-700 bg-pink-50 hover:bg-pink-100 transition-colors cursor-pointer border border-pink-100"
-          >
-            <span>{showAll ? 'Ver menos' : `Ver todos (${filteredInvestments.length})`}</span>
-            <ChevronRight className="w-3 h-3" />
-          </button>
-        </div>
-      )}
-
       {/* Footer Timestamp */}
-      <div className="flex items-center gap-1.5 text-slate-400 text-[8.5px] border-t border-slate-50/80 px-4 py-2 bg-slate-50/30">
+      <div className="flex items-center gap-1.5 text-slate-400 text-[8.5px] border-t border-slate-50/80 px-3 py-1.5 bg-slate-50/30">
         <Clock className="w-3 h-3 shrink-0" />
         <span>
           Última atualização: <span className="font-semibold">{timestamp}</span>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { hashPassword, maskEmail } from '../utils/security';
 import { PrivacyModal } from '../components/modals/PrivacyModal';
+import { usePWAInstall } from '../hooks/usePWAInstall';
 import { 
   Users, 
   Building2, 
@@ -20,7 +21,8 @@ import {
   Eye,
   Key,
   User as UserIcon,
-  Camera
+  Camera,
+  Smartphone
 } from 'lucide-react';
 
 export interface User {
@@ -321,6 +323,8 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
   const [apiKey, setApiKey] = useState('uni_key_live_8f0a202d08311eb8a0de');
   const [showApiKey, setShowApiKey] = useState(false);
 
+  const { isInstallable, installApp, isInstalled } = usePWAInstall();
+
   return (
     <div className="flex-grow overflow-y-auto p-4 md:p-5 pb-20 md:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition text-slate-800">
       <header className="mb-4 md:mb-5 shrink-0 flex justify-between items-center select-none">
@@ -338,6 +342,8 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
           <p className="text-xs font-bold text-emerald-800">{successToast}</p>
         </div>
       )}
+
+
 
       {/* Grid Principal Layout Settings */}
       <div className="flex-grow flex flex-col md:flex-row gap-6 overflow-hidden min-h-0">
@@ -874,6 +880,33 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
               <p className="text-xs text-gray-400 mb-6">Personalize a exibição do dashboard e configure tokens de segurança das APIs corporativas</p>
 
               <div className="max-w-2xl space-y-6">
+                {/* Botão de Instalação PWA */}
+                {!isInstalled && (
+                  <div className="p-5 border border-pink-200 bg-gradient-to-r from-pink-50 to-pink-100/50 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm shrink-0 text-pink-600 border border-pink-100">
+                        <Smartphone className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h3 className="font-extrabold text-slate-800 text-sm">Instalar Aplicativo Nativo (PWA)</h3>
+                        <p className="text-xs text-slate-500 mt-0.5">Instale o Dashboard no seu dispositivo para uso rápido, sem barras do navegador.</p>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => {
+                        if (isInstallable) {
+                          installApp();
+                        } else {
+                          alert("A instalação pelo botão não está disponível agora (seu navegador pode já ter instalado, ou não suporta o atalho direto). Tente a opção 'Adicionar à Tela Inicial' no menu do seu navegador.");
+                        }
+                      }}
+                      className="px-5 py-2.5 bg-gradient-to-r from-pink-700 to-pink-500 text-white rounded-xl font-bold text-[11px] shadow-md shadow-pink-200 hover:scale-105 active:scale-95 transition-all shrink-0 uppercase tracking-wider"
+                    >
+                      Instalar App
+                    </button>
+                  </div>
+                )}
+
                 {/* Tema do Sistema / Aparência */}
                 <div className="p-5 border border-slate-200 bg-white rounded-2xl flex flex-col gap-4 shadow-sm">
                   <h3 className="text-xs font-extrabold text-slate-700 uppercase tracking-wide flex items-center gap-1.5 border-b border-slate-100 pb-2.5">

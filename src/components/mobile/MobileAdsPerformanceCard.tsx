@@ -120,7 +120,7 @@ export const MobileAdsPerformanceCard: React.FC<MobileAdsPerformanceCardProps> =
   };
 
   return (
-    <div className="bg-[#0D040A] text-white p-4 rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between w-full h-[335px] select-none overflow-hidden">
+    <div className="bg-[#0D040A] text-white p-4 rounded-3xl shadow-[0_2px_12px_rgba(0,0,0,0.02)] flex flex-col justify-between w-full h-[365px] select-none overflow-hidden">
       <div>
         {/* Título e Abas */}
         <div className="flex justify-between items-center mb-1 gap-2">
@@ -135,7 +135,7 @@ export const MobileAdsPerformanceCard: React.FC<MobileAdsPerformanceCardProps> =
                 <button
                   key={p}
                   onClick={() => setPlatform(p)}
-                  className={`px-2 py-0.5 text-[8px] rounded-lg font-bold transition-all duration-200 cursor-pointer ${
+                  className={`px-2.5 py-1 text-[9.5px] rounded-lg font-bold transition-all duration-200 cursor-pointer ${
                     active
                       ? 'bg-pink-700 text-white shadow-xs'
                       : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -154,7 +154,7 @@ export const MobileAdsPerformanceCard: React.FC<MobileAdsPerformanceCardProps> =
       </div>
 
       {/* Gráfico Canvas */}
-      <div className="relative flex-grow min-h-0 w-full h-[95px] py-1 flex items-center justify-center">
+      <div className="relative flex-grow min-h-0 w-full h-[115px] py-1 flex items-center justify-center">
         <Bar data={chartData} options={chartOptions} />
       </div>
 
