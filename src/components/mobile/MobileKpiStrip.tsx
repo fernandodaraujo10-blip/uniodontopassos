@@ -63,8 +63,8 @@ export const MobileKpiStrip: React.FC<MobileKpiStripProps> = ({ data, activeKpi 
   ];
 
   return (
-    <div className="relative w-full mt-5">
-      <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full select-none">
+    <div className="relative w-full mt-4">
+      <div className="grid grid-cols-3 gap-3 w-full select-none">
         {kpis.map((kpi, idx) => {
           const Icon = kpi.icon;
           const isActive = activeKpi === kpi.type;
@@ -73,45 +73,47 @@ export const MobileKpiStrip: React.FC<MobileKpiStripProps> = ({ data, activeKpi 
             <div 
               key={idx} 
               onClick={() => onChangeKpi && onChangeKpi(kpi.type)}
-              className={`p-2.5 sm:p-3.5 rounded-2xl border shadow-[0_2px_8px_rgba(136,14,79,0.03)] flex flex-col justify-between cursor-pointer transition-colors min-h-[92px] ${
-                isActive ? 'bg-pink-300 border-pink-400' : 'bg-pink-200 border-pink-300'
+              className={`p-3 rounded-2xl border flex flex-col justify-between cursor-pointer transition-all duration-200 min-h-[96px] ${
+                isActive 
+                  ? 'bg-pink-50/50 border-pink-300 shadow-[0_4px_12px_rgba(216,27,96,0.08)]' 
+                  : 'bg-white border-slate-100 shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:border-slate-200'
               }`}
             >
-            <div className="flex flex-col mb-1.5 gap-1">
-              <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center shrink-0 shadow-[0_1px_3px_rgba(136,14,79,0.04)] ${
-                isActive ? 'bg-white text-pink-700' : 'bg-white/80 text-pink-600'
-              }`}>
-                <Icon className="w-3 h-3 stroke-[2.2]" />
+              <div className="flex flex-col mb-2 gap-1.5">
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
+                  isActive ? 'bg-pink-600 text-white shadow-sm' : 'bg-slate-50 text-slate-400'
+                }`}>
+                  <Icon className="w-3.5 h-3.5 stroke-[2.2]" />
+                </div>
+                <span className={`text-[10px] font-semibold uppercase tracking-wider leading-tight line-clamp-1 ${
+                  isActive ? 'text-pink-800' : 'text-slate-500'
+                }`}>
+                  {kpi.label}
+                </span>
               </div>
-              <span className={`text-[9.5px] sm:text-[11px] font-bold uppercase tracking-tight leading-tight ${
-                isActive ? 'text-pink-900' : 'text-slate-500'
-              }`}>
-                {kpi.label}
-              </span>
-            </div>
 
-            <div>
-              <div className={`text-base sm:text-lg font-black tracking-tight leading-none mb-0.5 ${
-                isActive ? 'text-slate-900' : 'text-slate-800'
-              }`}>
-                {kpi.value}
-              </div>
-              
-              <div className={`text-[9px] sm:text-[10px] font-semibold flex items-center gap-0.5 ${
-                kpi.isUp ? 'text-emerald-500' : 'text-rose-500'
-              }`}>
-                {kpi.isUp ? (
-                  <TrendingUp className="w-2 h-2 shrink-0" />
-                ) : (
-                  <TrendingDown className="w-2 h-2 shrink-0" />
-                )}
-                <span>{kpi.percentText}</span>
+              <div>
+                <div className={`text-base font-bold tracking-tight leading-none mb-1 ${
+                  isActive ? 'text-pink-950' : 'text-slate-800'
+                }`}>
+                  {kpi.value}
+                </div>
+                
+                <div className={`text-[10px] font-medium flex items-center gap-0.5 ${
+                  kpi.isUp ? 'text-emerald-600' : 'text-rose-600'
+                }`}>
+                  {kpi.isUp ? (
+                    <TrendingUp className="w-2.5 h-2.5 shrink-0" />
+                  ) : (
+                    <TrendingDown className="w-2.5 h-2.5 shrink-0" />
+                  )}
+                  <span>{kpi.percentText}</span>
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

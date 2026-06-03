@@ -17,17 +17,17 @@ export const MobileDashboardTabs: React.FC<MobileDashboardTabsProps> = ({
   ];
 
   return (
-    <div className="w-full bg-pink-50/50 rounded-2xl p-1.5 flex items-center h-14 select-none">
+    <div className="w-full bg-slate-100/80 rounded-2xl p-1.5 flex items-center h-12 select-none border border-slate-200/60">
       {tabs.map((tab) => {
         const active = currentArea === tab.id;
         return (
           <button
             key={tab.id}
             onClick={() => onChangeArea(tab.id)}
-            className={`flex-1 h-full rounded-xl font-bold text-xs transition-all duration-250 cursor-pointer active:scale-98
+            className={`flex-1 h-full rounded-xl font-semibold text-[13px] transition-all duration-200 cursor-pointer 
               ${active 
-                ? 'bg-pink-700 text-white shadow-xs' 
-                : 'bg-transparent text-slate-600 hover:text-slate-800'
+                ? 'bg-white text-slate-800 shadow-sm border border-slate-200/50' 
+                : 'bg-transparent text-slate-500 hover:text-slate-700'
               }`}
           >
             {tab.label}

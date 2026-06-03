@@ -37,19 +37,19 @@ export const MobileFunnelCard: React.FC<MobileFunnelCardProps> = ({
   };
 
   return (
-    <div className="bg-white p-5 rounded-3xl border border-pink-200 shadow-[0_4px_20px_rgba(136,14,79,0.03)] flex flex-col justify-between w-full h-[385px] select-none overflow-hidden">
-      {/* Abas Superiores Compactas */}
-      <div className="flex gap-1 mb-3.5 bg-slate-50 border border-slate-100 p-0.5 rounded-xl shrink-0 overflow-x-auto scrollbar-hide">
+    <div className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] flex flex-col justify-between w-full min-h-[410px] select-none overflow-hidden">
+      {/* Abas Superiores (Segmented Control Style) */}
+      <div className="flex bg-slate-100/80 rounded-[14px] p-1 gap-1 border border-slate-200/60 shrink-0 overflow-x-auto scrollbar-hide mb-5">
         {tabs.map((tab) => {
           const active = tab.id === activeTab;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 px-2.5 py-1 text-[10px] font-bold rounded-lg transition-all duration-200 cursor-pointer whitespace-nowrap min-h-[30px] ${
+              className={`flex-1 px-3 py-1.5 text-[11px] font-semibold rounded-xl transition-all duration-200 cursor-pointer whitespace-nowrap min-h-[32px] ${
                 active
-                  ? 'bg-pink-700 text-white shadow-xs'
-                  : 'text-slate-500 hover:text-slate-700'
+                  ? 'bg-white text-slate-800 shadow-sm border border-slate-200/50'
+                  : 'text-slate-500 hover:text-slate-700 bg-transparent'
               }`}
             >
               {tab.label}
@@ -60,69 +60,69 @@ export const MobileFunnelCard: React.FC<MobileFunnelCardProps> = ({
 
       {/* Conteúdo 1: Funil de Conversão */}
       {activeTab === 'funnel' && (
-        <div className="flex-grow flex items-center justify-between gap-1.5 min-h-0">
+        <div className="flex-grow flex items-center justify-between gap-3 min-h-0">
           {/* Métricas da Esquerda (Volumes) */}
-          <div className="flex flex-col justify-between h-[265px] py-1 text-[9px] w-[65px] shrink-0">
+          <div className="flex flex-col justify-between h-[280px] py-2 text-[10px] w-[70px] shrink-0">
             <div>
-              <p className="text-gray-400 font-medium leading-none">Impressões</p>
-              <p className="font-extrabold text-slate-700 text-[11px] mt-0.5 leading-none">{funnelData.impressoes}</p>
+              <p className="text-slate-400 font-medium leading-none">Impressões</p>
+              <p className="font-bold text-slate-800 text-[12px] mt-1 leading-none">{funnelData.impressoes}</p>
               {renderTrendValue(funnelData.impressoesChange, funnelData.impressoesChangeType)}
             </div>
             <div>
-              <p className="text-gray-400 font-medium leading-none">Cliques</p>
-              <p className="font-extrabold text-slate-700 text-[11px] mt-0.5 leading-none">{funnelData.cliques}</p>
+              <p className="text-slate-400 font-medium leading-none">Cliques</p>
+              <p className="font-bold text-slate-800 text-[12px] mt-1 leading-none">{funnelData.cliques}</p>
               {renderTrendValue(funnelData.cliquesChange, funnelData.cliquesChangeType)}
             </div>
             <div>
-              <p className="text-gray-400 font-medium leading-none">Leads</p>
-              <p className="font-extrabold text-slate-700 text-[11px] mt-0.5 leading-none">{funnelData.leads}</p>
+              <p className="text-slate-400 font-medium leading-none">Leads</p>
+              <p className="font-bold text-slate-800 text-[12px] mt-1 leading-none">{funnelData.leads}</p>
               {renderTrendValue(funnelData.leadsChange, funnelData.leadsChangeType)}
             </div>
           </div>
 
-          {/* Gráfico do Funil de Conversão (Design Pirâmide Invertida Rosa/Magenta) */}
-          <div className="flex-grow flex flex-col items-center gap-2 max-w-[125px]">
+          {/* Gráfico do Funil de Conversão (Design Pirâmide Rosa Limpo) */}
+          <div className="flex-grow flex flex-col items-center gap-2.5 max-w-[130px]">
             {/* Bloco 1 - Impressões */}
-            <div className="w-full h-[52px] bg-pink-50 rounded-lg flex items-center justify-center text-pink-700 border border-pink-100 shadow-2xs hover:scale-102 transition-transform select-none">
-              <Eye className="w-4 h-4 stroke-[2.2]" />
+            <div className="w-full h-[54px] bg-pink-50 rounded-xl flex items-center justify-center text-pink-600 border border-pink-100/50 shadow-sm hover:scale-102 transition-transform select-none">
+              <Eye className="w-4 h-4 stroke-[2]" />
             </div>
 
             {/* Bloco 2 - Cliques */}
-            <div className="w-[82%] h-[52px] bg-pink-100 rounded-lg flex items-center justify-center text-pink-700 border border-pink-200/50 shadow-2xs hover:scale-102 transition-transform select-none">
-              <MousePointerClick className="w-4 h-4 stroke-[2.2]" />
+            <div className="w-[82%] h-[54px] bg-pink-100 rounded-xl flex items-center justify-center text-pink-700 shadow-sm hover:scale-102 transition-transform select-none">
+              <MousePointerClick className="w-4 h-4 stroke-[2]" />
             </div>
 
             {/* Bloco 3 - Leads */}
-            <div className="w-[64%] h-[52px] bg-pink-200 rounded-lg flex items-center justify-center text-pink-700 border border-pink-300/40 shadow-2xs hover:scale-102 transition-transform select-none">
-              <Users className="w-4 h-4 stroke-[2.2]" />
+            <div className="w-[64%] h-[54px] bg-pink-200 rounded-xl flex items-center justify-center text-pink-800 shadow-sm hover:scale-102 transition-transform select-none">
+              <Users className="w-4 h-4 stroke-[2]" />
             </div>
 
             {/* Bloco 4 - Vendas */}
-            <div className="w-[46%] h-[52px] bg-pink-500 rounded-lg flex items-center justify-center text-white shadow-2xs hover:scale-102 transition-transform select-none">
-              <ShoppingCart className="w-4 h-4 stroke-[2.2]" />
+            <div className="w-[46%] h-[54px] bg-pink-600 rounded-xl flex items-center justify-center text-white shadow-md hover:scale-102 transition-transform select-none">
+              <ShoppingCart className="w-4 h-4 stroke-[2]" />
             </div>
           </div>
 
           {/* Métricas da Direita (Taxas de Conversão) */}
-          <div className="flex flex-col justify-between h-[265px] py-1 text-[8.5px] w-[80px] shrink-0 border-l border-slate-50 pl-2">
+          <div className="flex flex-col justify-between h-[280px] py-2 text-[9px] w-[85px] shrink-0 border-l border-slate-100 pl-3">
             <div>
-              <p className="text-gray-400 font-medium leading-none">CTR (Cliques/Imp.)</p>
-              <p className="font-extrabold text-slate-700 text-[10px] mt-0.5 leading-none">{funnelData.txCtr}</p>
+              <p className="text-slate-400 font-medium leading-none">CTR (Tx. Cliques)</p>
+              <p className="font-bold text-slate-800 text-[11px] mt-1 leading-none">{funnelData.txCtr}</p>
               {renderTrendValue(funnelData.txCtrChange, funnelData.txCtrChangeType)}
             </div>
             <div>
-              <p className="text-gray-400 font-medium leading-none">Conversão Leads</p>
-              <p className="font-extrabold text-slate-700 text-[10px] mt-0.5 leading-none">{funnelData.txLeads}</p>
+              <p className="text-slate-400 font-medium leading-none">Conv. Leads</p>
+              <p className="font-bold text-slate-800 text-[11px] mt-1 leading-none">{funnelData.txLeads}</p>
               {renderTrendValue(funnelData.txLeadsChange, funnelData.txLeadsChangeType)}
             </div>
             <div>
-              <p className="text-gray-400 font-medium leading-none">Tx. Agendamento</p>
-              <p className="font-extrabold text-slate-700 text-[10px] mt-0.5 leading-none">{funnelData.txAgendamentos}</p>
+              <p className="text-slate-400 font-medium leading-none">Agendamentos</p>
+              <p className="font-bold text-slate-800 text-[11px] mt-1 leading-none">{funnelData.txAgendamentos}</p>
               {renderTrendValue(funnelData.txAgendamentosChange, funnelData.txAgendamentosChangeType)}
             </div>
             <div>
-              <p className="text-gray-400 font-medium leading-none">Aprov. Comercial</p>
-              <p className="font-extrabold text-slate-700 text-[10px] mt-0.5 leading-none">{funnelData.txVendas}</p>
+              <p className="text-slate-400 font-medium leading-none">Aprov. Coml.</p>
+              <p className="font-bold text-slate-800 text-[11px] mt-1 leading-none">{funnelData.txVendas}</p>
               {renderTrendValue(funnelData.txVendasChange, funnelData.txVendasChangeType)}
             </div>
           </div>
@@ -132,23 +132,23 @@ export const MobileFunnelCard: React.FC<MobileFunnelCardProps> = ({
       {/* Conteúdo 2: Origem dos Leads */}
       {activeTab === 'origin' && (
         <div className="flex-grow flex flex-col justify-between py-1 min-h-0 animate-fadeIn">
-          <div className="flex justify-between items-center mb-2 shrink-0">
-            <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-tight">Leads Qualificados</h4>
-            <span className="px-2 py-0.5 bg-pink-50 text-pink-700 font-extrabold text-[10px] rounded-full border border-pink-100 leading-none">
-              {leadsData.total} Leads
+          <div className="flex justify-between items-center mb-4 shrink-0">
+            <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Leads Qualificados</h4>
+            <span className="px-2.5 py-1 bg-slate-50 text-slate-700 font-bold text-[10px] rounded-lg border border-slate-100 leading-none">
+              {leadsData.total} Total
             </span>
           </div>
 
-          <div className="space-y-2 flex-grow overflow-y-auto pr-1">
+          <div className="space-y-4 flex-grow overflow-y-auto pr-2">
             {/* Google Ads */}
             <div>
-              <div className="flex justify-between text-[11px] mb-0.5">
-                <span className="font-semibold text-slate-600">Google Ads</span>
-                <span className="font-extrabold text-pink-700">{leadsData.origem.google}</span>
+              <div className="flex justify-between text-xs mb-1.5">
+                <span className="font-medium text-slate-500">Google Ads</span>
+                <span className="font-bold text-slate-800">{leadsData.origem.google}</span>
               </div>
-              <div className="w-full bg-slate-50 h-2 rounded-full overflow-hidden border border-slate-100">
+              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                 <div
-                  className="bg-pink-700 h-full rounded-full transition-all duration-700 ease-out"
+                  className="bg-pink-600 h-full rounded-full transition-all duration-700 ease-out"
                   style={{ width: leadsData.origem.google }}
                 ></div>
               </div>
@@ -156,13 +156,13 @@ export const MobileFunnelCard: React.FC<MobileFunnelCardProps> = ({
 
             {/* Meta ADS */}
             <div>
-              <div className="flex justify-between text-[11px] mb-0.5">
-                <span className="font-semibold text-slate-600">Meta ADS</span>
-                <span className="font-extrabold text-pink-700">{leadsData.origem.meta}</span>
+              <div className="flex justify-between text-xs mb-1.5">
+                <span className="font-medium text-slate-500">Meta ADS</span>
+                <span className="font-bold text-slate-800">{leadsData.origem.meta}</span>
               </div>
-              <div className="w-full bg-slate-50 h-2 rounded-full overflow-hidden border border-slate-100">
+              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                 <div
-                  className="bg-pink-700 h-full rounded-full transition-all duration-700 ease-out"
+                  className="bg-pink-500 h-full rounded-full transition-all duration-700 ease-out"
                   style={{ width: leadsData.origem.meta }}
                 ></div>
               </div>
@@ -170,13 +170,13 @@ export const MobileFunnelCard: React.FC<MobileFunnelCardProps> = ({
 
             {/* Indicação */}
             <div>
-              <div className="flex justify-between text-[11px] mb-0.5">
-                <span className="font-semibold text-slate-600">Indicação</span>
-                <span className="font-extrabold text-pink-700">{leadsData.origem.indicacao}</span>
+              <div className="flex justify-between text-xs mb-1.5">
+                <span className="font-medium text-slate-500">Indicação</span>
+                <span className="font-bold text-slate-800">{leadsData.origem.indicacao}</span>
               </div>
-              <div className="w-full bg-slate-50 h-2 rounded-full overflow-hidden border border-slate-100">
+              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                 <div
-                  className="bg-pink-700 h-full rounded-full transition-all duration-700 ease-out"
+                  className="bg-pink-400 h-full rounded-full transition-all duration-700 ease-out"
                   style={{ width: leadsData.origem.indicacao }}
                 ></div>
               </div>
@@ -184,13 +184,13 @@ export const MobileFunnelCard: React.FC<MobileFunnelCardProps> = ({
 
             {/* Outros */}
             <div>
-              <div className="flex justify-between text-[11px] mb-0.5">
-                <span className="font-semibold text-slate-600">Outros</span>
-                <span className="font-extrabold text-pink-700">{leadsData.origem.outros}</span>
+              <div className="flex justify-between text-xs mb-1.5">
+                <span className="font-medium text-slate-500">Outros</span>
+                <span className="font-bold text-slate-800">{leadsData.origem.outros}</span>
               </div>
-              <div className="w-full bg-slate-50 h-2 rounded-full overflow-hidden border border-slate-100">
+              <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
                 <div
-                  className="bg-pink-700 h-full rounded-full transition-all duration-700 ease-out"
+                  className="bg-slate-300 h-full rounded-full transition-all duration-700 ease-out"
                   style={{ width: leadsData.origem.outros }}
                 ></div>
               </div>
@@ -201,23 +201,23 @@ export const MobileFunnelCard: React.FC<MobileFunnelCardProps> = ({
 
       {/* Conteúdo 3: Cidades */}
       {activeTab === 'cities' && (
-        <div className="flex-grow flex flex-col min-h-0 justify-between animate-fadeIn">
+        <div className="flex-grow flex flex-col min-h-0 animate-fadeIn">
           <div className="overflow-y-auto pr-1 flex-grow min-h-0">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="text-slate-400 text-[8.5px] font-extrabold uppercase tracking-tight border-b border-slate-50 sticky top-0 bg-white pb-1.5 z-10">
-                  <th className="pb-1.5 font-bold">Cidade</th>
-                  <th className="pb-1.5 font-bold text-right pr-4">Beneficiários</th>
-                  <th className="pb-1.5 font-bold text-right">Crescimento</th>
+                <tr className="text-slate-400 text-[10px] font-bold uppercase tracking-wider border-b border-slate-100 sticky top-0 bg-white pb-2 z-10">
+                  <th className="pb-2 font-semibold">Cidade</th>
+                  <th className="pb-2 font-semibold text-right pr-4">Leads</th>
+                  <th className="pb-2 font-semibold text-right">Crescimento</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {cidadesData.map((cidade) => (
                   <tr key={cidade.nome} className="hover:bg-slate-50/50 transition-colors">
-                    <td className="py-2 font-bold text-slate-700 text-[11px]">{cidade.nome}</td>
-                    <td className="py-2 text-right pr-4 font-bold text-slate-700 text-[11px]">{cidade.beneficiarios}</td>
-                    <td className="py-2 text-right">
-                      <span className="inline-block px-2.5 py-0.5 bg-green-50 text-green-600 font-extrabold text-[9px] rounded-full border border-green-100">
+                    <td className="py-2.5 font-semibold text-slate-700 text-xs">{cidade.nome}</td>
+                    <td className="py-2.5 text-right pr-4 font-bold text-slate-800 text-xs">{cidade.beneficiarios}</td>
+                    <td className="py-2.5 text-right">
+                      <span className="inline-block px-2.5 py-1 bg-emerald-50 text-emerald-600 font-bold text-[10px] rounded-lg">
                         {cidade.crescimento}
                       </span>
                     </td>

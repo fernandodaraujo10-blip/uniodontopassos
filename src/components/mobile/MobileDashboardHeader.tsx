@@ -27,30 +27,30 @@ export const MobileDashboardHeader: React.FC<MobileDashboardHeaderProps> = ({
     availableMonths.find((m) => m.value === currentMonthKey)?.label || '';
 
   return (
-    <div className="flex items-center justify-between gap-3 w-full px-1 py-1 shrink-0 select-none">
-      <h1 className="text-[22px] font-black text-slate-800 tracking-tight leading-none">
+    <div className="flex items-center justify-between gap-3 w-full py-1 shrink-0 select-none">
+      <h1 className="text-xl md:text-[22px] font-bold text-slate-800 tracking-tight leading-none">
         {title}
       </h1>
 
-      {/* Pill do Seletor de Mês (Mockup de Referência) */}
-      <div className="flex items-center bg-white rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.04)] border border-gray-100 p-0.5 shrink-0">
+      {/* Pill do Seletor de Mês (Premium) */}
+      <div className="flex items-center bg-slate-50/80 rounded-[14px] shadow-sm border border-slate-100 p-0.5 shrink-0 backdrop-blur-sm">
         <button
           onClick={() => navigateMonth(-1)}
           disabled={currentIndex <= 0}
-          className="w-7 h-7 flex items-center justify-center hover:bg-slate-50 active:scale-95 rounded-xl text-gray-500 transition-all disabled:opacity-20 disabled:scale-100 cursor-pointer disabled:cursor-not-allowed"
+          className="w-8 h-8 flex items-center justify-center hover:bg-white active:scale-95 rounded-xl text-slate-400 hover:text-slate-700 transition-all disabled:opacity-20 disabled:scale-100 cursor-pointer disabled:cursor-not-allowed hover:shadow-sm"
           aria-label="Mês anterior"
         >
           <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
         </button>
 
-        <span className="px-2.5 text-pink-700 font-bold text-xs tracking-tight">
+        <span className="px-3 text-pink-700 font-bold text-xs uppercase tracking-wider">
           {currentMonthLabel}
         </span>
 
         <button
           onClick={() => navigateMonth(1)}
           disabled={currentIndex === -1 || currentIndex === availableMonths.length - 1}
-          className="w-7 h-7 flex items-center justify-center hover:bg-slate-50 active:scale-95 rounded-xl text-gray-500 transition-all disabled:opacity-20 disabled:scale-100 cursor-pointer disabled:cursor-not-allowed"
+          className="w-8 h-8 flex items-center justify-center hover:bg-white active:scale-95 rounded-xl text-slate-400 hover:text-slate-700 transition-all disabled:opacity-20 disabled:scale-100 cursor-pointer disabled:cursor-not-allowed hover:shadow-sm"
           aria-label="Próximo mês"
         >
           <ChevronRight className="w-4 h-4 stroke-[2.5]" />

@@ -97,37 +97,34 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
   }
 
   return (
-    <div className="flex-grow overflow-y-auto overflow-x-hidden bg-black md:bg-[#F8F9FA] page-transition h-full scrollbar-hide snap-y snap-mandatory">
+    <div className="flex-grow overflow-y-auto overflow-x-hidden bg-[#F8F9FA] page-transition h-full scrollbar-hide">
       {/* ═══════════════════════════════════════════════
-          LAYOUT MOBILE (< md): coluna única empilhada com margem Dark arredondada e fundo rosa claro
+          LAYOUT MOBILE (< md)
           ═══════════════════════════════════════════════ */}
-      <div className="flex flex-col md:hidden px-4 pt-5 pb-6 gap-6 border-[12px] border-pink-200 dark:border-pink-900/60 rounded-[40px] m-3 shadow-2xl bg-[#FFF5F7] dark:bg-slate-950 h-full overflow-y-auto snap-y snap-mandatory scrollbar-hide">
-        {/* ── TELA 1: Resumo executivo (Visão Geral + KPIs + Beneficiários) ── */}
-        <div className="snap-start shrink-0 min-h-[88vh] flex flex-col gap-6 w-full">
-          <div className="bg-slate-50 rounded-3xl p-5 border border-pink-200 shadow-[0_4px_20px_rgba(136,14,79,0.03)] flex flex-col gap-5">
-            {/* Header compacto mobile */}
-            <MobileDashboardHeader
-              title={getHeaderTitle()}
-              currentMonthKey={selectedMonth}
-              onChangeMonth={setSelectedMonth}
-            />
+      <div className="flex flex-col md:hidden w-full h-full pb-28">
+        {/* Seção Superior (Header, Tabs e KPIs) */}
+        <div className="bg-white rounded-b-3xl pt-5 pb-6 px-4 shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col gap-6 w-full z-10 relative">
+          <MobileDashboardHeader
+            title={getHeaderTitle()}
+            currentMonthKey={selectedMonth}
+            onChangeMonth={setSelectedMonth}
+          />
 
-            {/* Tabs superiores */}
-            <MobileDashboardTabs
-              currentArea={currentArea}
-              onChangeArea={setCurrentArea}
-            />
+          <MobileDashboardTabs
+            currentArea={currentArea}
+            onChangeArea={setCurrentArea}
+          />
 
-            {/* KPIs rápidos interativos na grade 2x2 original */}
-            <MobileKpiStrip 
-              data={activeMonthData} 
-              activeKpi={activeMobileKpi}
-              onChangeKpi={setActiveMobileKpi}
-            />
-          </div>
+          <MobileKpiStrip 
+            data={activeMonthData} 
+            activeKpi={activeMobileKpi}
+            onChangeKpi={setActiveMobileKpi}
+          />
+        </div>
 
-          {/* Card Principal Dinâmico - Altura Estrita de 335px idêntica ao de Beneficiários */}
-          <div className="h-[335px] w-full shrink-0 relative overflow-hidden mt-10">
+        {/* Conteúdo Dinâmico (Card Principal) */}
+        <div className="flex flex-col px-4 pt-6 gap-6 w-full relative z-0">
+          <div className="w-full flex-shrink-0 min-h-0">
             {activeMobileKpi === 'Beneficiários' && (
               <MobileBeneficiariesCard data={activeMonthData.beneficiarios} />
             )}
@@ -135,42 +132,39 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
             {activeMobileKpi === 'Leads' && (
               <LeadsCard 
                 data={activeMonthData.leads} 
-                className="bg-slate-200 p-5 rounded-3xl border-2 border-slate-400 shadow-[0_4px_20px_rgba(136,14,79,0.03)] relative overflow-hidden flex flex-col justify-between w-full h-full select-none"
+                className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden flex flex-col justify-between w-full min-h-[220px]"
               />
             )}
             
             {activeMobileKpi === 'Conversão' && (
               <ConversoesCard 
                 data={activeMonthData.conversoes} 
-                className="bg-slate-200 p-5 rounded-3xl border-2 border-slate-400 shadow-[0_4px_20px_rgba(136,14,79,0.03)] relative overflow-hidden flex flex-col justify-between w-full h-full select-none"
+                className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden flex flex-col justify-between w-full min-h-[220px]"
               />
             )}
             
             {activeMobileKpi === 'Investimento' && (
               <InvestimentoCard 
                 data={activeMonthData.investimento} 
-                className="bg-slate-200 p-5 rounded-3xl border-2 border-slate-400 shadow-[0_4px_20px_rgba(136,14,79,0.03)] relative overflow-hidden flex flex-col justify-between w-full h-full select-none"
+                className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden flex flex-col justify-between w-full min-h-[220px]"
               />
             )}
             
             {activeMobileKpi === 'ROI' && (
               <RoiCard 
                 data={activeMonthData.roi} 
-                className="bg-slate-200 p-5 rounded-3xl border-2 border-slate-400 shadow-[0_4px_20px_rgba(136,14,79,0.03)] relative overflow-hidden flex flex-col justify-between w-full h-full select-none"
+                className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden flex flex-col justify-between w-full min-h-[220px]"
               />
             )}
             
             {activeMobileKpi === 'NPS' && (
               <NpsCard 
                 data={activeMonthData.nps} 
-                className="bg-slate-200 p-5 rounded-3xl border-2 border-slate-400 shadow-[0_4px_20px_rgba(136,14,79,0.03)] relative overflow-hidden flex flex-col justify-between w-full h-full select-none"
+                className="bg-white p-5 rounded-[24px] border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] relative overflow-hidden flex flex-col justify-between w-full min-h-[220px]"
               />
             )}
           </div>
-        </div>
 
-        {/* ── TELA 2: Desempenho de Anúncios + Funil de Conversão ── */}
-        <div className="snap-start shrink-0 min-h-[88vh] flex flex-col gap-6 w-full">
           <MobileAdsPerformanceCard 
             anunciosData={activeMonthData.anuncios} 
             monthLabel={currentMonthData?.summary.monthLabel || ''} 
@@ -181,10 +175,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
             leadsData={activeMonthData.leads}
             cidadesData={activeMonthData.cidades}
           />
-        </div>
 
-        {/* ── TELA 3: Investimentos do Mês (Todos os itens) ── */}
-        <div className="snap-start shrink-0 min-h-[88vh] flex flex-col gap-6 w-full pb-8">
           <MobileInvestmentsPreviewCard
             investimentos={activeMonthData.investimentosTabela}
             timestamp={activeMonthData.timestamp}
