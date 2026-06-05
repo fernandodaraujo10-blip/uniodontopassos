@@ -80,7 +80,7 @@ export const MobileInvestmentList: React.FC<MobileInvestmentListProps> = ({
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`h-5 px-2 rounded-full border whitespace-nowrap font-bold transition-all duration-200 cursor-pointer text-[10px] ${
+                  className={`h-8 px-2.5 rounded-full border whitespace-nowrap font-bold transition-all duration-200 cursor-pointer text-[11px] ${
                     active
                       ? 'bg-pink-700 text-white border-pink-700'
                       : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-50 hover:text-slate-700'
@@ -101,7 +101,7 @@ export const MobileInvestmentList: React.FC<MobileInvestmentListProps> = ({
         </div>
       </div>
 
-      <div className={`${dense ? 'flex-1 min-h-0 overflow-hidden divide-y divide-gray-50' : 'divide-y divide-gray-50'}`}>
+      <div className={`${dense ? 'flex-1 min-h-0 overflow-y-auto divide-y divide-gray-50 mobile-scroll' : 'divide-y divide-gray-50'}`}>
         {filteredInvestments.length === 0 ? (
           <div className={`${dense ? 'px-3 py-3 text-[11px]' : 'px-4 py-8 text-sm'} text-center text-gray-400 italic`}>
             Nenhum investimento nesta categoria.
@@ -110,13 +110,13 @@ export const MobileInvestmentList: React.FC<MobileInvestmentListProps> = ({
           filteredInvestments.map((item, index) => (
             <div
               key={`${selectedCategory}-${item.metric}-${index}`}
-              className={`${dense ? 'px-3 py-1.5' : 'px-4 py-3'} hover:bg-gray-50/60 transition-colors`}
+              className={`${dense ? 'px-3 py-2' : 'px-4 py-3'} hover:bg-gray-50/60 transition-colors`}
             >
               <div className="flex items-start justify-between gap-2.5">
                 <div className="flex-grow min-w-0">
                   <div className={`flex items-center gap-2 ${dense ? 'mb-0.5' : 'mb-1'}`}>
                     <span className={`${dense ? 'w-1.5 h-1.5' : 'w-2 h-2'} rounded-full flex-shrink-0 ${getTagColorClass(item.categoria)}`} />
-                    <p className={`${dense ? 'text-[11px]' : 'text-[14px]'} font-semibold text-gray-800 truncate leading-tight`}>
+                    <p className={`${dense ? 'mobile-small' : 'text-[14px]'} font-semibold text-gray-800 truncate leading-tight`}>
                       {item.metric}
                     </p>
                   </div>
@@ -129,7 +129,7 @@ export const MobileInvestmentList: React.FC<MobileInvestmentListProps> = ({
                 </div>
 
                 <div className="text-right flex-shrink-0">
-                  <p className={`${dense ? 'text-[12px]' : 'text-[15px]'} font-bold text-gray-900`}>{item.valor}</p>
+                  <p className={`${dense ? 'mobile-subtitle' : 'text-[15px]'} font-bold text-gray-900`}>{item.valor}</p>
                 </div>
               </div>
             </div>
@@ -138,7 +138,7 @@ export const MobileInvestmentList: React.FC<MobileInvestmentListProps> = ({
       </div>
 
       {showFooter && (
-        <div className={`${dense ? 'px-3 py-2 text-[9px]' : 'px-4 py-3 text-[10px]'} flex items-center gap-2 text-gray-400 border-t border-gray-50`}>
+        <div className={`${dense ? 'safe-bottom px-3 py-2 text-[9px]' : 'px-4 py-3 text-[10px]'} flex items-center gap-2 text-gray-400 border-t border-gray-50`}>
           <Clock className="w-3.5 h-3.5 flex-shrink-0" />
           <span>
             Última atualização: <span className="font-semibold">{timestamp}</span>

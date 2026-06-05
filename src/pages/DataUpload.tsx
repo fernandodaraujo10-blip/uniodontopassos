@@ -801,19 +801,19 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
 
     return (
       <>
-      <div className="md:hidden h-full min-h-0 flex flex-col overflow-hidden animate-fadeIn w-full">
+      <div className="md:hidden mobile-page flex flex-col overflow-hidden animate-fadeIn w-full">
         <div className="shrink-0 flex flex-col gap-2">
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-2.5 flex flex-col gap-1.5 select-none">
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0">
-                <h2 className="text-[13px] font-black text-gray-800 leading-none">Envio de Dados</h2>
-                <p className="text-[10px] text-gray-400 mt-1 truncate">Atualização rápida do mês selecionado</p>
+                <h2 className="mobile-subtitle font-black text-gray-800 leading-none">Envio de Dados</h2>
+                <p className="mobile-small text-gray-400 mt-1 truncate">Atualização rápida do mês selecionado</p>
               </div>
               <div className="relative shrink-0">
                 <button
                   type="button"
                   onClick={() => setMonthDropdownOpen(!monthDropdownOpen)}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-gray-200 bg-slate-50 text-[10px] font-bold text-gray-700"
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-gray-200 bg-slate-50 text-[11px] font-bold text-gray-700"
                 >
                   <Calendar className="w-3.5 h-3.5 text-pink-600" />
                   <span>{formatMonthLabel(manualMonth)}</span>
@@ -870,7 +870,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1.5">
               {steps.map((st) => {
                 const active = st.id === manualStep;
                 return (
@@ -881,7 +881,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                       setManualStep(st.id);
                       setMobileManualListTab(st.id === 0 ? 'resumo' : st.id === 1 ? 'investimentos' : 'trafego');
                     }}
-                    className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[9px] font-bold transition-all cursor-pointer ${
+                    className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
                       active ? 'bg-pink-700 text-white shadow-sm' : 'bg-slate-50 text-slate-500 border border-slate-100'
                     }`}
                   >
@@ -953,7 +953,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
           </div>
         </div>
 
-        <div className="flex-1 min-h-0 overflow-hidden px-0.5">
+        <div className="mobile-content flex-1 min-h-0 mobile-scroll">
           <div className="h-full min-h-0 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
             <div className="shrink-0 p-1.5 border-b border-gray-50">
               <div className="grid grid-cols-3 gap-1 bg-slate-50 p-1 rounded-xl">
@@ -975,7 +975,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
               </div>
             </div>
 
-            <div className="flex-1 min-h-0 overflow-y-auto px-2.5 py-2.5">
+            <div className="flex-1 min-h-0 overflow-y-auto px-2.5 py-2.5 mobile-scroll">
               {mobileManualListTab === 'resumo' && (
                 <div className="space-y-1.5">
                   {summaryKeys.map((key) => {
@@ -1002,7 +1002,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                             type="number"
                             value={formSummary[key]}
                             onChange={(e) => setFormSummary(prev => ({ ...prev, [key]: Number(e.target.value) }))}
-                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[13px] font-bold text-slate-700 outline-none focus:border-pink-500"
+                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[12px] font-bold text-slate-700 outline-none focus:border-pink-500"
                           />
                         </div>
                       </div>
@@ -1037,7 +1037,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
                         type="text"
                         value={inv.customName}
                         onChange={(e) => handleUpdateInvestment(inv.categoryId, 'customName', e.target.value)}
-                        className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[13px] font-semibold text-slate-700 outline-none focus:border-pink-500"
+                        className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[12px] font-semibold text-slate-700 outline-none focus:border-pink-500"
                       />
                       <div className="mt-1.5 grid grid-cols-2 gap-1.5">
                         <select

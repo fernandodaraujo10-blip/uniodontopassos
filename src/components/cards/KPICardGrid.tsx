@@ -72,7 +72,7 @@ export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area, compact = 
   if (area === 'marketing') {
     return (
       <div className="w-full shrink-0">
-        <div className={`grid ${compact ? 'grid-cols-2 gap-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'} transition-all duration-300`}>
+        <div className={`grid ${compact ? 'grid-cols-2 gap-3' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'} transition-all duration-300`}>
           <LeadsCard data={data.leads} />
           <ConversoesCard data={data.conversoes} />
           <InvestimentoCard data={data.investimento} />
@@ -85,7 +85,7 @@ export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area, compact = 
   if (area === 'analise') {
     return (
       <div className="w-full shrink-0">
-        <div className={`grid ${compact ? 'grid-cols-2 gap-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'} transition-all duration-300`}>
+        <div className={`grid ${compact ? 'grid-cols-2 gap-3' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'} transition-all duration-300`}>
           <BeneficiariosCard data={data.beneficiarios} compact={compact} />
           <LeadsCard data={data.leads} compact={compact} />
           <ConversoesCard data={data.conversoes} compact={compact} />
@@ -98,7 +98,7 @@ export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area, compact = 
   if (compact) {
     return (
       <div className="w-full shrink-0">
-        <div className="grid grid-cols-2 gap-2 transition-all duration-300">
+        <div className="grid grid-cols-2 gap-3 transition-all duration-300">
           <BeneficiariosCard data={data.beneficiarios} compact />
           <InvestimentoCard data={data.investimento} compact />
           <RoiCard data={data.roi} compact />
@@ -112,7 +112,7 @@ export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area, compact = 
 
   // Se for a área 'geral', exibe todos os 6 cards em formato de carrossel
   return (
-    <div className="relative w-full shrink-0 group select-none">
+      <div className="relative w-full shrink-0 group select-none">
       {/* Seta Scroll Anterior */}
       {showPrevArrow && (
         <button

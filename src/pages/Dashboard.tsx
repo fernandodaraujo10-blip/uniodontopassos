@@ -95,7 +95,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
   return (
     <div className="flex-grow overflow-hidden md:overflow-y-auto overflow-x-hidden bg-[#F8F9FA] page-transition h-full scrollbar-hide">
       {isPerformanceMobile ? (
-        <div className="md:hidden h-[100dvh] overflow-hidden bg-slate-50 flex flex-col">
+        <div className="md:hidden mobile-page bg-slate-50 flex flex-col">
           <div className="shrink-0 h-[56px] px-2 flex items-center justify-between">
             <MobileDashboardHeader
               title={getMobileSectionTitle()}
@@ -113,8 +113,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
             />
           </div>
 
-          <div className="flex-1 overflow-hidden px-2 pb-[64px]">
-            <div className="flex flex-col gap-1.5 h-full min-h-0">
+          <div className="mobile-content flex-1 mobile-scroll">
+            <div className="flex flex-col gap-2 h-full min-h-0">
               <div className="flex-[1.3] min-h-0">
                 <AdPerformanceChart
                   anunciosData={activeMonthData.anuncios}
@@ -134,7 +134,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col md:hidden w-full h-full min-h-0 px-2 pt-2 pb-0 gap-1">
+        <div className="flex flex-col md:hidden w-full h-full min-h-0 px-0 pt-2 pb-0 gap-1">
           <div className="shrink-0 space-y-1.5">
             <MobileDashboardHeader
               title={getMobileSectionTitle()}
@@ -149,14 +149,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
             />
           </div>
 
-          <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="mobile-content flex-1 min-h-0 mobile-scroll">
             {mobileSection === 'visao-geral' && (
               <div className="flex flex-col gap-1.5 animate-fadeIn h-full min-h-0">
                 <section className="space-y-1.5 h-full min-h-0">
                   <div className="flex items-end justify-between gap-2">
                     <div className="min-w-0">
-                      <h2 className="text-sm font-extrabold text-slate-800 tracking-tight">Visão Geral</h2>
-                      <p className="text-[11px] text-slate-500 mt-0.5">
+                      <h2 className="mobile-title font-extrabold text-slate-800 tracking-tight">Visão Geral</h2>
+                      <p className="mobile-small text-slate-500 mt-0.5">
                         Os seis cards principais do mês, no mesmo visual da versão desktop.
                       </p>
                     </div>
@@ -165,7 +165,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
                     </span>
                   </div>
 
-                  <div className="flex-1 min-h-0 overflow-hidden">
+                  <div className="flex-1 min-h-0 mobile-scroll">
                     <KPICardGrid data={activeMonthData} area="geral" compact />
                   </div>
                 </section>

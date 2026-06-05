@@ -13,7 +13,7 @@ export const RoiCard: React.FC<RoiCardProps> = ({ data, className, compact = fal
   const isUp = data.diffType === 'up';
 
   return (
-    <div className={className || `bg-white relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full ${compact ? 'p-2 rounded-xl border border-gray-100' : 'p-4 rounded-2xl border border-gray-100'}`}>
+    <div className={className || `bg-white relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full ${compact ? 'mobile-card min-h-[190px] p-2 border border-gray-100' : 'p-4 rounded-2xl border border-gray-100'}`}>
       <button 
         onClick={(e) => { e.stopPropagation(); setShowHelp(true); }}
         className={`absolute text-gray-400 hover:text-pink-700 transition-colors p-1 rounded-full hover:bg-gray-50 focus:outline-none shrink-0 cursor-pointer z-20 ${compact ? 'top-2 right-2' : 'top-3.5 right-3.5'}`}
@@ -30,7 +30,7 @@ export const RoiCard: React.FC<RoiCardProps> = ({ data, className, compact = fal
           <h3 className={`font-bold text-pink-700 uppercase ${compact ? 'text-[9px]' : 'text-[10px]'}`}>Retorno (ROI)</h3>
         </div>
         
-        <div className={`${compact ? 'text-2xl' : 'text-3xl'} font-bold text-gray-900 mb-0.5 value-transition`}>
+        <div className={`${compact ? 'mobile-card-value' : 'text-3xl'} font-bold text-gray-900 mb-0.5 value-transition`}>
           {data.total}
         </div>
         
@@ -42,7 +42,7 @@ export const RoiCard: React.FC<RoiCardProps> = ({ data, className, compact = fal
           <span className="text-gray-400 font-normal ml-1">vs. anterior</span>
         </div>
         
-        <div className={`space-y-1.5 mt-2 pt-2 border-t border-gray-50 ${compact ? 'text-[10px]' : 'text-[11px]'}`}>
+        <div className={`space-y-1.5 mt-2 pt-2 border-t border-gray-50 ${compact ? 'mobile-small' : 'text-[11px]'}`}>
           <div className="flex justify-between items-center">
             <span className="text-gray-400">CAC do período</span>
             <span className="font-bold text-gray-800">{data.cac}</span>

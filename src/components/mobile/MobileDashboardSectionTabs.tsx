@@ -28,10 +28,10 @@ export const MobileDashboardSectionTabs: React.FC<MobileDashboardSectionTabsProp
           <button
             key={tab.id}
             onClick={() => onChangeSection(tab.id)}
-            className={`flex-1 h-full rounded-xl font-semibold transition-all duration-200 cursor-pointer ${compact ? 'text-[11px]' : 'text-[12px]'} ${
-              active
-                ? 'bg-white text-slate-800 shadow-sm border border-slate-200/50'
-                : 'bg-transparent text-slate-500 hover:text-slate-700'
+              className={`flex-1 h-full rounded-xl font-semibold transition-all duration-200 cursor-pointer ${compact ? 'mobile-small' : 'text-[12px]'} ${
+                active
+                  ? 'bg-white text-slate-800 shadow-sm border border-slate-200/50'
+                  : 'bg-transparent text-slate-500 hover:text-slate-700'
             }`}
           >
             {tab.label}

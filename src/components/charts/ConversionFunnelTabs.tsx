@@ -64,7 +64,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-2 md:px-3 font-bold rounded-lg transition-all duration-300 cursor-pointer whitespace-nowrap min-h-[34px] ${
-                compact ? 'py-1 text-[9px]' : 'py-1.5 text-[11px] md:text-xs'
+                compact ? 'py-1 text-[10px]' : 'py-1.5 text-[11px] md:text-xs'
               } ${
                 isActive
                   ? 'bg-pink-700 text-white shadow-sm'
@@ -85,7 +85,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
         >
           
           {/* Funil Métrica Esquerda (Absoluto) */}
-          <div className={`flex flex-col justify-between h-full shrink-0 select-none ${compact ? 'py-0.5 text-[8px] w-12' : 'py-1 text-[10px] w-16 md:w-20'}`}>
+          <div className={`flex flex-col justify-between h-full shrink-0 select-none ${compact ? 'py-0.5 text-[8px] w-11' : 'py-1 text-[10px] w-16 md:w-20'}`}>
             <div className="hover:scale-105 transition-transform duration-200">
               <p className="text-gray-400 font-medium leading-none">Impressões</p>
               <p className={`font-bold text-gray-800 ${compact ? 'text-[10px]' : 'text-xs'} mt-0.5`}>{funnelData.impressoes}</p>
@@ -172,7 +172,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
           </div>
           
           {/* Funil Taxa Direita (Conversão Relativa) */}
-          <div className={`flex flex-col justify-around h-full shrink-0 border-l border-gray-50 select-none ${compact ? 'py-0.5 text-[7px] w-16 pl-1' : 'py-1 text-[8px] md:text-[9px] w-20 md:w-24 pl-1.5 md:pl-2'}`}>
+          <div className={`flex flex-col justify-around h-full shrink-0 border-l border-gray-50 select-none ${compact ? 'py-0.5 text-[7px] w-14 pl-1' : 'py-1 text-[8px] md:text-[9px] w-20 md:w-24 pl-1.5 md:pl-2'}`}>
             <div>
               <p className="text-gray-400 font-medium leading-none">CTR (Cliques/Imp.)</p>
               <p className={`font-bold text-gray-800 ${compact ? 'text-[10px]' : 'text-xs'} mt-0.5`}>{funnelData.txCtr}</p>

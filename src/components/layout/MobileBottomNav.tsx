@@ -22,7 +22,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   onLogout,
   loggedUser,
 }) => {
-  // Estado do modal de confirmação de logout
+  // Estado do modal de confirma??o de logout
   const [isLogoutOpen, setIsLogoutOpen] = useState<boolean>(false);
 
   const items: NavItem[] = [
@@ -34,7 +34,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       id: 'sair',
       label: 'Sair',
       icon: LogOut,
-      // Abre o modal de confirmação em vez de executar logout direto
+      // Abre o modal de confirma??o em vez de executar logout direto
       action: () => setIsLogoutOpen(true),
     },
   ];
@@ -62,9 +62,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   return (
     <>
       <nav
-        className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 flex items-stretch"
-        style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
-        aria-label="Navegação principal"
+        className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[80] bg-white border-t border-gray-100 flex items-stretch"
+        style={{ height: 'calc(72px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        aria-label="Navega??o principal"
       >
         {items.map((item) => {
           const Icon = item.icon;
@@ -82,7 +82,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   setCurrentPage(item.id);
                 }
               }}
-              className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[56px] transition-all duration-200 cursor-pointer select-none focus:outline-none
+              className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[72px] transition-all duration-200 cursor-pointer select-none focus:outline-none
                 ${active
                   ? 'text-pink-700'
                   : item.id === 'sair'

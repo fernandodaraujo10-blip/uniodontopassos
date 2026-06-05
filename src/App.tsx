@@ -116,7 +116,7 @@ export const App: React.FC = () => {
 
   return (
     <DashboardProvider>
-      <div className="flex h-screen w-screen overflow-hidden bg-[#F8F9FA] font-sans antialiased">
+      <div className="flex h-[100dvh] md:h-screen w-full overflow-hidden bg-[#F8F9FA] font-sans antialiased">
         {/* Sidebar Lateral — visível apenas no desktop (md+), escondida no mobile */}
         <Sidebar
           currentPage={currentPage}
@@ -127,7 +127,7 @@ export const App: React.FC = () => {
 
         {/* Conteúdo Principal Dinâmico — Suspense envolve apenas o conteúdo lazy */}
         {/* pb-20 no mobile para não ficar atrás da bottom navigation (64px + margem) */}
-        <main className={`flex-grow flex flex-col h-full min-h-0 overflow-hidden ${currentPage === 'dashboard' ? 'pb-0' : 'pb-20'} md:pb-0`}>
+        <main className={`mobile-page flex-grow flex flex-col h-full min-h-0 overflow-hidden ${currentPage === 'dashboard' ? 'pb-0' : 'pb-20'} md:pb-0`}>
           <Suspense fallback={<PageLoader />}>
             {renderPage()}
           </Suspense>

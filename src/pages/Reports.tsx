@@ -269,12 +269,12 @@ export const Reports: React.FC = () => {
       case 'executive':
       default:
         return {
-          explicacao: 'Consolida?o de alto n?vel das principais m?tricas operacionais, comerciais e financeiras da Uniodonto Passos. Destinado ao conselho de administra?o para tomada de decis?o ?gil sobre aloca?o de recursos e expans?o geogr?fica.',
+          explicacao: 'Consolidação de alto nível das principais métricas operacionais, comerciais e financeiras da Uniodonto Passos. Destinado ao conselho de administração para tomada de decisão ágil sobre alocação de recursos e expansão geográfica.',
           insights: [
-            { tipo: 'info', texto: `Crescimento Operacional: Captação consolidada de ${formatarNumero(totalBenefs)} novos benefici?rios com investimento total de ${formatarMoeda(totalSpend)} no per?odo avaliado.` },
-            { tipo: 'alerta', texto: `Equil?brio Operacional (Modo CEO): O CAC médio ponderado fixou-se em ${formatarMoeda(averageCac)}. Recomenda-se monitorar a tend?ncia de alta no ?ltimo m?s para evitar compress?o das margens.` },
-            { tipo: 'oportunidade', texto: `Expans?o de Market Share (Shark Tank): Aproveitar a lideran?a de NPS para lan?ar planos odontol?gicos coletivos por ades?o em parceria com associaàes comerciais da regi?o, escalando vendas com baixo custo.` },
-            { tipo: 'sucesso', texto: `Recomenda?o Executiva: Sugere-se a aprova?o de verba adicional de 15% para a estrutura?o de novos canais de vendas digitais focados no público PME regional.` }
+            { tipo: 'info', texto: `Crescimento Operacional: Captação consolidada de ${formatarNumero(totalBenefs)} novos beneficiários com investimento total de ${formatarMoeda(totalSpend)} no período avaliado.` },
+            { tipo: 'alerta', texto: `Equilíbrio Operacional (Modo CEO): O CAC médio ponderado fixou-se em ${formatarMoeda(averageCac)}. Recomenda-se monitorar a tendência de alta no último mês para evitar compressão das margens.` },
+            { tipo: 'oportunidade', texto: `Expansão de Market Share (Shark Tank): Aproveitar a liderança de NPS para lançar planos odontológicos coletivos por adesão em parceria com associações comerciais da região, escalando vendas com baixo custo.` },
+            { tipo: 'sucesso', texto: `Recomendação Executiva: Sugere-se a aprovação de verba adicional de 15% para a estruturação de novos canais de vendas digitais focados no público PME regional.` }
           ]
         };
     }
@@ -925,7 +925,7 @@ export const Reports: React.FC = () => {
         </div>
 
         {/* Layout Mobile Específico (Oculto no Desktop e na Impressão) */}
-        <div className="md:hidden h-[100dvh] overflow-hidden bg-slate-50 flex flex-col print:hidden">
+        <div className="md:hidden mobile-page bg-slate-50 flex flex-col print:hidden">
           <div className="shrink-0 h-[40px] px-2 pt-1">
             <div className="grid grid-cols-3 gap-1 h-full rounded-2xl bg-white border border-gray-100 p-1 shadow-[0_8px_30px_rgba(0,0,0,0.03)]">
               {[
@@ -949,14 +949,14 @@ export const Reports: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex-1 overflow-hidden px-2 pb-[64px]">
+          <div className="mobile-content flex-1 mobile-scroll">
             {mobileSection === 'resumo' && (
               <div className="flex flex-col gap-2 h-full min-h-0 animate-fadeIn">
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-2.5 shrink-0">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Resumo do Relatório</p>
-                      <p className="text-[12px] font-bold text-slate-800 leading-tight mt-1 line-clamp-2">{obterTituloRelatorio()}</p>
+                      <p className="mobile-title font-bold text-slate-800 leading-tight mt-1 line-clamp-2">{obterTituloRelatorio()}</p>
                       <p className="text-[10px] text-slate-500 mt-0.5">{reportFilter.startMonth} a {reportFilter.endMonth}</p>
                     </div>
                     <div className="text-right shrink-0">
@@ -970,14 +970,14 @@ export const Reports: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-2 shrink-0">
                   {mobileKpis.map((kpi, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] p-2 flex flex-col justify-between min-h-[70px]">
+                    <div key={idx} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] p-2 flex flex-col justify-between min-h-[88px]">
                       <div className="flex items-center gap-2 min-w-0">
                         <div className="w-6 h-6 rounded-lg bg-pink-50 text-pink-700 flex items-center justify-center shrink-0">
                           {kpi.icon}
                         </div>
-                        <p className="text-[8px] uppercase font-bold tracking-wider text-slate-400 leading-tight">{kpi.label}</p>
+                        <p className="mobile-card-label uppercase font-bold tracking-wider text-slate-400 leading-tight">{kpi.label}</p>
                       </div>
-                      <p className={`mt-1.5 text-[13px] font-black leading-none ${kpi.label.includes('CAC') || kpi.label.includes('NPS') ? 'text-pink-700' : 'text-slate-800'}`}>
+                      <p className={`mt-1.5 mobile-card-value font-black leading-none ${kpi.label.includes('CAC') || kpi.label.includes('NPS') ? 'text-pink-700' : 'text-slate-800'}`}>
                         {kpi.value}
                       </p>
                     </div>
@@ -994,12 +994,12 @@ export const Reports: React.FC = () => {
                       Insights
                     </span>
                   </div>
-                  <p className="text-[10px] text-slate-500 mt-1.5 leading-relaxed line-clamp-2">{ceoAnalysis.explicacao}</p>
+                  <p className="mobile-small text-slate-500 mt-1.5 leading-relaxed line-clamp-2">{ceoAnalysis.explicacao}</p>
                   <div className="mt-2 space-y-1.5 overflow-hidden">
                     {ceoAnalysis.insights.slice(0, 2).map((insight, idx) => (
                       <div key={idx} className="flex items-start gap-2 bg-slate-50 rounded-xl border border-slate-100 p-2">
                         {renderIconeInsight(insight.tipo)}
-                        <p className="text-[9px] text-slate-600 leading-relaxed line-clamp-3">{insight.texto}</p>
+                        <p className="mobile-small text-slate-600 leading-relaxed line-clamp-3">{insight.texto}</p>
                       </div>
                     ))}
                   </div>
@@ -1015,7 +1015,7 @@ export const Reports: React.FC = () => {
                       Compacto
                     </span>
                   </div>
-                  <div className="h-[150px] min-h-0 overflow-hidden">
+                  <div className="h-[170px] min-h-0 overflow-hidden">
                     <TrendCharts
                       rows={consolidatedReport.rows}
                       reportType={reportFilter.reportType || 'executive'}

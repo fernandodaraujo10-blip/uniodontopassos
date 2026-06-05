@@ -326,7 +326,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
   const { isInstallable, installApp, isInstalled } = usePWAInstall();
 
   return (
-    <div className="h-[100dvh] overflow-hidden md:overflow-y-auto p-3 md:p-5 pb-0 md:pb-5 bg-[#F8F9FA] flex flex-col md:max-h-screen page-transition text-slate-800">
+    <div className="mobile-page h-[100dvh] overflow-hidden md:overflow-y-auto p-3 md:p-5 pb-0 md:pb-5 bg-[#F8F9FA] flex flex-col md:max-h-screen page-transition text-slate-800">
       <header className="mb-2 md:mb-5 shrink-0 flex justify-between items-start md:items-center select-none">
         <div>
           <h1 className="text-[18px] md:text-3xl font-black text-gray-800 leading-none">Configurações</h1>
@@ -629,7 +629,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
               </div>
 
               {/* Grid / Tabela de Usuários */}
-              <div className="flex-grow min-h-0 overflow-hidden border border-slate-100 rounded-2xl bg-slate-50/50">
+              <div className="mobile-scroll flex-grow min-h-0 overflow-hidden border border-slate-100 rounded-2xl bg-slate-50/50">
                 {/* Versão Desktop (Tabela) */}
                 <table className="w-full text-xs text-slate-600 min-w-[600px] border-collapse hidden md:table">
                   <thead>
@@ -723,9 +723,9 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                 </table>
 
                 {/* Versão Mobile (Cards) */}
-                <div className="grid grid-cols-2 gap-2 p-2 md:hidden">
+                <div className="grid grid-cols-1 gap-2 p-2 md:hidden">
                   {filteredUsers.map((user) => (
-                    <div key={user.id} className="bg-white border border-slate-100 rounded-2xl p-2.5 shadow-sm flex flex-col gap-2 overflow-hidden">
+                    <div key={user.id} className="mobile-card min-h-[132px] bg-white border border-slate-100 rounded-2xl p-2.5 shadow-sm flex flex-col gap-2 overflow-hidden">
                       <div className="flex items-center gap-2 min-w-0">
                         {user.photo ? (
                           <img
@@ -740,7 +740,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                         )}
                         <div className="flex flex-col min-w-0 text-left flex-1">
                           <span className="font-bold text-gray-800 text-[11px] leading-tight truncate">{user.name}</span>
-                          <span className="text-gray-400 font-medium text-[9px] truncate mt-0.5">{maskEmail(user.email)}</span>
+                          <span className="mobile-small text-gray-400 font-medium truncate mt-0.5">{maskEmail(user.email)}</span>
                         </div>
                       </div>
 
@@ -764,7 +764,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleOpenEditModal(user)}
-                            className="w-7 h-7 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors flex items-center justify-center cursor-pointer"
+                            className="w-7 h-7 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors flex items-center justify-center cursor-pointer shrink-0"
                             title="Editar Usuário"
                           >
                             <Edit2 className="w-3 h-3" />

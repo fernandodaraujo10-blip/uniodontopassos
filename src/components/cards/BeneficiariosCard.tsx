@@ -13,7 +13,7 @@ export const BeneficiariosCard: React.FC<BeneficiariosCardProps> = ({ data, comp
 
   return (
     <div className={`bg-white relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full ${
-      compact ? 'p-2 rounded-xl border border-gray-100' : 'p-4 rounded-2xl border border-gray-100'
+      compact ? 'mobile-card min-h-[190px] p-2 border border-gray-100' : 'p-4 rounded-2xl border border-gray-100'
     }`}>
       <button 
         onClick={(e) => { e.stopPropagation(); setShowHelp(true); }}
@@ -33,7 +33,7 @@ export const BeneficiariosCard: React.FC<BeneficiariosCardProps> = ({ data, comp
           </span>
         </div>
         
-        <div className={`${compact ? 'text-2xl' : 'text-3xl'} font-bold text-gray-900 mb-0.5 value-transition`}>
+        <div className={`${compact ? 'mobile-card-value' : 'text-3xl'} font-bold text-gray-900 mb-0.5 value-transition`}>
           {data.total}
         </div>
         
@@ -47,7 +47,7 @@ export const BeneficiariosCard: React.FC<BeneficiariosCardProps> = ({ data, comp
           <span className="text-gray-400 font-normal ml-1">vs. anterior</span>
         </div>
         
-        <div className={`space-y-1 text-gray-500 ${compact ? 'text-[9px]' : 'text-[10px]'}`}>
+        <div className={`space-y-1 text-gray-500 ${compact ? 'mobile-small' : 'text-[10px]'}`}>
           <div className="flex justify-between border-b border-gray-50 pb-0.5">
             <span>Base <span className="text-[9px] block">Resumo</span></span>
             <span className="text-right">versus período anterior <span className="block font-medium">Nomes: {data.novos}</span></span>

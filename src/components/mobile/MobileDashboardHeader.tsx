@@ -30,7 +30,7 @@ export const MobileDashboardHeader: React.FC<MobileDashboardHeaderProps> = ({
 
   return (
     <div className={`w-full shrink-0 select-none ${compact ? 'h-[56px] px-2 flex items-center justify-between gap-2' : 'flex items-center justify-between gap-3 py-1'}`}>
-      <h1 className={`font-bold text-slate-800 tracking-tight leading-none ${compact ? 'text-[16px]' : 'text-xl md:text-[22px]'}`}>
+      <h1 className={`font-bold text-slate-800 tracking-tight leading-none ${compact ? 'mobile-title' : 'text-xl md:text-[22px]'}`}>
         {title}
       </h1>
 
@@ -44,7 +44,7 @@ export const MobileDashboardHeader: React.FC<MobileDashboardHeaderProps> = ({
           <ChevronLeft className="w-4 h-4 stroke-[2.5]" />
         </button>
 
-        <span className={`text-pink-700 font-bold uppercase tracking-wider ${compact ? 'px-2 text-[10px]' : 'px-3 text-xs'}`}>
+        <span className={`text-pink-700 font-bold uppercase tracking-wider ${compact ? 'px-2 mobile-small' : 'px-3 text-xs'}`}>
           {currentMonthLabel}
         </span>
 
