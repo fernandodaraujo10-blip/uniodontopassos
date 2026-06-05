@@ -165,7 +165,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
                     </span>
                   </div>
 
-                  <div className="flex-1 min-h-0 mobile-scroll">
+                  <div className="min-h-0">
                     <KPICardGrid data={activeMonthData} area="geral" compact />
                   </div>
                 </section>

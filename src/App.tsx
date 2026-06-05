@@ -116,7 +116,7 @@ export const App: React.FC = () => {
 
   return (
     <DashboardProvider>
-      <div className="flex h-[100dvh] md:h-screen w-full overflow-hidden bg-[#F8F9FA] font-sans antialiased">
+      <div className="flex h-[100dvh] md:h-screen w-full overflow-hidden bg-[#F8F9FA] antialiased">
         {/* Sidebar Lateral — visível apenas no desktop (md+), escondida no mobile */}
         <Sidebar
           currentPage={currentPage}

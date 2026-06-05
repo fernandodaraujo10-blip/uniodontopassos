@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 @layer base {
+  :root {
+    --font-sans: Inter, Roboto, system-ui, sans-serif;
+  }
+
   html {
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
