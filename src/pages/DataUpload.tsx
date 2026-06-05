@@ -205,6 +205,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
   // --- ESTADOS DO ENVIO MANUAL ---
   const [manualMonth, setManualMonth] = useState('2026-07');
   const [manualStep, setManualStep] = useState(0);
+  const [mobileManualListTab, setMobileManualListTab] = useState<'resumo' | 'investimentos' | 'trafego'>('resumo');
   const [manualSuccessMessage, setManualSuccessMessage] = useState('');
   const [activeInvTab, setActiveInvTab] = useState<'Todos' | 'Marketing' | 'Ads' | 'Offline' | 'Ferramentas'>('Todos');
   const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
@@ -783,12 +784,377 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
       { id: 2, title: 'Tráfego, Canais & Campanhas', desc: 'Fontes e anúncios' }
     ];
 
+    const summaryKeys = ['activeBeneficiaries', 'newBeneficiaries', 'canceledBeneficiaries', 'leads', 'conversions', 'ltv', 'nps'] as const;
+    const totalItems = summaryKeys.length + formInvestments.length + (8 + formCampaigns.length);
+    const validatedCount =
+      summaryKeys.filter(k => validatedSummary[k]).length +
+      formInvestments.filter(inv => validatedInvestments[inv.categoryId]).length +
+      Object.values(validatedCampaigns).filter(Boolean).length;
+    const pct = totalItems > 0 ? Math.round((validatedCount / totalItems) * 100) : 0;
+    const allValidated = pct === 100;
+    const hasAny = validatedCount > 0;
+    const mobileListTabs: { id: 'resumo' | 'investimentos' | 'trafego'; label: string }[] = [
+      { id: 'resumo', label: 'Resumo Geral' },
+      { id: 'investimentos', label: 'Investimentos' },
+      { id: 'trafego', label: 'Tráfego' },
+    ];
+
     return (
-      <div className="flex flex-col h-full overflow-hidden animate-fadeIn pb-4 w-full">
+      <>
+      <div className="md:hidden h-full min-h-0 flex flex-col overflow-hidden animate-fadeIn w-full">
+        <div className="shrink-0 flex flex-col gap-2">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-2.5 flex flex-col gap-1.5 select-none">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <h2 className="text-[13px] font-black text-gray-800 leading-none">Envio de Dados</h2>
+                <p className="text-[10px] text-gray-400 mt-1 truncate">Atualização rápida do mês selecionado</p>
+              </div>
+              <div className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setMonthDropdownOpen(!monthDropdownOpen)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-gray-200 bg-slate-50 text-[10px] font-bold text-gray-700"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-pink-600" />
+                  <span>{formatMonthLabel(manualMonth)}</span>
+                </button>
+
+                {monthDropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40 bg-transparent" onClick={() => setMonthDropdownOpen(false)} />
+                    <div className="absolute right-0 top-full mt-2 z-50 w-72 bg-white border border-gray-100 rounded-3xl shadow-xl p-3 animate-scaleUp text-left select-none">
+                      <div className="flex items-center justify-between mb-3 pb-2 border-b border-gray-100">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setDropdownYear(prev => prev - 1); }}
+                          className="p-1 hover:bg-slate-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                        <span className="text-xs font-black text-slate-700 tracking-wide">{dropdownYear}</span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setDropdownYear(prev => prev + 1); }}
+                          className="p-1 hover:bg-slate-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-2">
+                        {['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'].map((mesNome, idx) => {
+                          const monthNum = String(idx + 1).padStart(2, '0');
+                          const monthKey = `${dropdownYear}-${monthNum}`;
+                          const isSelected = manualMonth === monthKey;
+                          return (
+                            <button
+                              key={monthKey}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setManualMonth(monthKey);
+                                setMonthDropdownOpen(false);
+                              }}
+                              className={`relative py-2 rounded-2xl text-[11px] font-bold text-center transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white font-black shadow-md'
+                                  : 'text-gray-500 hover:bg-slate-50 hover:text-gray-700'
+                              }`}
+                            >
+                              {mesNome}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-1">
+              {steps.map((st) => {
+                const active = st.id === manualStep;
+                return (
+                  <button
+                    key={st.id}
+                    type="button"
+                    onClick={() => {
+                      setManualStep(st.id);
+                      setMobileManualListTab(st.id === 0 ? 'resumo' : st.id === 1 ? 'investimentos' : 'trafego');
+                    }}
+                    className={`flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-[9px] font-bold transition-all cursor-pointer ${
+                      active ? 'bg-pink-700 text-white shadow-sm' : 'bg-slate-50 text-slate-500 border border-slate-100'
+                    }`}
+                  >
+                    <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[9px]">{st.id + 1}</span>
+                    <span>{st.id === 0 ? 'Resumo' : st.id === 1 ? 'Inv.' : 'Tráfego'}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="grid grid-cols-3 gap-1.5">
+              <button
+                type="button"
+                onClick={handleManualSave}
+                className="h-8 rounded-xl bg-pink-700 text-white text-[9px] font-bold flex items-center justify-center gap-1"
+              >
+                <Save className="w-3 h-3" />
+                Salvar
+              </button>
+              <button
+                type="button"
+                onClick={() => handleTabChange('envio-planilhas')}
+                className="h-8 rounded-xl bg-white border border-pink-700/30 text-pink-700 text-[9px] font-bold flex items-center justify-center gap-1"
+              >
+                Importar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const next = Math.min(manualStep + 1, 2);
+                  setManualStep(next);
+                  setMobileManualListTab(next === 0 ? 'resumo' : next === 1 ? 'investimentos' : 'trafego');
+                }}
+                className="h-8 rounded-xl bg-slate-900 text-white text-[9px] font-bold flex items-center justify-center gap-1"
+              >
+                Próximo Passo
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-1.5">
+              <div className={`rounded-xl border px-2.5 py-1.5 text-[9px] font-bold ${allValidated ? 'border-emerald-100 bg-emerald-50 text-emerald-700' : hasAny ? 'border-pink-100 bg-pink-50 text-pink-700' : 'border-slate-100 bg-slate-50 text-slate-400'}`}>
+                {allValidated ? 'Mês Fechado' : hasAny ? 'Em Andamento' : 'Aguardando'}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (allValidated) {
+                    setValidatedSummary({});
+                    setValidatedInvestments({});
+                    setValidatedCampaigns({});
+                  } else {
+                    const summaryNext: Record<string, boolean> = {};
+                    summaryKeys.forEach(k => { summaryNext[k] = true; });
+                    const invNext: Record<string, boolean> = {};
+                    formInvestments.forEach(inv => { invNext[inv.categoryId] = true; });
+                    const campNext: Record<string, boolean> = {};
+                    ['impressions','clicks','ctr','cpc','leads','conversions','agendamentos','vendas'].forEach(k => { campNext[k] = true; });
+                    formCampaigns.forEach(c => { campNext[c.campaignId] = true; });
+                    setValidatedSummary(summaryNext);
+                    setValidatedInvestments(invNext);
+                    setValidatedCampaigns(campNext);
+                  }
+                }}
+                className={`rounded-xl border px-2.5 py-1.5 text-[9px] font-bold ${allValidated ? 'border-rose-100 bg-rose-50 text-rose-600' : 'border-emerald-100 bg-emerald-50 text-emerald-700'}`}
+              >
+                {allValidated ? 'Limpar Tudo' : `Confirmar Tudo ${pct}%`}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex-1 min-h-0 overflow-hidden px-0.5">
+          <div className="h-full min-h-0 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+            <div className="shrink-0 p-1.5 border-b border-gray-50">
+              <div className="grid grid-cols-3 gap-1 bg-slate-50 p-1 rounded-xl">
+                {mobileListTabs.map((tab) => {
+                  const active = mobileManualListTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setMobileManualListTab(tab.id)}
+                      className={`h-7 rounded-lg text-[9px] font-bold transition-all ${
+                        active ? 'bg-pink-700 text-white shadow-sm' : 'text-slate-500'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-y-auto px-2.5 py-2.5">
+              {mobileManualListTab === 'resumo' && (
+                <div className="space-y-1.5">
+                  {summaryKeys.map((key) => {
+                    const labels: Record<typeof key, string> = {
+                      activeBeneficiaries: 'Beneficiários Ativos',
+                      newBeneficiaries: 'Novas Vendas',
+                      canceledBeneficiaries: 'Cancelamentos',
+                      leads: 'Leads Captados',
+                      conversions: 'Conversões Efetivas',
+                      ltv: 'LTV',
+                      nps: 'NPS',
+                    };
+                    return (
+                      <div key={key} className="rounded-xl border border-slate-100 bg-slate-50/60 p-2 flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={!!validatedSummary[key]}
+                          onChange={(e) => setValidatedSummary(prev => ({ ...prev, [key]: e.target.checked }))}
+                          className="w-4 h-4 accent-emerald-600"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[9px] font-bold text-slate-500 uppercase truncate">{labels[key]}</p>
+                          <input
+                            type="number"
+                            value={formSummary[key]}
+                            onChange={(e) => setFormSummary(prev => ({ ...prev, [key]: Number(e.target.value) }))}
+                            className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[13px] font-bold text-slate-700 outline-none focus:border-pink-500"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {mobileManualListTab === 'investimentos' && (
+                <div className="space-y-1.5">
+                  {formInvestments.map((inv) => (
+                    <div key={inv.categoryId} className={`rounded-xl border p-2 ${validatedInvestments[inv.categoryId] ? 'border-emerald-100 bg-emerald-50/20' : 'border-slate-100 bg-slate-50/40'}`}>
+                      <div className="flex items-center justify-between gap-2 mb-1.5">
+                        <label className="flex items-center gap-2 text-[9px] font-bold text-slate-500 uppercase">
+                          <input
+                            type="checkbox"
+                            checked={!!validatedInvestments[inv.categoryId]}
+                            onChange={() => setValidatedInvestments(prev => ({ ...prev, [inv.categoryId]: !prev[inv.categoryId] }))}
+                            className="w-4 h-4 accent-emerald-600"
+                          />
+                          Auditado
+                        </label>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveInvestment(inv.categoryId)}
+                          className="text-rose-500"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={inv.customName}
+                        onChange={(e) => handleUpdateInvestment(inv.categoryId, 'customName', e.target.value)}
+                        className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[13px] font-semibold text-slate-700 outline-none focus:border-pink-500"
+                      />
+                      <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+                        <select
+                          value={inv.customType}
+                          onChange={(e) => handleUpdateInvestment(inv.categoryId, 'customType', e.target.value)}
+                          className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] font-bold text-slate-700 outline-none focus:border-pink-500"
+                        >
+                          <option value="marketing">Ads</option>
+                          <option value="sales">Software</option>
+                          <option value="operational">Operacional</option>
+                        </select>
+                        <input
+                          type="text"
+                          defaultValue={inv.amount === 0 ? '' : inv.amount.toString().replace('.', ',')}
+                          onBlur={(e) => {
+                            const normalized = e.target.value.replace(/\./g, '').replace(',', '.');
+                            const parsed = parseFloat(normalized);
+                            handleUpdateInvestment(inv.categoryId, 'amount', isNaN(parsed) ? 0 : parsed);
+                          }}
+                          className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-right text-[13px] font-mono font-bold text-slate-700 outline-none focus:border-pink-500"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <div className="rounded-xl border border-pink-100 bg-pink-50 px-2.5 py-2 flex items-center justify-between">
+                    <span className="text-[9px] font-extrabold uppercase text-pink-700">Total investido</span>
+                    <span className="text-[13px] font-black text-pink-700">{totalInvestments.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                  </div>
+                </div>
+              )}
+
+              {mobileManualListTab === 'trafego' && (
+                <div className="space-y-1.5">
+                  {([
+                    { metricKey: 'impressions', label: 'Impressões', value: `${totalImpressions.toLocaleString('pt-BR')}` },
+                    { metricKey: 'clicks', label: 'Cliques', value: `${totalClicks.toLocaleString('pt-BR')}` },
+                    { metricKey: 'ctr', label: 'CTR', value: `${calculatedCTR.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%` },
+                    { metricKey: 'cpc', label: 'CPC', value: calculatedCPC.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) },
+                    { metricKey: 'leads', label: 'Leads por Canal', value: `${totalLeads}` },
+                    { metricKey: 'conversions', label: 'Conversões por Canal', value: `${totalConversions}` },
+                    { metricKey: 'agendamentos', label: 'Agendamentos', value: `${Math.round(totalConversions * 1.25)}` },
+                    { metricKey: 'vendas', label: 'Vendas', value: `${totalConversions}` },
+                  ]).map(({ metricKey, label, value }) => (
+                    <div key={metricKey} className={`rounded-xl border p-2 ${validatedCampaigns[metricKey] ? 'border-emerald-100 bg-emerald-50/20' : 'border-slate-100 bg-slate-50/40'}`}>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={!!validatedCampaigns[metricKey]}
+                          onChange={(e) => setValidatedCampaigns(prev => ({ ...prev, [metricKey]: e.target.checked }))}
+                          className="w-4 h-4 accent-emerald-600"
+                        />
+                        <span className="text-[9px] font-bold text-slate-500 uppercase">{label}</span>
+                      </div>
+                      <p className="mt-1 text-[13px] font-black text-slate-700">{value}</p>
+                    </div>
+                  ))}
+
+                  {formCampaigns.map((c) => (
+                    <div key={c.campaignId} className={`rounded-xl border p-2 ${validatedCampaigns[c.campaignId] ? 'border-emerald-100 bg-emerald-50/20' : 'border-slate-100 bg-white'}`}>
+                      <div className="flex items-center justify-between gap-2">
+                        <label className="flex items-center gap-2 text-[9px] font-bold text-slate-500 uppercase">
+                          <input
+                            type="checkbox"
+                            checked={!!validatedCampaigns[c.campaignId]}
+                            onChange={(e) => setValidatedCampaigns(prev => ({ ...prev, [c.campaignId]: e.target.checked }))}
+                            className="w-4 h-4 accent-emerald-600"
+                          />
+                          Auditada
+                        </label>
+                        <button type="button" onClick={() => handleRemoveCampaign(c.campaignId)} className="text-rose-500">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <input
+                        type="text"
+                        value={c.campaignName}
+                        onChange={(e) => handleUpdateCampaign(c.campaignId, 'campaignName', e.target.value)}
+                        className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50/50 px-2 py-1 text-[13px] font-semibold text-slate-700 outline-none focus:border-pink-500"
+                      />
+                      <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+                        <select
+                          value={c.platform}
+                          onChange={(e) => handleUpdateCampaign(c.campaignId, 'platform', e.target.value)}
+                          className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] font-bold text-slate-700 outline-none focus:border-pink-500"
+                        >
+                          <option value="Google Ads">Google Ads</option>
+                          <option value="Meta Ads">Meta Ads</option>
+                          <option value="Offline">Offline</option>
+                          <option value="Online">Online</option>
+                        </select>
+                        <input
+                          type="number"
+                          value={c.clicks === 0 ? '' : c.clicks}
+                          placeholder="Cliques"
+                          onChange={(e) => handleUpdateCampaign(c.campaignId, 'clicks', Number(e.target.value))}
+                          className="w-full rounded-lg border border-slate-200 bg-white px-2 py-1 text-right text-[13px] font-mono font-bold text-slate-700 outline-none focus:border-pink-500"
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="rounded-xl border border-pink-100 bg-pink-50 px-2.5 py-2 flex items-center justify-between">
+                    <span className="text-[9px] font-extrabold uppercase text-pink-700">CPL</span>
+                    <span className="text-[13px] font-black text-pink-700">{calculatedCPL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="hidden md:flex flex-col h-full overflow-hidden animate-fadeIn pb-0 w-full">
         {/* Sub-Header Horizontal ( Wizard Premium + Botões de Ações ) */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 select-none shrink-0 w-full">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 mb-3 select-none shrink-0 w-full">
           {/* Step Indicator horizontal limpo */}
-          <div className="flex items-center justify-between sm:justify-start gap-1.5 sm:gap-6 bg-white border border-gray-100 shadow-sm rounded-2xl px-2.5 sm:px-4 py-2.5 sm:py-3 w-full sm:w-auto shrink-0 select-none">
+          <div className="flex items-center justify-between sm:justify-start gap-1.5 sm:gap-6 bg-white border border-gray-100 shadow-sm rounded-2xl px-2.5 sm:px-4 py-2 sm:py-3 w-full sm:w-auto shrink-0 select-none">
             {steps.map((st, index) => (
               <React.Fragment key={st.id}>
                 <button 
@@ -823,7 +1189,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
           </div>
 
           {/* Botões de Ação Superiores + Seletor de Data */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-end gap-3 w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between lg:justify-end gap-2 w-full lg:w-auto">
             {/* Seletor de Período Cronológico com setas (Full width no mobile, auto no desktop) */}
             <div className="relative flex items-center justify-between sm:justify-start gap-1 bg-white border border-gray-200 rounded-2xl p-1 shadow-xs w-full sm:w-auto">
               <button 
@@ -1697,6 +2063,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
           </div>
         </div>
       </div>
+      </>
     );
   };
 
@@ -2230,8 +2597,8 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
   };
 
   return (
-    <div className="flex-grow overflow-y-auto p-4 md:p-5 pb-28 lg:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition">
-      <header className="mb-3 lg:mb-5 shrink-0 flex justify-between items-center select-none">
+    <div className="flex-grow overflow-hidden md:overflow-y-auto p-4 md:p-5 pb-0 md:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition">
+      <header className="mb-2 lg:mb-5 shrink-0 flex justify-between items-center select-none">
         <div>
           <h1 className="text-[30px] lg:text-3xl font-bold text-gray-800 leading-tight">
             <span className="lg:hidden">Envio de Dados</span>
@@ -2245,7 +2612,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
       </header>
 
       {/* TABS SELECTOR (ABAS HORIZONTAIS PREMIUM) */}
-      <div className="flex border-b border-gray-200 mb-5 shrink-0 select-none overflow-x-auto scrollbar-hide -mx-4 px-4 whitespace-nowrap h-[52px]">
+      <div className="flex border-b border-gray-200 mb-3 shrink-0 select-none overflow-x-auto scrollbar-hide -mx-4 px-4 whitespace-nowrap h-[44px]">
         <button
           onClick={() => handleTabChange('envio-manual')}
           className={`pb-3 px-4 sm:px-6 text-xs sm:text-sm font-extrabold cursor-pointer border-b-2 transition-all flex items-center gap-2 h-full ${
@@ -2285,14 +2652,14 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
       </div>
 
       {importMessage && activeTab === 'envio-planilhas' && (
-        <div className="mb-4 shrink-0 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 animate-fadeIn">
+        <div className="mb-3 shrink-0 p-3 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 animate-fadeIn">
           <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
           <p className="text-xs font-bold text-emerald-800">{importMessage}</p>
         </div>
       )}
 
       {/* Renderizador de visualizações */}
-      <div className="flex-grow overflow-hidden flex flex-col h-full min-h-0">
+      <div className="flex-grow overflow-hidden flex flex-col h-full min-h-0 pb-0 md:pb-0">
         {activeTab === 'envio-manual' && renderManualView()}
         {activeTab === 'envio-planilhas' && renderSpreadsheetView()}
         {activeTab === 'envio-conexoes' && renderWebhookView()}

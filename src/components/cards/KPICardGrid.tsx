@@ -12,9 +12,10 @@ import NpsCard from './NpsCard';
 interface KPICardGridProps {
   data: MonthDashboardData;
   area: DashboardArea;
+  compact?: boolean;
 }
 
-export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area }) => {
+export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area, compact = false }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showPrevArrow, setShowPrevArrow] = useState(false);
   const [showNextArrow, setShowNextArrow] = useState(true);
@@ -71,7 +72,7 @@ export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area }) => {
   if (area === 'marketing') {
     return (
       <div className="w-full shrink-0">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 transition-all duration-300">
+        <div className={`grid ${compact ? 'grid-cols-2 gap-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'} transition-all duration-300`}>
           <LeadsCard data={data.leads} />
           <ConversoesCard data={data.conversoes} />
           <InvestimentoCard data={data.investimento} />
@@ -84,11 +85,26 @@ export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area }) => {
   if (area === 'analise') {
     return (
       <div className="w-full shrink-0">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 transition-all duration-300">
-          <BeneficiariosCard data={data.beneficiarios} />
-          <LeadsCard data={data.leads} />
-          <ConversoesCard data={data.conversoes} />
-          <NpsCard data={data.nps} />
+        <div className={`grid ${compact ? 'grid-cols-2 gap-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4'} transition-all duration-300`}>
+          <BeneficiariosCard data={data.beneficiarios} compact={compact} />
+          <LeadsCard data={data.leads} compact={compact} />
+          <ConversoesCard data={data.conversoes} compact={compact} />
+          <NpsCard data={data.nps} compact={compact} />
+        </div>
+      </div>
+    );
+  }
+
+  if (compact) {
+    return (
+      <div className="w-full shrink-0">
+        <div className="grid grid-cols-2 gap-2 transition-all duration-300">
+          <BeneficiariosCard data={data.beneficiarios} compact />
+          <InvestimentoCard data={data.investimento} compact />
+          <RoiCard data={data.roi} compact />
+          <NpsCard data={data.nps} compact />
+          <LeadsCard data={data.leads} compact />
+          <ConversoesCard data={data.conversoes} compact />
         </div>
       </div>
     );

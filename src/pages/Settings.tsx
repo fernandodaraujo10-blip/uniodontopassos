@@ -326,89 +326,87 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
   const { isInstallable, installApp, isInstalled } = usePWAInstall();
 
   return (
-    <div className="flex-grow overflow-y-auto p-4 md:p-5 pb-20 md:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition text-slate-800">
-      <header className="mb-4 md:mb-5 shrink-0 flex justify-between items-center select-none">
+    <div className="h-[100dvh] overflow-hidden md:overflow-y-auto p-3 md:p-5 pb-0 md:pb-5 bg-[#F8F9FA] flex flex-col md:max-h-screen page-transition text-slate-800">
+      <header className="mb-2 md:mb-5 shrink-0 flex justify-between items-start md:items-center select-none">
         <div>
-          <h1 className="text-xl md:text-3xl font-bold text-gray-800">Configurações Gerais</h1>
-          <p className="text-xs md:text-sm text-gray-500 mt-1 leading-relaxed">
+          <h1 className="text-[18px] md:text-3xl font-black text-gray-800 leading-none">Configurações</h1>
+          <p className="hidden md:block text-sm text-gray-500 mt-1 leading-relaxed">
             Gerencie os usuários do dashboard, parametrize dados da cooperativa e configure segurança e alertas.
           </p>
         </div>
       </header>
 
       {successToast && (
-        <div className="mb-4 shrink-0 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 animate-fadeIn shadow-sm">
-          <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 animate-bounce" />
-          <p className="text-xs font-bold text-emerald-800">{successToast}</p>
+        <div className="mb-2 shrink-0 p-2.5 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-2 animate-fadeIn shadow-sm">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 animate-bounce" />
+          <p className="text-[10px] font-bold text-emerald-800">{successToast}</p>
         </div>
       )}
 
 
 
       {/* Grid Principal Layout Settings */}
-      <div className="flex-grow flex flex-col md:flex-row gap-6 overflow-hidden min-h-0">
+      <div className="flex-grow flex flex-col md:flex-row gap-3 overflow-hidden min-h-0 pb-0 md:pb-0">
         
         {/* Menu de Abas Mobile (Scroll Horizontal) */}
-        <div className="relative md:hidden shrink-0 -mx-4">
-          <div className="flex overflow-x-auto scrollbar-hide py-1 mb-1 flex-row gap-2 select-none px-4">
+        <div className="relative md:hidden shrink-0">
+          <div className="grid grid-cols-3 gap-1.5 mb-2 select-none">
             <button
               onClick={() => setActiveTab('meu-perfil')}
-              className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+              className={`min-h-9 flex items-center justify-center px-2 py-2 rounded-2xl text-[9px] font-bold transition-all cursor-pointer gap-1 shrink-0 ${
                 activeTab === 'meu-perfil'
                   ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
                   : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
               }`}
             >
-              <UserIcon className="w-3.5 h-3.5 shrink-0" />
-              <span>Meu Perfil</span>
+              <UserIcon className="w-3 h-3 shrink-0" />
+              <span className="truncate">Perfil</span>
             </button>
             <button
               onClick={() => setActiveTab('usuarios')}
-              className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+              className={`min-h-9 flex items-center justify-center px-2 py-2 rounded-2xl text-[9px] font-bold transition-all cursor-pointer gap-1 shrink-0 ${
                 activeTab === 'usuarios'
                   ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
                   : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
               }`}
             >
-              <Users className="w-3.5 h-3.5 shrink-0" />
-              <span>Usuários</span>
+              <Users className="w-3 h-3 shrink-0" />
+              <span className="truncate">Usuários</span>
             </button>
             <button
               onClick={() => setActiveTab('perfil')}
-              className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+              className={`min-h-9 flex items-center justify-center px-2 py-2 rounded-2xl text-[9px] font-bold transition-all cursor-pointer gap-1 shrink-0 ${
                 activeTab === 'perfil'
                   ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
                   : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
               }`}
             >
-              <Building2 className="w-3.5 h-3.5 shrink-0" />
-              <span>Cooperativa</span>
+              <Building2 className="w-3 h-3 shrink-0" />
+              <span className="truncate">Coop.</span>
             </button>
             <button
               onClick={() => setActiveTab('seguranca')}
-              className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+              className={`min-h-9 flex items-center justify-center px-2 py-2 rounded-2xl text-[9px] font-bold transition-all cursor-pointer gap-1 shrink-0 ${
                 activeTab === 'seguranca'
                   ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
                   : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
               }`}
             >
-              <ShieldAlert className="w-3.5 h-3.5 shrink-0" />
-              <span>Segurança & API</span>
+              <ShieldAlert className="w-3 h-3 shrink-0" />
+              <span className="truncate">Segurança</span>
             </button>
             <button
               onClick={() => setActiveTab('notificacoes')}
-              className={`flex items-center px-4 py-2.5 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap gap-1.5 shrink-0 ${
+              className={`min-h-9 flex items-center justify-center px-2 py-2 rounded-2xl text-[9px] font-bold transition-all cursor-pointer gap-1 shrink-0 ${
                 activeTab === 'notificacoes'
                   ? 'bg-gradient-to-r from-pink-700 to-pink-500 text-white shadow-md shadow-pink-100'
                   : 'bg-white border border-gray-100 text-gray-500 hover:bg-slate-50'
               }`}
             >
-              <BellRing className="w-3.5 h-3.5 shrink-0" />
-              <span>Notificações</span>
+              <BellRing className="w-3 h-3 shrink-0" />
+              <span className="truncate">Alertas</span>
             </button>
           </div>
-          {/* Sombreamento degradê à direita para indicar rolagem horizontal */}
-          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#F8F9FA] to-transparent pointer-events-none z-10" />
         </div>
 
         {/* Menu Lateral de Abas de Configurações - Desktop */}
@@ -599,39 +597,39 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
 
           {/* TAB 1: GERENCIAMENTO DE USUÁRIOS */}
           {activeTab === 'usuarios' && (
-            <div className="flex flex-col h-full overflow-hidden animate-fadeIn">
+            <div className="flex flex-col h-full overflow-hidden animate-fadeIn min-h-0">
               {/* Header do CRUD */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5 shrink-0 select-none">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 shrink-0 select-none">
                 <div>
-                  <h2 className="text-sm sm:text-md font-extrabold text-slate-800">Contas e Membros Ativos</h2>
-                  <p className="text-[11px] sm:text-xs text-gray-400">Configure quem possui acesso de visualização ou administração técnica</p>
+                  <h2 className="text-[13px] sm:text-md font-extrabold text-slate-800 leading-none">Contas e Membros Ativos</h2>
+                  <p className="hidden sm:block text-[11px] sm:text-xs text-gray-400">Configure quem possui acesso de visualização ou administração técnica</p>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   {/* Barra de Pesquisa */}
                   <div className="relative w-full sm:w-60">
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       placeholder="Pesquisar usuários..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2.5 sm:py-2 border border-slate-200 rounded-2xl text-xs font-semibold text-gray-700 focus:outline-none focus:border-pink-500"
+                      className="w-full pl-9 pr-3 py-2 sm:py-2 border border-slate-200 rounded-2xl text-[11px] font-semibold text-gray-700 focus:outline-none focus:border-pink-500"
                     />
                   </div>
 
                   {/* Adicionar Usuário */}
                   <button
                     onClick={handleOpenAddModal}
-                    className="py-2.5 sm:py-2 px-4 bg-gradient-to-r from-pink-700 to-pink-500 text-white font-bold rounded-2xl text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-md hover:scale-102 active:scale-98 transition-all"
+                    className="py-2 sm:py-2 px-3 bg-gradient-to-r from-pink-700 to-pink-500 text-white font-bold rounded-2xl text-[10px] flex items-center justify-center gap-1 cursor-pointer shadow-md hover:scale-102 active:scale-98 transition-all"
                   >
-                    <Plus className="w-4 h-4 animate-pulse" /> Novo Usuário
+                    <Plus className="w-3.5 h-3.5 animate-pulse" /> Novo Usuário
                   </button>
                 </div>
               </div>
 
               {/* Grid / Tabela de Usuários */}
-              <div className="flex-grow overflow-y-auto border border-slate-100 rounded-2xl bg-slate-50/50">
+              <div className="flex-grow min-h-0 overflow-hidden border border-slate-100 rounded-2xl bg-slate-50/50">
                 {/* Versão Desktop (Tabela) */}
                 <table className="w-full text-xs text-slate-600 min-w-[600px] border-collapse hidden md:table">
                   <thead>
@@ -725,42 +723,40 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                 </table>
 
                 {/* Versão Mobile (Cards) */}
-                <div className="block md:hidden space-y-3 p-3">
+                <div className="grid grid-cols-2 gap-2 p-2 md:hidden">
                   {filteredUsers.map((user) => (
-                    <div key={user.id} className="bg-white border border-slate-100 rounded-2xl p-4 shadow-sm flex flex-col gap-3">
-                      <div className="flex items-center gap-3">
+                    <div key={user.id} className="bg-white border border-slate-100 rounded-2xl p-2.5 shadow-sm flex flex-col gap-2 overflow-hidden">
+                      <div className="flex items-center gap-2 min-w-0">
                         {user.photo ? (
                           <img
                             src={user.photo}
                             alt={user.name}
-                            className="w-12 h-12 rounded-full object-cover shadow-sm shrink-0 border border-slate-100"
+                            className="w-10 h-10 rounded-full object-cover shadow-sm shrink-0 border border-slate-100"
                           />
                         ) : (
-                          <div className={`w-12 h-12 rounded-full bg-gradient-to-tr ${user.avatarColor} flex items-center justify-center font-extrabold text-sm text-white shadow-sm shrink-0`}>
+                          <div className={`w-10 h-10 rounded-full bg-gradient-to-tr ${user.avatarColor} flex items-center justify-center font-extrabold text-[11px] text-white shadow-sm shrink-0`}>
                             {getInitials(user.name)}
                           </div>
                         )}
-                        <div className="flex flex-col min-w-0 text-left">
-                          <span className="font-bold text-gray-800 text-sm truncate">{user.name}</span>
-                          <span className="text-gray-400 font-medium text-[11px] flex items-center gap-1 truncate mt-0.5">
-                            <Mail className="w-3.5 h-3.5 shrink-0 text-slate-400" /> {maskEmail(user.email)}
-                          </span>
+                        <div className="flex flex-col min-w-0 text-left flex-1">
+                          <span className="font-bold text-gray-800 text-[11px] leading-tight truncate">{user.name}</span>
+                          <span className="text-gray-400 font-medium text-[9px] truncate mt-0.5">{maskEmail(user.email)}</span>
                         </div>
                       </div>
 
-                      <div className="flex flex-wrap gap-2 items-center justify-between border-t border-slate-100/60 pt-3 mt-1">
-                        <div className="flex flex-wrap gap-2">
-                          <span className="font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded-full text-[10px] flex items-center gap-1">
-                            <Briefcase className="w-3 h-3 text-slate-400" />
+                      <div className="flex items-center justify-between gap-2 border-t border-slate-100/60 pt-2">
+                        <div className="flex flex-wrap gap-1.5 min-w-0">
+                          <span className="font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-full text-[9px] flex items-center gap-1">
+                            <Briefcase className="w-2.5 h-2.5 text-slate-400" />
                             {user.role}
                           </span>
                           {user.status === 'ativo' ? (
-                            <span className="bg-emerald-50 text-emerald-600 font-extrabold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-1">
-                              <UserCheck className="w-3 h-3" /> Ativo
+                            <span className="bg-emerald-50 text-emerald-600 font-extrabold text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-100 flex items-center gap-1">
+                              <UserCheck className="w-2.5 h-2.5" /> Ativo
                             </span>
                           ) : (
-                            <span className="bg-slate-100 text-slate-400 font-extrabold text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-slate-200 flex items-center gap-1">
-                              <UserX className="w-3 h-3" /> Inativo
+                            <span className="bg-slate-100 text-slate-400 font-extrabold text-[8px] uppercase tracking-wider px-2 py-0.5 rounded-full border border-slate-200 flex items-center gap-1">
+                              <UserX className="w-2.5 h-2.5" /> Inativo
                             </span>
                           )}
                         </div>
@@ -768,24 +764,24 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleOpenEditModal(user)}
-                            className="w-8 h-8 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors flex items-center justify-center cursor-pointer"
+                            className="w-7 h-7 rounded-xl bg-slate-50 border border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-800 transition-colors flex items-center justify-center cursor-pointer"
                             title="Editar Usuário"
                           >
-                            <Edit2 className="w-3.5 h-3.5" />
+                            <Edit2 className="w-3 h-3" />
                           </button>
                           <button
                             onClick={() => handleDeleteUser(user.id, user.name)}
-                            className="w-8 h-8 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 hover:bg-rose-100 transition-colors flex items-center justify-center cursor-pointer"
+                            className="w-7 h-7 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 hover:bg-rose-100 transition-colors flex items-center justify-center cursor-pointer"
                             title="Excluir Usuário"
                           >
-                            <Trash2 className="w-3.5 h-3.5" />
+                            <Trash2 className="w-3 h-3" />
                           </button>
                         </div>
                       </div>
                     </div>
                   ))}
                   {filteredUsers.length === 0 && (
-                    <div className="p-8 text-center text-slate-400 font-medium">
+                    <div className="col-span-2 p-6 text-center text-slate-400 font-medium text-xs">
                       Nenhum usuário encontrado correspondente à pesquisa.
                     </div>
                   )}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { FileText, Download, TrendingUp, Printer, Calendar, DollarSign, Users, Award, Info, RefreshCw, CheckCircle2, AlertTriangle, Lightbulb } from 'lucide-react';
 import { useDashboard } from '../hooks/useDashboard';
 import { TrendCharts } from '../components/charts/TrendCharts';
@@ -20,10 +20,11 @@ export const Reports: React.FC = () => {
     allDashboardData
   } = useDashboard();
 
-  // Estado local para controlar se exibe colunas detalhadas na tabela do relatório
+  // Estado local para controlar se exibe colunas detalhadas na tabela do relat?rio
   const [showChannelDetails, setShowChannelDetails] = useState<boolean>(false);
+  const [mobileSection, setMobileSection] = useState<'resumo' | 'graficos' | 'acoes'>('resumo');
 
-  // Estado para feedback de geração de relatório mobile
+  // Estado para feedback de gera?o de relat?rio mobile
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [generationSuccess, setGenerationSuccess] = useState<boolean>(false);
 
@@ -37,14 +38,14 @@ export const Reports: React.FC = () => {
     }, 1500);
   };
 
-  // Estado para controlar se filtra apenas o mês atual do dashboard
+  // Estado para controlar se filtra apenas o m?s atual do dashboard
   const [isCurrentMonthOnly, setIsCurrentMonthOnly] = useState<boolean>(false);
   const [prevMonths, setPrevMonths] = useState<{ start: string; end: string }>({
     start: reportFilter.startMonth,
     end: reportFilter.endMonth
   });
 
-  // Atualiza os meses de início/fim caso o mês selecionado no painel mude e a caixa esteja ativa
+  // Atualiza os meses de in?cio/fim caso o m?s selecionado no painel mude e a caixa esteja ativa
   useEffect(() => {
     if (isCurrentMonthOnly) {
       setReportFilter({
@@ -77,17 +78,17 @@ export const Reports: React.FC = () => {
     }
   };
 
-  // Função para formatar moeda pt-BR
+  // Funào para formatar moeda pt-BR
   const formatarMoeda = (valor: number): string => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   };
 
-  // Função para formatar número inteiro pt-BR
+  // Funào para formatar número inteiro pt-BR
   const formatarNumero = (valor: number): string => {
     return new Intl.NumberFormat('pt-BR').format(valor);
   };
 
-  // Retorna o título do cabeçalho timbrado com base no tipo de relatório
+  // Retorna o título do cabeçalho timbrado com base no tipo de relat?rio
   const obterTituloRelatorio = () => {
     switch (reportFilter.reportType) {
       case 'commercial': return 'Relatório de Desempenho Comercial';
@@ -98,11 +99,11 @@ export const Reports: React.FC = () => {
     }
   };
 
-  // Retorna os KPIs correspondentes ao tipo de relatório selecionado
+  // Retorna os KPIs correspondentes ao tipo de relat?rio selecionado
   const obterKpisDinamicos = () => {
     const type = reportFilter.reportType || 'executive';
     
-    // Cálculos de NPS e LTV acumulados para os cards
+    // C?lculos de NPS e LTV acumulados para os cards
     let totalNps = 0;
     let totalLtv = 0;
     let monthsCount = 0;
@@ -163,7 +164,7 @@ export const Reports: React.FC = () => {
     }
   };
 
-  // Helper para renderizar os ícones correspondentes a cada insight da análise CEO (Evita 100% bugs de codificação no Windows)
+  // Helper para renderizar os ?cones correspondentes a cada insight da análise CEO (Evita 100% bugs de codifica?o no Windows)
   const renderIconeInsight = (tipo: 'alerta' | 'oportunidade' | 'info' | 'sucesso') => {
     switch (tipo) {
       case 'alerta':
@@ -178,19 +179,19 @@ export const Reports: React.FC = () => {
     }
   };
 
-  // Retorna análise estratégica (Modo CEO / Shark Tank) com base nos dados do período (Tipado e seguro contra UTF-8)
+  // Retorna análise estratégica (Modo CEO / Shark Tank) com base nos dados do per?odo (Tipado e seguro contra UTF-8)
   const obterAnaliseCEO = (): { explicacao: string; insights: CEOInsight[] } => {
     const type = reportFilter.reportType || 'executive';
     const rows = consolidatedReport.rows;
     
     if (rows.length === 0) {
       return {
-        explicacao: 'Este relatório apresenta os principais indicadores operacionais do período.',
-        insights: [{ tipo: 'info', texto: 'Aguardando dados para consolidação de oportunidades.' }]
+        explicacao: 'Este relat?rio apresenta os principais indicadores operacionais do per?odo.',
+        insights: [{ tipo: 'info', texto: 'Aguardando dados para consolida?o de oportunidades.' }]
       };
     }
 
-    // Cálculos dinâmicos com base nos dados
+    // C?lculos din?micos com base nos dados
     const maiorCacRow = [...rows].sort((a, b) => b.cac - a.cac)[0];
     const menorCacRow = [...rows].sort((a, b) => a.cac - b.cac)[0];
     const maiorChurnRow = [...rows].sort((a, b) => b.churnRate - a.churnRate)[0];
@@ -227,59 +228,62 @@ export const Reports: React.FC = () => {
     switch (type) {
       case 'commercial':
         return {
-          explicacao: 'Análise estratégica aprofundada da saúde do funil de vendas. Examina as etapas de captação de leads, o volume de fechamentos contratuais e a taxa de conversão das equipes, permitindo identificar pontos de atrito no pipeline comercial e canais subutilizados.',
+          explicacao: 'Análise estratégica aprofundada da saúde do funil de vendas. Examina as etapas de captaào de leads, o volume de fechamentos contratuais e a taxa de convers?o das equipes, permitindo identificar pontos de atrito no pipeline comercial e canais subutilizados.',
           insights: [
-            { tipo: 'info', texto: `Volume de Leads: O período consolidou ${formatarNumero(totalLeads)} oportunidades comerciais captadas, convertendo um total de ${formatarNumero(totalConversions)} novos contratos ativos para a cooperativa.` },
-            { tipo: 'alerta', texto: `Eficiência do Funil (Modo CEO): A taxa de conversão média está fixada em ${mediaTxConversao.toFixed(1).replace('.', ',')}%: Identificamos perda de 85%+ de leads nas fases intermediárias do funil, indicando gargalos no primeiro contato comercial.` },
-            { tipo: 'oportunidade', texto: `Benchmarking de Performance (Shark Tank): O mês de ${menorCacRow.monthLabel} registrou o menor custo de aquisição (CAC de ${formatarMoeda(menorCacRow.cac)}). Replicar imediatamente a régua de contato e o pitch de vendas deste mês em todos os canais.` },
+            { tipo: 'info', texto: `Volume de Leads: O per?odo consolidou ${formatarNumero(totalLeads)} oportunidades comerciais captadas, convertendo um total de ${formatarNumero(totalConversions)} novos contratos ativos para a cooperativa.` },
+            { tipo: 'alerta', texto: `Eficiência do Funil (Modo CEO): A taxa de convers?o m?dia est? fixada em ${mediaTxConversao.toFixed(1).replace('.', ',')}%: Identificamos perda de 85%+ de leads nas fases intermedi?rias do funil, indicando gargalos no primeiro contato comercial.` },
+            { tipo: 'oportunidade', texto: `Benchmarking de Performance (Shark Tank): O m?s de ${menorCacRow.monthLabel} registrou o menor custo de aquisição (CAC de ${formatarMoeda(menorCacRow.cac)}). Replicar imediatamente a r?gua de contato e o pitch de vendas deste m?s em todos os canais.` },
             { tipo: 'sucesso', texto: `Diretriz Estratégica: O investimento focado em canais digitais de alta performance demonstrou a melhor correlação de vendas. Sugere-se automação de leads frios via CRM para desafogar a equipe de SDR.` }
           ]
         };
       case 'churn':
         return {
-          explicacao: 'Avaliação analítica da movimentação da base de clientes (entradas versus saídas). Fornece inteligência sobre o crescimento líquido da carteira, a taxa média de evasão e subsidia ações de retenção ativa de contratos corporativos de grande porte.',
+          explicacao: 'Avalia?o anal?tica da movimenta?o da base de clientes (entradas versus sa?das). Fornece intelig?ncia sobre o crescimento líquido da carteira, a taxa m?dia de evas?o e subsidia aàes de reten?o ativa de contratos corporativos de grande porte.',
           insights: [
-            { tipo: 'info', texto: `Movimentação de Carteira: Adição de ${formatarNumero(totalBenefs)} novas vidas contra a perda de ${formatarNumero(totalCancelados)} beneficiários no período. A base ativa encerrou o período em ${formatarNumero(activeBenefs)} vidas.` },
-            { tipo: 'alerta', texto: `Análise de Churn (Modo CEO): O pico de evasão ocorreu em ${maiorChurnRow.monthLabel} com churn de ${maiorChurnRow.churnRate.toFixed(2).replace('.', ',')}%. A evasão concentrou-se no segmento PME, sugerindo reajustes de sinistralidade ou insatisfação com a rede credenciada local.` },
-            { tipo: 'oportunidade', texto: `Blindagem de Contratos (Shark Tank): Reduzir o churn médio atual de ${averageChurnRate.toFixed(2).replace('.', ',')}% para a meta de 0,15% ao mês trará uma receita incremental estimada de R$ 150.000 ao ano, sem custos adicionais de marketing.` },
-            { tipo: 'sucesso', texto: `Sucesso do Cliente (CS): Implementar um plano de retenção ativa ligando para contas corporativas com uso acima de 80% nos primeiros 90 dias, blindando a carteira ativa de clientes.` }
+            { tipo: 'info', texto: `Movimentaào de Carteira: Adiào de ${formatarNumero(totalBenefs)} novas vidas contra a perda de ${formatarNumero(totalCancelados)} benefici?rios no per?odo. A base ativa encerrou o per?odo em ${formatarNumero(activeBenefs)} vidas.` },
+            { tipo: 'alerta', texto: `Análise de Churn (Modo CEO): O pico de evas?o ocorreu em ${maiorChurnRow.monthLabel} com churn de ${maiorChurnRow.churnRate.toFixed(2).replace('.', ',')}%. A evas?o concentrou-se no segmento PME, sugerindo reajustes de sinistralidade ou insatisfaào com a rede credenciada local.` },
+            { tipo: 'oportunidade', texto: `Blindagem de Contratos (Shark Tank): Reduzir o churn médio atual de ${averageChurnRate.toFixed(2).replace('.', ',')}% para a meta de 0,15% ao m?s trar? uma receita incremental estimada de R$ 150.000 ao ano, sem custos adicionais de marketing.` },
+            { tipo: 'sucesso', texto: `Sucesso do Cliente (CS): Implementar um plano de reten?o ativa ligando para contas corporativas com uso acima de 80% nos primeiros 90 dias, blindando a carteira ativa de clientes.` }
           ]
         };
       case 'financial':
         return {
-          explicacao: 'Diagnóstico financeiro sobre o orçamento alocado na operação. Analisa o Custo de Aquisição de Clientes (CAC) e o Custo por Lead (CPL) contra o retorno sobre o investimento em publicidade (ROAS), visando otimizar a distribuição do capital entre marketing digital e vendas.',
+          explicacao: 'Diagn?stico financeiro sobre o orçamento alocado na opera?o. Analisa o Custo de Aquisi?o de Clientes (CAC) e o Custo por Lead (CPL) contra o retorno sobre o investimento em publicidade (ROAS), visando otimizar a distribui?o do capital entre marketing digital e vendas.',
           insights: [
-            { tipo: 'info', texto: `Distribuição de Capital: Alocação de ${formatarMoeda(totalMkt)} em marketing de atração e ${formatarMoeda(totalSales)} no suporte operacional de vendas, totalizando ${formatarMoeda(totalSpend)} investidos.` },
-            { tipo: 'alerta', texto: `Custo de Aquisição (Modo CEO): O pico de CAC em ${maiorCacRow.monthLabel} (${formatarMoeda(maiorCacRow.cac)}) revela ineficiência em campanhas offline tradicionais, que exigiram alto orçamento para baixo retorno de novas vidas.` },
-            { tipo: 'oportunidade', texto: `Otimização de Portfólio (Shark Tank): Migrar 20% do budget de marketing offline/mídia externa para campanhas de Meta Ads direcionadas a PMEs. Esta ação visa reduzir o CAC consolidado em até 14% no próximo trimestre.` },
-            { tipo: 'sucesso', texto: `Controle de CPL: Manter o CPL médio sob controle em ${formatarMoeda(averageCpl)} garante margem líquida saudável na comercialização dos planos corporativos e individuais.` }
+            { tipo: 'info', texto: `Distribui?o de Capital: Alocaào de ${formatarMoeda(totalMkt)} em marketing de atraào e ${formatarMoeda(totalSales)} no suporte operacional de vendas, totalizando ${formatarMoeda(totalSpend)} investidos.` },
+            { tipo: 'alerta', texto: `Custo de Aquisi?o (Modo CEO): O pico de CAC em ${maiorCacRow.monthLabel} (${formatarMoeda(maiorCacRow.cac)}) revela inefici?ncia em campanhas offline tradicionais, que exigiram alto orçamento para baixo retorno de novas vidas.` },
+            { tipo: 'oportunidade', texto: `Otimiza?o de Portfólio (Shark Tank): Migrar 20% do budget de marketing offline/m?dia externa para campanhas de Meta Ads direcionadas a PMEs. Esta a?o visa reduzir o CAC consolidado em at? 14% no próximo trimestre.` },
+            { tipo: 'sucesso', texto: `Controle de CPL: Manter o CPL médio sob controle em ${formatarMoeda(averageCpl)} garante margem l?quida saudável na comercializaào dos planos corporativos e individuais.` }
           ]
         };
       case 'satisfaction':
         return {
-          explicacao: 'Auditoria de satisfação, fidelidade e valor financeiro de longo prazo (LTV). Compara a percepção da qualidade do atendimento (NPS) com o tempo de retenção do beneficiário na base, garantindo que o custo de aquisição seja amortizado com alta margem.',
+          explicacao: 'Auditoria de satisfa?o, fidelidade e valor financeiro de longo prazo (LTV). Compara a percep?o da qualidade do atendimento (NPS) com o tempo de reten?o do benefici?rio na base, garantindo que o custo de aquisição seja amortizado com alta margem.',
           insights: [
-            { tipo: 'sucesso', texto: `Qualidade de Marca: O NPS médio consolidou-se em ${npsMedio} pontos, posicionando a cooperativa na Zona de Excelência com altíssima satisfação da carteira com a rede credenciada.` },
-            { tipo: 'alerta', texto: `Custo de Retenção (Modo CEO): Embora o LTV médio de ${formatarMoeda(ltvMedio)} seja saudável, o aumento no tempo médio de carência de novos planos pode impactar a percepção de valor nos primeiros meses de contrato.` },
-            { tipo: 'oportunidade', texto: `Multiplicador LTV/CAC (Shark Tank): A relação LTV/CAC atual é de ${ratio.toFixed(1).replace('.', ',')}x. Como cada cliente retorna ${ratio.toFixed(1).replace('.', ',')} vezes o seu custo de aquisição à cooperativa, há um sinal verde para acelerar o investimento de atração.` },
-            { tipo: 'info', texto: `Diretriz Estratégica: Criar um programa de indicação oferecendo descontos a beneficiários promotores (NPS 9-10) que indicarem novas vidas, reduzindo o CAC geral.` }
+            { tipo: 'sucesso', texto: `Qualidade de Marca: O NPS médio consolidou-se em ${npsMedio} pontos, posicionando a cooperativa na Zona de Excel?ncia com alt?ssima satisfa?o da carteira com a rede credenciada.` },
+            { tipo: 'alerta', texto: `Custo de Reten?o (Modo CEO): Embora o LTV médio de ${formatarMoeda(ltvMedio)} seja saudável, o aumento no tempo médio de car?ncia de novos planos pode impactar a percep?o de valor nos primeiros meses de contrato.` },
+            { tipo: 'oportunidade', texto: `Multiplicador LTV/CAC (Shark Tank): A relação LTV/CAC atual é de ${ratio.toFixed(1).replace('.', ',')}x. Como cada cliente retorna ${ratio.toFixed(1).replace('.', ',')} vezes o seu custo de aquisição à cooperativa, há um sinal verde para acelerar o investimento de atraào.` },
+            { tipo: 'info', texto: `Diretriz Estratégica: Criar um programa de indica?o oferecendo descontos a benefici?rios promotores (NPS 9-10) que indicarem novas vidas, reduzindo o CAC geral.` }
           ]
         };
       case 'executive':
       default:
         return {
-          explicacao: 'Consolidação de alto nível das principais métricas operacionais, comerciais e financeiras da Uniodonto Passos. Destinado ao conselho de administração para tomada de decisão ágil sobre alocação de recursos e expansão geográfica.',
+          explicacao: 'Consolida?o de alto n?vel das principais m?tricas operacionais, comerciais e financeiras da Uniodonto Passos. Destinado ao conselho de administra?o para tomada de decis?o ?gil sobre aloca?o de recursos e expans?o geogr?fica.',
           insights: [
-            { tipo: 'info', texto: `Crescimento Operacional: Captação consolidada de ${formatarNumero(totalBenefs)} novos beneficiários com investimento total de ${formatarMoeda(totalSpend)} no período avaliado.` },
-            { tipo: 'alerta', texto: `Equilíbrio Operacional (Modo CEO): O CAC médio ponderado fixou-se em ${formatarMoeda(averageCac)}. Recomenda-se monitorar a tendência de alta no último mês para evitar compressão das margens.` },
-            { tipo: 'oportunidade', texto: `Expansão de Market Share (Shark Tank): Aproveitar a liderança de NPS para lançar planos odontológicos coletivos por adesão em parceria com associações comerciais da região, escalando vendas com baixo custo.` },
-            { tipo: 'sucesso', texto: `Recomendação Executiva: Sugere-se a aprovação de verba adicional de 15% para a estruturação de novos canais de vendas digitais focados no público PME regional.` }
+            { tipo: 'info', texto: `Crescimento Operacional: Captação consolidada de ${formatarNumero(totalBenefs)} novos benefici?rios com investimento total de ${formatarMoeda(totalSpend)} no per?odo avaliado.` },
+            { tipo: 'alerta', texto: `Equil?brio Operacional (Modo CEO): O CAC médio ponderado fixou-se em ${formatarMoeda(averageCac)}. Recomenda-se monitorar a tend?ncia de alta no ?ltimo m?s para evitar compress?o das margens.` },
+            { tipo: 'oportunidade', texto: `Expans?o de Market Share (Shark Tank): Aproveitar a lideran?a de NPS para lan?ar planos odontol?gicos coletivos por ades?o em parceria com associaàes comerciais da regi?o, escalando vendas com baixo custo.` },
+            { tipo: 'sucesso', texto: `Recomenda?o Executiva: Sugere-se a aprova?o de verba adicional de 15% para a estrutura?o de novos canais de vendas digitais focados no público PME regional.` }
           ]
         };
     }
   };
 
-  // Lógica de exportação real para CSV detalhado com canais
+  const mobileKpis = obterKpisDinamicos();
+  const ceoAnalysis = obterAnaliseCEO();
+
+  // L?gica de exporta?o real para CSV detalhado com canais
   const exportarCSV = () => {
     const headers = [
       'Mes',
@@ -357,7 +361,7 @@ export const Reports: React.FC = () => {
   };
 
   const handleDownloadPDF = () => {
-    // Captura as imagens em base64 dos gráficos da biblioteca Chart.js exibidos na tela
+    // Captura as imagens em base64 dos gr?ficos da biblioteca Chart.js exibidos na tela
     const printContainer = document.querySelector('.print\\:flex');
     const canvasList = printContainer ? printContainer.querySelectorAll('canvas') : [];
     const chartImages: string[] = [];
@@ -369,7 +373,7 @@ export const Reports: React.FC = () => {
   };
 
   return (
-    <div className="flex-grow overflow-y-auto p-4 md:p-5 pb-28 lg:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition print:p-0 print:bg-white print:max-w-full">
+    <div className="flex-grow overflow-hidden md:overflow-y-auto p-4 md:p-5 pb-0 md:pb-5 bg-[#F8F9FA] flex flex-col h-full md:max-h-screen page-transition print:p-0 print:bg-white print:max-w-full">
       <style>{`
         @media print {
           html, body {
@@ -383,14 +387,14 @@ export const Reports: React.FC = () => {
             padding: 0 !important;
           }
           
-          /* Remove barras de rolagem e alturas fixas de contêineres na impressão */
+          /* Remove barras de rolagem e alturas fixas de cont?ineres na impress?o */
           .overflow-y-auto, .flex-grow, .max-h-screen {
             overflow: visible !important;
             max-height: none !important;
             height: auto !important;
           }
           
-          /* Otimiza espaçamento e margens no papel A4 */
+          /* Otimiza espa?amento e margens no papel A4 */
           .print\\:p-0 {
             padding: 0 !important;
           }
@@ -404,7 +408,7 @@ export const Reports: React.FC = () => {
             margin-top: 1.25rem !important;
           }
           
-          /* Força textos e bordas em preto de alta definição */
+          /* For?a textos e bordas em preto de alta defini?o */
           .text-gray-800, .text-gray-900, .text-gray-700, .text-gray-500, .text-gray-400 {
             color: #000000 !important;
           }
@@ -412,7 +416,7 @@ export const Reports: React.FC = () => {
             color: #880E4F !important;
           }
           
-          /* Borda fina de alta fidelidade para tabelas e divisórias */
+          /* Borda fina de alta fidelidade para tabelas e divis?rias */
           .border-b, .border-t, .divide-y > * {
             border-color: #cbd5e1 !important;
           }
@@ -423,13 +427,13 @@ export const Reports: React.FC = () => {
             border: 1px solid #cbd5e1 !important;
           }
           
-          /* Otimização de layouts do grid executivo */
+          /* Otimiza?o de layouts do grid executivo */
           .grid {
             display: grid !important;
             gap: 0.5rem !important;
           }
 
-          /* Compactação de tabela na impressão para evitar ultrapassar 2 páginas */
+          /* Compacta?o de tabela na impress?o para evitar ultrapassar 2 p?ginas */
           table td, table th {
             padding-top: 4px !important;
             padding-bottom: 4px !important;
@@ -438,14 +442,14 @@ export const Reports: React.FC = () => {
             font-size: 8.5px !important;
           }
           
-          /* Impede quebra órfã de páginas dentro de blocos essenciais */
+          /* Impede quebra ?rf? de p?ginas dentro de blocos essenciais */
           table, tr, td, th, .bg-gray-50\\/50, .print-avoid-break {
             page-break-inside: avoid !important;
           }
         }
       `}</style>
 
-      <header className="mb-3 lg:mb-6 shrink-0 print:hidden select-none">
+      <header className="hidden md:block mb-3 lg:mb-6 shrink-0 print:hidden select-none">
         <h1 className="text-[30px] lg:text-3xl font-bold text-gray-800 leading-tight">
           <span className="lg:hidden">Relatórios</span>
           <span className="hidden lg:inline">Relatórios Analíticos</span>
@@ -459,10 +463,10 @@ export const Reports: React.FC = () => {
       {/* Grid de Conteúdo Principal */}
       <div className="flex flex-col xl:grid xl:grid-cols-12 gap-6 flex-grow overflow-y-auto pr-1 print:overflow-visible print:block print:p-0">
         
-        {/* Lado Esquerdo: Prévia do Relatório Executivo A4 (Apenas Desktop e Impressão) */}
+        {/* Lado Esquerdo: Prévia do Relatório Executivo A4 (Apenas Desktop e Impress?o) */}
         <div className="w-full xl:col-span-9 bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-8 flex-col min-h-0 print:border-none print:shadow-none print:p-0 print:rounded-none hidden lg:flex print:flex">
           
-          {/* Cabeçalho do Relatório Timbrado */}
+          {/* Cabe?alho do Relatório Timbrado */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-pink-700/20 pb-4 mb-6 print:border-pink-800">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-pink-700 to-pink-900 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md print:from-black print:to-black">
@@ -480,7 +484,7 @@ export const Reports: React.FC = () => {
             </div>
           </div>
 
-          {/* Seção 1: Métricas Consolidadas do Topo do Relatório */}
+          {/* Seào 1: Métricas Consolidadas do Topo do Relatório */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 select-none">
             {obterKpisDinamicos().map((kpi, idx) => (
               <div key={idx} className="bg-gray-50/50 p-3.5 rounded-2xl border border-gray-100 flex flex-col justify-between hover:border-pink-200 transition-colors print:bg-white print:border-gray-200">
@@ -494,14 +498,14 @@ export const Reports: React.FC = () => {
             ))}
           </div>
 
-          {/* NOVO: Gráficos de Linha de Tendência Adaptativos */}
+          {/* NOVO: Gráficos de Linha de Tend?ncia Adaptativos */}
           <TrendCharts 
             rows={consolidatedReport.rows} 
             reportType={reportFilter.reportType || 'executive'} 
             allDashboardData={allDashboardData}
           />
 
-          {/* Seção de Análise Estratégica - Modo CEO / Shark Tank */}
+          {/* Seào de Análise Estratégica - Modo CEO / Shark Tank */}
           {(() => {
             const analise = obterAnaliseCEO();
             return (
@@ -598,7 +602,7 @@ export const Reports: React.FC = () => {
               <tbody className="divide-y divide-gray-50 text-gray-700">
                 {consolidatedReport.rows.map((row) => {
                   const monthData = allDashboardData[row.month];
-                  const nps = monthData ? (monthData.summary.nps ?? 78) : 78;
+                  const nps = monthData ? (monthData.summary.nps || 78) : 78;
                   const ltv = monthData ? (monthData.summary.ltv || 1200) : 1200;
                   
                   return (
@@ -621,7 +625,7 @@ export const Reports: React.FC = () => {
                           <td className="py-2.5 px-3 text-right font-medium">{formatarMoeda(row.totalSpend)}</td>
                           <td className="py-2.5 px-3 text-right font-semibold text-pink-700 print:text-black">{formatarMoeda(row.cac)}</td>
                           <td className="py-2.5 px-3 text-right text-gray-400">
-                            {row.churnRate > 0 ? `${row.churnRate.toFixed(2).replace('.', ',')}%` : '▬'}
+                            {row.churnRate > 0 ? `${row.churnRate.toFixed(2).replace('.', ',')}%` : 'â–¬'}
                           </td>
                         </>
                       )}
@@ -642,7 +646,7 @@ export const Reports: React.FC = () => {
                           <td className="py-2.5 px-3 text-right">{formatarNumero(row.newBeneficiaries)}</td>
                           <td className="py-2.5 px-3 text-right">{formatarNumero(row.canceledBeneficiaries)}</td>
                           <td className="py-2.5 px-3 text-right text-gray-400">
-                            {row.churnRate > 0 ? `${row.churnRate.toFixed(2).replace('.', ',')}%` : '▬'}
+                            {row.churnRate > 0 ? `${row.churnRate.toFixed(2).replace('.', ',')}%` : 'â–¬'}
                           </td>
                         </>
                       )}
@@ -663,7 +667,7 @@ export const Reports: React.FC = () => {
                           <td className="py-2.5 px-3 text-right font-semibold text-gray-800">{formatarMoeda(ltv)}</td>
                           <td className="py-2.5 px-3 text-right">{formatarNumero(row.conversions)}</td>
                           <td className="py-2.5 px-3 text-right text-gray-400">
-                            {row.churnRate > 0 ? `${row.churnRate.toFixed(2).replace('.', ',')}%` : '▬'}
+                            {row.churnRate > 0 ? `${row.churnRate.toFixed(2).replace('.', ',')}%` : 'â–¬'}
                           </td>
                         </>
                       )}
@@ -673,7 +677,7 @@ export const Reports: React.FC = () => {
                 
                 {/* Linha Consolidada de Totais */}
                 <tr className="border-t-2 border-gray-100 font-bold bg-pink-50/10 text-gray-900 select-none print:bg-transparent">
-                  <td className="py-3 px-3 text-pink-700 uppercase tracking-wide print:text-black">Total/Média</td>
+                  <td className="py-3 px-3 text-pink-700 uppercase tracking-wide print:text-black">Total/M?dia</td>
                   
                   {(reportFilter.reportType || 'executive') === 'executive' && (
                     <>
@@ -693,7 +697,7 @@ export const Reports: React.FC = () => {
                       <td className="py-3 px-3 text-right text-gray-400">
                         {consolidatedReport.totals.averageChurnRate > 0 
                           ? `${consolidatedReport.totals.averageChurnRate.toFixed(2).replace('.', ',')}%` 
-                          : '▬'}
+                          : 'â–¬'}
                       </td>
                     </>
                   )}
@@ -720,7 +724,7 @@ export const Reports: React.FC = () => {
                       <td className="py-3 px-3 text-right text-gray-400">
                         {consolidatedReport.totals.averageChurnRate > 0 
                           ? `${consolidatedReport.totals.averageChurnRate.toFixed(2).replace('.', ',')}%` 
-                          : '▬'}
+                          : 'â–¬'}
                       </td>
                     </>
                   )}
@@ -767,7 +771,7 @@ export const Reports: React.FC = () => {
                       <td className="py-3 px-3 text-right text-gray-400">
                         {consolidatedReport.totals.averageChurnRate > 0 
                           ? `${consolidatedReport.totals.averageChurnRate.toFixed(2).replace('.', ',')}%` 
-                          : '▬'}
+                          : 'â–¬'}
                       </td>
                     </>
                   )}
@@ -778,16 +782,16 @@ export const Reports: React.FC = () => {
 
           <div className="mt-8 pt-4 border-t border-gray-50 flex items-center justify-between text-[10px] text-gray-400 select-none print:mt-4 print:border-pink-800">
             <span>Uniodonto Passos Ltda. • Departamento Comercial</span>
-            <span>Página 1 de 1</span>
+            <span>P?gina 1 de 1</span>
           </div>
         </div>
 
-        {/* Lado Direito: Filtros e Configurações Globais no Desktop (Sidebar Oculta na Impressão e no Mobile) */}
+        {/* Lado Direito: Filtros e Configuraàes Globais no Desktop (Sidebar Oculta na Impress?o e no Mobile) */}
         <div className="hidden lg:flex lg:flex-col xl:col-span-3 space-y-6 print:hidden">
           <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-6">
             <div className="flex items-center gap-2 mb-4 border-b border-gray-50 pb-3 select-none">
               <Calendar className="w-5 h-5 text-pink-700" />
-              <h2 className="text-md font-bold text-gray-800">Configurações de Filtro</h2>
+              <h2 className="text-md font-bold text-gray-800">Configuraàes de Filtro</h2>
             </div>
             
             <div className="space-y-4 text-xs font-medium text-gray-500 select-none">
@@ -885,7 +889,7 @@ export const Reports: React.FC = () => {
           <div className="bg-white rounded-2xl md:rounded-3xl border border-gray-100 card-shadow p-4 md:p-6 select-none">
             <div className="flex items-center gap-2 mb-4 border-b border-gray-50 pb-3">
               <FileText className="w-5 h-5 text-pink-700" />
-              <h2 className="text-md font-bold text-gray-800">Ações de Exportação</h2>
+              <h2 className="text-md font-bold text-gray-800">Aàes de Exporta?o</h2>
             </div>
 
             <div className="space-y-3">
@@ -914,234 +918,285 @@ export const Reports: React.FC = () => {
               </button>
               
               <p className="text-[10px] text-gray-400 mt-2 text-center select-none leading-normal">
-                💡 <b>Dica de PDF:</b> Ao clicar em <i>Salvar como PDF</i> ou <i>Imprimir</i>, a janela do navegador se abrirá. Selecione <b>"Salvar como PDF"</b> no campo <i>Destino</i> para fazer o download digital do relatório A4.
+                ?💡 <b>Dica de PDF:</b> Ao clicar em <i>Salvar como PDF</i> ou <i>Imprimir</i>, a janela do navegador se abrirá. Selecione <b>"Salvar como PDF"</b> no campo <i>Destino</i> para fazer o download digital do relat?rio A4.
               </p>
             </div>
           </div>
         </div>
 
         {/* Layout Mobile Específico (Oculto no Desktop e na Impressão) */}
-        <div className="flex flex-col space-y-4 lg:hidden print:hidden pb-12 w-full">
-          {/* Card de Filtros Compacto */}
-          <div className="bg-white rounded-3xl border border-gray-100 card-shadow p-4">
-            <div className="flex items-center gap-2 mb-3 border-b border-gray-50 pb-2.5 select-none">
-              <Calendar className="w-5 h-5 text-pink-700" />
-              <h2 className="text-[15px] font-bold text-gray-800">Filtros</h2>
-            </div>
-            
-            <div className="space-y-3 text-xs font-semibold text-gray-500">
-              {/* Checkbox Mês Atual */}
-              <div className="flex items-center gap-2 pb-2 border-b border-gray-50">
-                <input 
-                  type="checkbox" 
-                  id="currentMonthOnlyMob"
-                  checked={isCurrentMonthOnly}
-                  onChange={handleCurrentMonthOnlyChange}
-                  className="w-4 h-4 text-pink-700 border-gray-200 rounded focus:ring-pink-500 accent-pink-700 cursor-pointer"
-                />
-                <label htmlFor="currentMonthOnlyMob" className="text-gray-700 font-bold cursor-pointer select-none">
-                  Filtrar apenas Mês Atual
-                </label>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={`block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1 transition-opacity duration-200 ${isCurrentMonthOnly ? 'opacity-50' : ''}`}>Início</label>
-                  <select 
-                    value={reportFilter.startMonth}
-                    onChange={(e) => setReportFilter({ ...reportFilter, startMonth: e.target.value })}
-                    disabled={isCurrentMonthOnly}
-                    className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100/50 transition-all duration-200 cursor-pointer"
+        <div className="md:hidden h-[100dvh] overflow-hidden bg-slate-50 flex flex-col print:hidden">
+          <div className="shrink-0 h-[40px] px-2 pt-1">
+            <div className="grid grid-cols-3 gap-1 h-full rounded-2xl bg-white border border-gray-100 p-1 shadow-[0_8px_30px_rgba(0,0,0,0.03)]">
+              {[
+                { id: 'resumo', label: 'Resumo' },
+                { id: 'graficos', label: 'Gráficos' },
+                { id: 'acoes', label: 'Ações' },
+              ].map((item) => {
+                const active = mobileSection === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setMobileSection(item.id as 'resumo' | 'graficos' | 'acoes')}
+                    className={`rounded-xl text-[10px] font-bold transition-all duration-200 ${
+                      active ? 'bg-pink-700 text-white shadow-sm' : 'bg-transparent text-slate-500 hover:text-slate-700'
+                    }`}
                   >
-                    {availableMonths.map(m => (
-                      <option key={m.value} value={m.value}>{m.label}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className={`block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1 transition-opacity duration-200 ${isCurrentMonthOnly ? 'opacity-50' : ''}`}>Fim</label>
-                  <select 
-                    value={reportFilter.endMonth}
-                    onChange={(e) => setReportFilter({ ...reportFilter, endMonth: e.target.value })}
-                    disabled={isCurrentMonthOnly}
-                    className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100/50 transition-all duration-200 cursor-pointer"
-                  >
-                    {availableMonths.map(m => (
-                      <option key={m.value} value={m.value}>{m.label}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1">Tipo de Relatório</label>
-                <select 
-                  value={reportFilter.reportType || 'executive'}
-                  onChange={(e) => setReportFilter({ ...reportFilter, reportType: e.target.value as ReportType })}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold cursor-pointer"
-                >
-                  <option value="executive">Consolidado Executivo</option>
-                  <option value="commercial">Desempenho Comercial</option>
-                  <option value="churn">Evolução & Churn</option>
-                  <option value="financial">Financeiro & LTV</option>
-                  <option value="satisfaction">Satisfação & NPS</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-gray-400 text-[10px] uppercase font-bold tracking-wider mb-1">Canal Comercial</label>
-                <select 
-                  value={reportFilter.channel || 'all'}
-                  onChange={(e) => setReportFilter({ ...reportFilter, channel: e.target.value as 'all' | 'google' | 'meta' | 'offline' })}
-                  className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold cursor-pointer"
-                >
-                  <option value="all">Todos os Canais</option>
-                  <option value="google">Google Ads</option>
-                  <option value="meta">Meta Ads</option>
-                  <option value="offline">Offline (Eventos & Parcerias)</option>
-                </select>
-              </div>
-
-              {reportFilter.channel === 'all' && (
-                <div className="flex items-center gap-2 pt-2 border-t border-gray-50">
-                  <input 
-                    type="checkbox" 
-                    id="showChannelDetailsMob"
-                    checked={showChannelDetails}
-                    onChange={(e) => setShowChannelDetails(e.target.checked)}
-                    className="w-4 h-4 text-pink-700 border-gray-200 rounded focus:ring-pink-500 accent-pink-700 cursor-pointer"
-                  />
-                  <label htmlFor="showChannelDetailsMob" className="text-gray-600 font-bold cursor-pointer select-none">
-                    Detalhar Canais na Tabela
-                  </label>
-                </div>
-              )}
+                    {item.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Card de Ações de Exportação */}
-          <div className="bg-white rounded-3xl border border-gray-100 card-shadow p-4 select-none">
-            <div className="flex items-center gap-2 mb-3 border-b border-gray-50 pb-2.5">
-              <FileText className="w-5 h-5 text-pink-700" />
-              <h2 className="text-[15px] font-bold text-gray-800">Ações de Exportação</h2>
-            </div>
-
-            <div className="space-y-3">
-              <button
-                onClick={handleGerarRelatorio}
-                disabled={isGenerating}
-                className="w-full h-12 bg-pink-700 text-white font-bold rounded-2xl flex items-center justify-center gap-2 text-sm shadow-md active:scale-98 transition-all duration-200 cursor-pointer disabled:opacity-75 select-none"
-              >
-                {isGenerating ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Processando...</span>
-                  </>
-                ) : (
-                  <span>Gerar Relatório</span>
-                )}
-              </button>
-
-              {generationSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-2 animate-fadeIn text-left">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <p className="text-[11px] text-emerald-800 font-bold leading-normal font-sans">
-                    Relatório processado e gerado com sucesso!
-                  </p>
+          <div className="flex-1 overflow-hidden px-2 pb-[64px]">
+            {mobileSection === 'resumo' && (
+              <div className="flex flex-col gap-2 h-full min-h-0 animate-fadeIn">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-2.5 shrink-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Resumo do Relatório</p>
+                      <p className="text-[12px] font-bold text-slate-800 leading-tight mt-1 line-clamp-2">{obterTituloRelatorio()}</p>
+                      <p className="text-[10px] text-slate-500 mt-0.5">{reportFilter.startMonth} a {reportFilter.endMonth}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-[9px] uppercase text-slate-400 font-bold">Canal</p>
+                      <p className="text-[11px] font-bold text-pink-700">
+                        {reportFilter.channel === 'all' ? 'Todos' : reportFilter.channel === 'google' ? 'Google' : reportFilter.channel === 'meta' ? 'Meta' : 'Offline'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              )}
 
-              <div className="flex gap-3">
-                <button
-                  onClick={exportarCSV}
-                  className="w-1/2 h-12 bg-white border border-pink-700/30 text-pink-700 font-bold rounded-2xl flex items-center justify-center gap-2 text-sm hover:bg-pink-50/50 active:scale-98 transition-all duration-200 cursor-pointer"
-                >
-                  <Download className="w-4 h-4 animate-bounce" />
-                  <span>CSV</span>
-                </button>
-
-                <button
-                  onClick={handleDownloadPDF}
-                  className="w-1/2 h-12 bg-white border border-pink-700/30 text-pink-700 font-bold rounded-2xl flex items-center justify-center gap-2 text-sm hover:bg-pink-50/50 active:scale-98 transition-all duration-200 cursor-pointer"
-                >
-                  <FileText className="w-4 h-4 text-pink-700" />
-                  <span>PDF</span>
-                </button>
-              </div>
-
-              <button
-                onClick={handlePrint}
-                className="w-full h-12 bg-white border border-pink-700/30 text-pink-700 font-bold rounded-2xl flex items-center justify-center gap-2 text-sm hover:bg-pink-50/50 active:scale-98 transition-all duration-200 cursor-pointer"
-              >
-                <Printer className="w-4 h-4 text-pink-700" />
-                <span>Imprimir Relatório (A4)</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Card Informativo de PDF */}
-          <div className="bg-slate-50 border border-gray-100 rounded-2xl p-3 flex items-start gap-2.5 select-none">
-            <Info className="w-4 h-4 text-pink-700 shrink-0 mt-0.5" />
-            <p className="text-[13px] text-gray-500 font-medium leading-normal text-left">
-              Para salvar em PDF, toque em 'PDF'. A janela do navegador será aberta para concluir o download.
-            </p>
-          </div>
-
-          {/* Card de Prévia do Relatório */}
-          <div className="bg-white rounded-3xl border border-gray-100 card-shadow p-4 select-none">
-            <div className="flex items-center justify-between mb-3 border-b border-gray-50 pb-2.5">
-              <div className="flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-pink-700" />
-                <h2 className="text-[15px] font-bold text-gray-800">{obterTituloRelatorio()}</h2>
-              </div>
-              <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2.5 py-0.5 rounded-full">
-                Pronto para exportar
-              </span>
-            </div>
-
-            <div className="space-y-2.5 text-xs">
-              <div className="flex justify-between border-b border-slate-50 py-1 text-left">
-                <span className="text-gray-400 font-medium">Período</span>
-                <span className="font-bold text-gray-700">{reportFilter.startMonth} a {reportFilter.endMonth}</span>
-              </div>
-              <div className="flex justify-between border-b border-slate-50 py-1 text-left">
-                <span className="text-gray-400 font-medium">Canal</span>
-                <span className="font-bold text-gray-700">
-                  {reportFilter.channel === 'all' ? 'Todos os Canais' : reportFilter.channel === 'google' ? 'Google Ads' : reportFilter.channel === 'meta' ? 'Meta Ads' : 'Offline'}
-                </span>
-              </div>
-              {obterKpisDinamicos().map((kpi, idx) => (
-                <div key={idx} className="flex justify-between border-b border-slate-50 last:border-0 py-1 text-left">
-                  <span className="text-gray-400 font-medium">{kpi.label}</span>
-                  <span className={`font-bold ${kpi.label.includes('CAC') || kpi.label.includes('NPS') ? 'text-pink-700' : 'text-gray-700'}`}>{kpi.value}</span>
+                <div className="grid grid-cols-2 gap-2 shrink-0">
+                  {mobileKpis.map((kpi, idx) => (
+                    <div key={idx} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] p-2 flex flex-col justify-between min-h-[70px]">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-6 h-6 rounded-lg bg-pink-50 text-pink-700 flex items-center justify-center shrink-0">
+                          {kpi.icon}
+                        </div>
+                        <p className="text-[8px] uppercase font-bold tracking-wider text-slate-400 leading-tight">{kpi.label}</p>
+                      </div>
+                      <p className={`mt-1.5 text-[13px] font-black leading-none ${kpi.label.includes('CAC') || kpi.label.includes('NPS') ? 'text-pink-700' : 'text-slate-800'}`}>
+                        {kpi.value}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {/* Análise CEO Integrada na Prévia Mobile */}
-            {(() => {
-              const analise = obterAnaliseCEO();
-              return (
-                <div className="mt-4 pt-3.5 border-t border-slate-100 bg-slate-50/50 rounded-2xl p-3 text-left select-none">
-                  <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                    <span className="w-1 h-2.5 bg-pink-700 rounded-full"></span>
-                    Análise Estratégica CEO
-                  </h3>
-                  <p className="text-[11px] text-gray-500 mb-2 leading-relaxed">
-                    {analise.explicacao}
-                  </p>
-                  <div className="space-y-1.5">
-                    {analise.insights.map((insight, idx) => (
-                      <div key={idx} className="text-[11px] text-gray-700 font-semibold leading-relaxed flex items-start gap-1.5">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-2.5 shrink-0 overflow-hidden">
+                  <div className="flex items-center justify-between gap-2 shrink-0">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Info className="w-4 h-4 text-pink-700 shrink-0" />
+                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Análise CEO</p>
+                    </div>
+                    <span className="text-[9px] font-bold uppercase text-pink-700 bg-pink-50 border border-pink-100 px-2 py-0.5 rounded-full shrink-0">
+                      Insights
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 mt-1.5 leading-relaxed line-clamp-2">{ceoAnalysis.explicacao}</p>
+                  <div className="mt-2 space-y-1.5 overflow-hidden">
+                    {ceoAnalysis.insights.slice(0, 2).map((insight, idx) => (
+                      <div key={idx} className="flex items-start gap-2 bg-slate-50 rounded-xl border border-slate-100 p-2">
                         {renderIconeInsight(insight.tipo)}
-                        <span>{insight.texto}</span>
+                        <p className="text-[9px] text-slate-600 leading-relaxed line-clamp-3">{insight.texto}</p>
                       </div>
                     ))}
                   </div>
                 </div>
-              );
-            })()}
+
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-2.5 shrink-0 overflow-hidden">
+                  <div className="flex items-center justify-between gap-2 shrink-0 mb-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <TrendingUp className="w-4 h-4 text-pink-700 shrink-0" />
+                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Gráfico</p>
+                    </div>
+                    <span className="text-[9px] font-bold uppercase text-pink-700 bg-pink-50 border border-pink-100 px-2 py-0.5 rounded-full shrink-0">
+                      Compacto
+                    </span>
+                  </div>
+                  <div className="h-[150px] min-h-0 overflow-hidden">
+                    <TrendCharts
+                      rows={consolidatedReport.rows}
+                      reportType={reportFilter.reportType || 'executive'}
+                      allDashboardData={allDashboardData}
+                      compact
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {mobileSection === 'graficos' && (
+              <div className="h-full min-h-0 animate-fadeIn overflow-hidden">
+                <TrendCharts
+                  rows={consolidatedReport.rows}
+                  reportType={reportFilter.reportType || 'executive'}
+                  allDashboardData={allDashboardData}
+                  compact
+                />
+              </div>
+            )}
+
+            {mobileSection === 'acoes' && (
+              <div className="flex flex-col gap-2 h-full min-h-0 animate-fadeIn overflow-hidden">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-3 shrink-0">
+                  <div className="flex items-center gap-2 mb-3 border-b border-gray-50 pb-2.5 select-none">
+                    <Calendar className="w-4 h-4 text-pink-700" />
+                    <h2 className="text-[13px] font-bold text-gray-800">Filtros</h2>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 text-xs font-semibold text-gray-500">
+                    <label className="col-span-2 flex items-center gap-2 pb-2 border-b border-gray-50">
+                      <input
+                        type="checkbox"
+                        id="currentMonthOnlyMob"
+                        checked={isCurrentMonthOnly}
+                        onChange={handleCurrentMonthOnlyChange}
+                        className="w-4 h-4 text-pink-700 border-gray-200 rounded focus:ring-pink-500 accent-pink-700 cursor-pointer"
+                      />
+                      <span className="text-gray-700 font-bold cursor-pointer select-none text-[11px]">Filtrar apenas Mês Atual</span>
+                    </label>
+
+                    <div>
+                      <label className={`block text-gray-400 text-[9px] uppercase font-bold tracking-wider mb-1 transition-opacity duration-200 ${isCurrentMonthOnly ? 'opacity-50' : ''}`}>Início</label>
+                      <select
+                        value={reportFilter.startMonth}
+                        onChange={(e) => setReportFilter({ ...reportFilter, startMonth: e.target.value })}
+                        disabled={isCurrentMonthOnly}
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100/50 transition-all duration-200 cursor-pointer"
+                      >
+                        {availableMonths.map(m => (
+                          <option key={m.value} value={m.value}>{m.label}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className={`block text-gray-400 text-[9px] uppercase font-bold tracking-wider mb-1 transition-opacity duration-200 ${isCurrentMonthOnly ? 'opacity-50' : ''}`}>Fim</label>
+                      <select
+                        value={reportFilter.endMonth}
+                        onChange={(e) => setReportFilter({ ...reportFilter, endMonth: e.target.value })}
+                        disabled={isCurrentMonthOnly}
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-100/50 transition-all duration-200 cursor-pointer"
+                      >
+                        {availableMonths.map(m => (
+                          <option key={m.value} value={m.value}>{m.label}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="col-span-2">
+                      <label className="block text-gray-400 text-[9px] uppercase font-bold tracking-wider mb-1">Tipo de Relatório</label>
+                      <select
+                        value={reportFilter.reportType || 'executive'}
+                        onChange={(e) => setReportFilter({ ...reportFilter, reportType: e.target.value as ReportType })}
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold cursor-pointer"
+                      >
+                        <option value="executive">Consolidado Executivo</option>
+                        <option value="commercial">Desempenho Comercial</option>
+                        <option value="churn">Evolução & Churn</option>
+                        <option value="financial">Financeiro & LTV</option>
+                        <option value="satisfaction">Satisfação & NPS</option>
+                      </select>
+                    </div>
+
+                    <div className="col-span-2">
+                      <label className="block text-gray-400 text-[9px] uppercase font-bold tracking-wider mb-1">Canal Comercial</label>
+                      <select
+                        value={reportFilter.channel || 'all'}
+                        onChange={(e) => setReportFilter({ ...reportFilter, channel: e.target.value as 'all' | 'google' | 'meta' | 'offline' })}
+                        className="w-full bg-gray-50 border border-gray-100 rounded-xl p-2.5 focus:outline-none focus:border-pink-200 text-gray-700 font-bold cursor-pointer"
+                      >
+                        <option value="all">Todos os Canais</option>
+                        <option value="google">Google Ads</option>
+                        <option value="meta">Meta Ads</option>
+                        <option value="offline">Offline (Eventos & Parcerias)</option>
+                      </select>
+                    </div>
+
+                    {reportFilter.channel === 'all' && (
+                      <div className="col-span-2 flex items-center gap-2 pt-2 border-t border-gray-50">
+                        <input
+                          type="checkbox"
+                          id="showChannelDetailsMob"
+                          checked={showChannelDetails}
+                          onChange={(e) => setShowChannelDetails(e.target.checked)}
+                          className="w-4 h-4 text-pink-700 border-gray-200 rounded focus:ring-pink-500 accent-pink-700 cursor-pointer"
+                        />
+                        <label htmlFor="showChannelDetailsMob" className="text-gray-600 font-bold cursor-pointer select-none">
+                          Detalhar Canais na Tabela
+                        </label>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-3 shrink-0">
+                  <div className="flex items-center gap-2 mb-3 border-b border-gray-50 pb-2.5 select-none">
+                    <FileText className="w-4 h-4 text-pink-700" />
+                    <h2 className="text-[13px] font-bold text-gray-800">Ações</h2>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={handleGerarRelatorio}
+                      disabled={isGenerating}
+                      className="col-span-2 w-full h-11 bg-pink-700 text-white font-bold rounded-2xl flex items-center justify-center gap-2 text-[12px] shadow-md active:scale-98 transition-all duration-200 cursor-pointer disabled:opacity-75 select-none"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" />
+                          <span>Processando...</span>
+                        </>
+                      ) : (
+                        <span>Gerar Relatório</span>
+                      )}
+                    </button>
+
+                    {generationSuccess && (
+                      <div className="col-span-2 p-2.5 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-2 animate-fadeIn text-left">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <p className="text-[10px] text-emerald-800 font-bold leading-normal font-sans">
+                          Relatório processado e gerado com sucesso!
+                        </p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={exportarCSV}
+                      className="h-11 bg-white border border-pink-700/30 text-pink-700 font-bold rounded-2xl flex items-center justify-center gap-2 text-[11px] hover:bg-pink-50/50 active:scale-98 transition-all duration-200 cursor-pointer"
+                    >
+                      <Download className="w-4 h-4 animate-bounce" />
+                      <span>CSV</span>
+                    </button>
+
+                    <button
+                      onClick={handleDownloadPDF}
+                      className="h-11 bg-white border border-pink-700/30 text-pink-700 font-bold rounded-2xl flex items-center justify-center gap-2 text-[11px] hover:bg-pink-50/50 active:scale-98 transition-all duration-200 cursor-pointer"
+                    >
+                      <FileText className="w-4 h-4 text-pink-700" />
+                      <span>PDF</span>
+                    </button>
+
+                    <button
+                      onClick={handlePrint}
+                      className="col-span-2 w-full h-11 bg-white border border-pink-700/30 text-pink-700 font-bold rounded-2xl flex items-center justify-center gap-2 text-[11px] hover:bg-pink-50/50 active:scale-98 transition-all duration-200 cursor-pointer"
+                    >
+                      <Printer className="w-4 h-4 text-pink-700" />
+                      <span>Imprimir Relatório (A4)</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 border border-gray-100 rounded-2xl p-3 flex items-start gap-2.5 select-none">
+                  <Info className="w-4 h-4 text-pink-700 shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-gray-500 font-medium leading-normal text-left">
+                    Para salvar em PDF, toque em 'PDF'. A janela do navegador será aberta para concluir o download.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

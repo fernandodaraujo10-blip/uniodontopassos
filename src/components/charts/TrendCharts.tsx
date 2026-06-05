@@ -28,10 +28,12 @@ interface TrendChartsProps {
   rows: ConsolidatedReportRow[];
   reportType?: ReportType;
   allDashboardData?: any;
+  compact?: boolean;
 }
 
-export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allDashboardData }) => {
+export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allDashboardData, compact = false }) => {
   const [isDark, setIsDark] = React.useState(() => document.documentElement.classList.contains('dark'));
+  const [activeChart, setActiveChart] = React.useState(0);
 
   React.useEffect(() => {
     const observer = new MutationObserver(() => {
@@ -231,6 +233,7 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
   };
 
   const config = obterDadosGraficos();
+  const chartCards = [config.g1, config.g2, config.g3];
 
   // Função para retornar datasets configurados dinamicamente
   const getChartConfig = (g: any) => {
@@ -331,51 +334,99 @@ export const TrendCharts: React.FC<TrendChartsProps> = ({ rows, reportType, allD
   });
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 select-none print:grid-cols-3 print:gap-4 print:mb-4">
-      {/* Card do Gráfico 1 */}
-      <div className="bg-slate-50/40 dark:bg-slate-900/40 border border-gray-100 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-[150px] transition-colors hover:border-pink-200 dark:hover:border-pink-900/50 print:bg-white print:border-gray-200/80 print:p-3 print:h-[135px]">
-        <div className="flex items-center justify-between shrink-0 mb-1.5">
-          <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-slate-400 tracking-wider">
-            {config.g1.title}
-          </span>
-          <span className="text-[10px] font-bold text-pink-700 dark:text-pink-400 bg-pink-50 dark:bg-pink-950/30 px-2.5 py-0.5 rounded-full print:bg-transparent print:border print:border-pink-200 print:p-0.5">
-            {config.g1.badge}
-          </span>
-        </div>
-        <div className="relative flex-grow min-h-0 w-full h-[100px] print:h-[90px]">
-          <Line data={getChartConfig(config.g1)} options={getOptions(config.g1.prefix, config.g1.suffix, config.g1.isCurrency)} />
-        </div>
-      </div>
+    <div className={`${compact ? 'select-none' : 'grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 select-none print:grid-cols-3 print:gap-4 print:mb-4'}`}>
+      {compact ? (
+        <div className="bg-white rounded-2xl border border-gray-100 card-shadow p-2.5 flex flex-col justify-between h-full min-h-0 overflow-hidden">
+          <div className="flex items-center justify-between gap-2 shrink-0 mb-2">
+            <div className="min-w-0">
+              <p className="text-[9px] uppercase font-bold text-gray-500 tracking-wider">Gráficos de Tendência</p>
+              <p className="text-[10px] text-gray-400 leading-none mt-0.5">Toque para alternar os painéis</p>
+            </div>
+            <span className="text-[9px] font-bold text-pink-700 bg-pink-50 px-2 py-0.5 rounded-full whitespace-nowrap">
+              {chartCards[activeChart].badge}
+            </span>
+          </div>
 
-      {/* Card do Gráfico 2 */}
-      <div className="bg-slate-50/40 dark:bg-slate-900/40 border border-gray-100 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-[150px] transition-colors hover:border-slate-200 dark:hover:border-slate-700 print:bg-white print:border-gray-200/80 print:p-3 print:h-[135px]">
-        <div className="flex items-center justify-between shrink-0 mb-1.5">
-          <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-slate-400 tracking-wider">
-            {config.g2.title}
-          </span>
-          <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/60 px-2.5 py-0.5 rounded-full print:bg-transparent print:border print:border-slate-200 print:p-0.5">
-            {config.g2.badge}
-          </span>
-        </div>
-        <div className="relative flex-grow min-h-0 w-full h-[100px] print:h-[90px]">
-          <Line data={getChartConfig(config.g2)} options={getOptions(config.g2.prefix, config.g2.suffix, config.g2.isCurrency)} />
-        </div>
-      </div>
+          <div className="grid grid-cols-3 gap-1 shrink-0 mb-2">
+            {chartCards.map((chart, idx) => {
+              const active = idx === activeChart;
+              return (
+                <button
+                  key={chart.title}
+                  onClick={() => setActiveChart(idx)}
+                  className={`rounded-xl px-2 py-1 text-[9px] font-bold leading-tight border transition-all duration-200 ${
+                    active
+                      ? 'bg-pink-700 text-white border-pink-700 shadow-sm'
+                      : 'bg-slate-50 text-slate-500 border-slate-100'
+                  }`}
+                >
+                  {idx + 1}
+                </button>
+              );
+            })}
+          </div>
 
-      {/* Card do Gráfico 3 */}
-      <div className="bg-slate-50/40 dark:bg-slate-900/40 border border-gray-100 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-[150px] transition-colors hover:border-slate-200 dark:hover:border-slate-700 print:bg-white print:border-gray-200/80 print:p-3 print:h-[135px]">
-        <div className="flex items-center justify-between shrink-0 mb-1.5">
-          <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-slate-400 tracking-wider">
-            {config.g3.title}
-          </span>
-          <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-0.5 rounded-full print:bg-transparent print:border print:border-emerald-200 print:p-0.5">
-            {config.g3.badge}
-          </span>
+          <div className="flex items-center justify-between gap-2 shrink-0 mb-1.5">
+            <span className="text-[9px] uppercase font-bold text-gray-500 tracking-wider truncate">
+              {chartCards[activeChart].title}
+            </span>
+          </div>
+
+          <div className="relative flex-grow min-h-0 w-full h-[150px]">
+            <Line
+              data={getChartConfig(chartCards[activeChart])}
+              options={getOptions(chartCards[activeChart].prefix, chartCards[activeChart].suffix, chartCards[activeChart].isCurrency)}
+            />
+          </div>
         </div>
-        <div className="relative flex-grow min-h-0 w-full h-[100px] print:h-[90px]">
-          <Line data={getChartConfig(config.g3)} options={getOptions(config.g3.prefix, config.g3.suffix, config.g3.isCurrency)} />
-        </div>
-      </div>
+      ) : (
+        <>
+          {/* Card do Gráfico 1 */}
+          <div className="bg-slate-50/40 dark:bg-slate-900/40 border border-gray-100 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-[150px] transition-colors hover:border-pink-200 dark:hover:border-pink-900/50 print:bg-white print:border-gray-200/80 print:p-3 print:h-[135px]">
+            <div className="flex items-center justify-between shrink-0 mb-1.5">
+              <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-slate-400 tracking-wider">
+                {config.g1.title}
+              </span>
+              <span className="text-[10px] font-bold text-pink-700 dark:text-pink-400 bg-pink-50 dark:bg-pink-950/30 px-2.5 py-0.5 rounded-full print:bg-transparent print:border print:border-pink-200 print:p-0.5">
+                {config.g1.badge}
+              </span>
+            </div>
+            <div className="relative flex-grow min-h-0 w-full h-[100px] print:h-[90px]">
+              <Line data={getChartConfig(config.g1)} options={getOptions(config.g1.prefix, config.g1.suffix, config.g1.isCurrency)} />
+            </div>
+          </div>
+
+          {/* Card do Gráfico 2 */}
+          <div className="bg-slate-50/40 dark:bg-slate-900/40 border border-gray-100 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-[150px] transition-colors hover:border-slate-200 dark:hover:border-slate-700 print:bg-white print:border-gray-200/80 print:p-3 print:h-[135px]">
+            <div className="flex items-center justify-between shrink-0 mb-1.5">
+              <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-slate-400 tracking-wider">
+                {config.g2.title}
+              </span>
+              <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800/60 px-2.5 py-0.5 rounded-full print:bg-transparent print:border print:border-slate-200 print:p-0.5">
+                {config.g2.badge}
+              </span>
+            </div>
+            <div className="relative flex-grow min-h-0 w-full h-[100px] print:h-[90px]">
+              <Line data={getChartConfig(config.g2)} options={getOptions(config.g2.prefix, config.g2.suffix, config.g2.isCurrency)} />
+            </div>
+          </div>
+
+          {/* Card do Gráfico 3 */}
+          <div className="bg-slate-50/40 dark:bg-slate-900/40 border border-gray-100 dark:border-slate-800 rounded-2xl p-4 flex flex-col justify-between h-[150px] transition-colors hover:border-slate-200 dark:hover:border-slate-700 print:bg-white print:border-gray-200/80 print:p-3 print:h-[135px]">
+            <div className="flex items-center justify-between shrink-0 mb-1.5">
+              <span className="text-[10px] uppercase font-bold text-gray-500 dark:text-slate-400 tracking-wider">
+                {config.g3.title}
+              </span>
+              <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-0.5 rounded-full print:bg-transparent print:border print:border-emerald-200 print:p-0.5">
+                {config.g3.badge}
+              </span>
+            </div>
+            <div className="relative flex-grow min-h-0 w-full h-[100px] print:h-[90px]">
+              <Line data={getChartConfig(config.g3)} options={getOptions(config.g3.prefix, config.g3.suffix, config.g3.isCurrency)} />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

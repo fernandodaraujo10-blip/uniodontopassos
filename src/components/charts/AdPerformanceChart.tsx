@@ -18,11 +18,13 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 interface AdPerformanceChartProps {
   anunciosData: Record<string, AdPlatformData>;
   monthLabel: string;
+  compact?: boolean;
 }
 
 export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
   anunciosData,
   monthLabel,
+  compact = false,
 }) => {
   const [platform, setPlatform] = useState<string>('Google Ads');
 
@@ -143,13 +145,13 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
   };
 
   return (
-    <div className="col-span-12 lg:col-span-7 bg-[#0D040A] text-white p-4 md:p-5 rounded-3xl shadow-xl flex flex-col justify-between h-full min-h-0 w-full min-w-0 overflow-hidden">
+    <div className={`col-span-12 lg:col-span-7 bg-[#0D040A] text-white rounded-3xl shadow-xl flex flex-col justify-between h-full min-h-0 w-full min-w-0 overflow-hidden ${compact ? 'p-2.5' : 'p-4 md:p-5'}`}>
       <div className="shrink-0">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-3">
-          <h2 className="text-xl font-bold text-pink-500">Desempenho de Anúncios</h2>
+        <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center ${compact ? 'mb-1.5 gap-2' : 'mb-2 gap-3'}`}>
+          <h2 className={`${compact ? 'text-sm' : 'text-xl'} font-bold text-pink-500`}>Desempenho de Anúncios</h2>
           
           {/* Seleção da Plataforma de Anúncio */}
-          <div className="flex bg-[#1A0A14] rounded-xl p-1 gap-1 border border-white/5 self-end">
+          <div className={`flex bg-[#1A0A14] rounded-xl p-1 gap-1 border border-white/5 self-end ${compact ? 'scale-[0.92] origin-right' : ''}`}>
             {platforms.map((p) => {
               const isActive = p === platform;
               return (
@@ -169,50 +171,77 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
           </div>
         </div>
         
-        <p className="text-[10px] text-gray-400 mb-1">
+        <p className={`${compact ? 'text-[9px] mb-0.5' : 'text-[10px] mb-1'} text-gray-400`}>
           Desempenho semanal em {platform} (Pistas geradas por dia)
         </p>
       </div>
       
       {/* Gráfico Canvas */}
-      <div className="relative flex-grow min-h-0 w-full flex items-center justify-center py-2 h-[120px] md:h-[160px]">
-        <Bar data={data} options={options} />
+      <div className={`relative flex-grow min-h-0 w-full flex items-center justify-center ${compact ? 'py-1 h-[92px]' : 'py-2 h-[120px] md:h-[160px]'}`}>
+        <Bar
+          data={data}
+          options={{
+            ...options,
+            scales: {
+              y: {
+                ...options.scales.y,
+                ticks: {
+                  ...options.scales.y.ticks,
+                  font: {
+                    size: compact ? 7 : 9,
+                    family: 'Inter',
+                  },
+                },
+              },
+              x: {
+                ...options.scales.x,
+                ticks: {
+                  ...options.scales.x.ticks,
+                  font: {
+                    size: compact ? 7 : 9,
+                    family: 'Inter',
+                  },
+                },
+              },
+            },
+          }}
+        />
       </div>
       
       {/* Grid de métricas do anúncio — 2 colunas no mobile, 3 no desktop */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-3 text-xs shrink-0 select-none">
-        <div className="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
+      <div className={`grid grid-cols-2 md:grid-cols-3 ${compact ? 'gap-1 mt-1.5 text-[10px]' : 'gap-2 mt-3 text-xs'} shrink-0 select-none`}>
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1.5' : 'p-2'}`}>
           <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Visualizações</p>
-          <p className="text-sm font-bold text-white transition-all duration-300">{activePlatformData.views}</p>
+          <p className={`${compact ? 'text-[12px]' : 'text-sm'} font-bold text-white transition-all duration-300`}>{activePlatformData.views}</p>
         </div>
-        <div className="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 flex flex-col justify-between">
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 flex flex-col justify-between ${compact ? 'p-1.5' : 'p-2'}`}>
           <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Campanhas</p>
           <div className="flex items-baseline justify-between">
-            <p className="text-sm font-bold text-white transition-all duration-300">
+            <p className={`${compact ? 'text-[12px]' : 'text-sm'} font-bold text-white transition-all duration-300`}>
               {activePlatformData.groups.split(' ')[0]}
             </p>
             {renderGroupsChange(activePlatformData.groupsChange)}
           </div>
         </div>
-        <div className="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1.5' : 'p-2'}`}>
           <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Investido</p>
-          <p className="text-sm font-bold text-white transition-all duration-300">{activePlatformData.invested}</p>
+          <p className={`${compact ? 'text-[12px]' : 'text-sm'} font-bold text-white transition-all duration-300`}>{activePlatformData.invested}</p>
         </div>
-        <div className="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1.5' : 'p-2'}`}>
           <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Leads</p>
-          <p className="text-sm font-bold text-white transition-all duration-300">{activePlatformData.leads}</p>
+          <p className={`${compact ? 'text-[12px]' : 'text-sm'} font-bold text-white transition-all duration-300`}>{activePlatformData.leads}</p>
         </div>
-        <div className="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1.5' : 'p-2'}`}>
           <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Conversões</p>
-          <p className="text-sm font-bold text-white transition-all duration-300">{activePlatformData.conversions}</p>
+          <p className={`${compact ? 'text-[12px]' : 'text-sm'} font-bold text-white transition-all duration-300`}>{activePlatformData.conversions}</p>
         </div>
-        <div className="bg-[#1A0A14] p-2 rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20">
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1.5' : 'p-2'}`}>
           <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Tx. Agendamento</p>
-          <p className="text-sm font-bold text-white transition-all duration-300">{activePlatformData.schedRate}</p>
+          <p className={`${compact ? 'text-[12px]' : 'text-sm'} font-bold text-white transition-all duration-300`}>{activePlatformData.schedRate}</p>
         </div>
       </div>
       
-      <p className="text-[8px] text-gray-600 mt-2 text-right shrink-0">
+      <p className={`${compact ? 'text-[7px] mt-1' : 'text-[8px] mt-2'} text-gray-600 text-right shrink-0`}>
         Fonte: Envio de Dados ({monthLabel})
       </p>
     </div>
