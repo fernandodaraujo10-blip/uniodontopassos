@@ -62,8 +62,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   return (
     <>
       <nav
-        className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[80] bg-white border-t border-gray-100 flex items-stretch"
-        style={{ height: 'calc(72px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        className="bottom-nav mobile-bottom-nav md:hidden"
         aria-label="Navega??o principal"
       >
         {items.map((item) => {
@@ -82,7 +81,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                   setCurrentPage(item.id);
                 }
               }}
-              className={`relative flex-1 flex flex-col items-center justify-center gap-0.5 py-2 min-h-[72px] transition-all duration-200 cursor-pointer select-none focus:outline-none
+              className={`bottom-nav-item relative transition-all duration-200 cursor-pointer select-none focus:outline-none
                 ${active
                   ? 'text-pink-700'
                   : item.id === 'sair'
@@ -117,15 +116,15 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                     {getInitials(loggedUser.name)}
                   </div>
                 )
-              ) : (
-                <Icon
-                  className={`w-5 h-5 transition-transform duration-200 ${active ? 'scale-110' : ''}`}
+                ) : (
+                  <Icon
+                  className={`transition-transform duration-200 ${active ? 'scale-110' : ''}`}
                   strokeWidth={active ? 2.5 : 1.8}
                 />
               )}
 
               <span
-                className={`text-[10px] font-semibold leading-none transition-all duration-200 ${
+                className={`block w-full truncate-1 font-semibold leading-none transition-all duration-200 ${
                   active ? 'opacity-100' : 'opacity-70'
                 }`}
               >

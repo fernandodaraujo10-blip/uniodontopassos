@@ -16,7 +16,7 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'Roboto', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
       },
       // Breakpoints padrão do Tailwind já cobrem mobile-first:
       // sm: 640px | md: 768px | lg: 1024px | xl: 1280px | 2xl: 1536px

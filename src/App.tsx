@@ -127,7 +127,7 @@ export const App: React.FC = () => {
 
         {/* Conteúdo Principal Dinâmico — Suspense envolve apenas o conteúdo lazy */}
         {/* pb-20 no mobile para não ficar atrás da bottom navigation (64px + margem) */}
-        <main className={`mobile-page flex-grow flex flex-col h-full min-h-0 overflow-hidden ${currentPage === 'dashboard' ? 'pb-0' : 'pb-20'} md:pb-0`}>
+        <main className="mobile-page app-mobile-shell flex-grow flex flex-col h-full min-h-0 overflow-hidden">
           <Suspense fallback={<PageLoader />}>
             {renderPage()}
           </Suspense>
