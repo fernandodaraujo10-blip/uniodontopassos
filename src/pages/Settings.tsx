@@ -470,7 +470,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
         </aside>
 
         {/* Conteúdo Dinâmico da Aba Selecionada */}
-        <main className="settings-content flex-grow bg-white border border-gray-100 rounded-2xl md:rounded-3xl p-4 md:p-6 card-shadow flex flex-col overflow-hidden min-h-0">
+        <main className="flex-grow bg-white border border-gray-100 rounded-2xl md:rounded-3xl p-4 md:p-6 card-shadow flex flex-col overflow-hidden min-h-0">
           
           {/* TAB 0: MEU PERFIL PESSOAL */}
           {activeTab === 'meu-perfil' && loggedUser && (

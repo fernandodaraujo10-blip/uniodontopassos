@@ -12,23 +12,23 @@ export const BeneficiariosCard: React.FC<BeneficiariosCardProps> = ({ data, comp
   const isUp = data.percentType === 'up';
 
   return (
-    <div className={`kpi-card bg-white relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full ${
-      compact ? 'mobile-card min-h-[176px] p-2 border border-gray-100' : 'p-4 rounded-2xl border border-gray-100'
+    <div className={`bg-white relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full ${
+      compact ? 'mobile-card min-h-[190px] p-2 border border-gray-100' : 'p-4 rounded-2xl border border-gray-100'
     }`}>
       <button 
         onClick={(e) => { e.stopPropagation(); setShowHelp(true); }}
         className={`absolute text-gray-400 hover:text-pink-700 transition-colors p-1 rounded-full hover:bg-gray-50 focus:outline-none shrink-0 cursor-pointer z-20 ${
-          compact ? 'hidden' : 'top-3.5 right-3.5'
+          compact ? 'top-2 right-2' : 'top-3.5 right-3.5'
         }`}
         title="Explicar métrica"
       >
-        <HelpCircle className="w-4 h-4" />
+        <HelpCircle className={compact ? 'w-3.5 h-3.5' : 'w-4 h-4'} />
       </button>
 
       <div>
-        <div className={`flex items-start justify-between gap-2 ${compact ? 'mb-1 pr-5' : 'mb-2 pr-7'}`}>
-          <h3 className={`font-bold text-pink-700 uppercase tracking-wider leading-tight ${compact ? 'max-w-[68%] text-[8px]' : 'text-[10px]'}`}>Total de Beneficiários</h3>
-          <span className={`shrink-0 px-1.5 py-0.5 bg-pink-50 text-pink-700 border border-pink-700/20 rounded-full cursor-pointer hover:bg-pink-100 transition-colors leading-none ${compact ? 'text-[7px]' : 'text-[10px]'}`}>
+        <div className={`flex justify-between items-start ${compact ? 'mb-1 pr-5' : 'mb-2 pr-7'}`}>
+          <h3 className={`font-bold text-pink-700 uppercase tracking-wider ${compact ? 'text-[9px]' : 'text-[10px]'}`}>Total de Beneficiários</h3>
+          <span className={`px-2 py-0.5 bg-pink-50 text-pink-700 border border-pink-700/20 rounded-full cursor-pointer hover:bg-pink-100 transition-colors ${compact ? 'text-[8px]' : 'text-[10px]'}`}>
             Parcial ▾
           </span>
         </div>

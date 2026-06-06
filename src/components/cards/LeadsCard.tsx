@@ -13,13 +13,13 @@ export const LeadsCard: React.FC<LeadsCardProps> = ({ data, className, compact =
   const isUp = data.percentType === 'up';
 
   return (
-    <div className={className || `kpi-card bg-white relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full ${compact ? 'mobile-card min-h-[176px] p-2 border border-gray-100' : 'p-4 rounded-2xl border border-gray-100'}`}>
+    <div className={className || `bg-white relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full ${compact ? 'mobile-card min-h-[190px] p-2 border border-gray-100' : 'p-4 rounded-2xl border border-gray-100'}`}>
       <button 
         onClick={(e) => { e.stopPropagation(); setShowHelp(true); }}
-        className={`absolute text-gray-400 hover:text-pink-700 transition-colors p-1 rounded-full hover:bg-gray-50 focus:outline-none shrink-0 cursor-pointer z-20 ${compact ? 'hidden' : 'top-3.5 right-3.5'}`}
+        className={`absolute text-gray-400 hover:text-pink-700 transition-colors p-1 rounded-full hover:bg-gray-50 focus:outline-none shrink-0 cursor-pointer z-20 ${compact ? 'top-2 right-2' : 'top-3.5 right-3.5'}`}
         title="Explicar métrica"
       >
-        <HelpCircle className="w-4 h-4" />
+        <HelpCircle className={compact ? 'w-3.5 h-3.5' : 'w-4 h-4'} />
       </button>
 
       <div>

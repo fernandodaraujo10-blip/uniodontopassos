@@ -953,7 +953,7 @@ export const DataUpload: React.FC<DataUploadProps> = ({ currentPage, setCurrentP
           </div>
         </div>
 
-        <div className="mobile-content envio-content flex-1 min-h-0 mobile-scroll">
+        <div className="mobile-content flex-1 min-h-0 mobile-scroll">
           <div className="h-full min-h-0 bg-white rounded-2xl border border-gray-100 shadow-sm flex flex-col overflow-hidden">
             <div className="shrink-0 p-1.5 border-b border-gray-50">
               <div className="grid grid-cols-3 gap-1 bg-slate-50 p-1 rounded-xl">

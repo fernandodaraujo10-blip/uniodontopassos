@@ -949,7 +949,7 @@ export const Reports: React.FC = () => {
             </div>
           </div>
 
-          <div className="mobile-content reports-content flex-1 mobile-scroll">
+          <div className="mobile-content flex-1 mobile-scroll">
             {mobileSection === 'resumo' && (
               <div className="flex flex-col gap-2 h-full min-h-0 animate-fadeIn">
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-2.5 shrink-0">
