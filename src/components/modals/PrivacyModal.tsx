@@ -4,9 +4,20 @@ import { X, ShieldCheck, FileText, Calendar } from 'lucide-react';
 interface PrivacyModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onAccept?: () => void;
+  acceptLabel?: string;
+  title?: string;
+  subtitle?: string;
 }
 
-export const PrivacyModal: React.FC<PrivacyModalProps> = ({ isOpen, onClose }) => {
+export const PrivacyModal: React.FC<PrivacyModalProps> = ({
+  isOpen,
+  onClose,
+  onAccept,
+  acceptLabel = 'Entendi e Declaro Ciente',
+  title = 'Política de Privacidade',
+  subtitle = 'Atualização: Junho/2026',
+}) => {
   if (!isOpen) return null;
 
   return (
@@ -24,10 +35,10 @@ export const PrivacyModal: React.FC<PrivacyModalProps> = ({ isOpen, onClose }) =
             </div>
             <div>
               <h3 className="text-md sm:text-lg font-black text-slate-800 dark:text-white tracking-tight flex items-center gap-1.5">
-                Política de Privacidade
+                {title}
               </h3>
               <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-wider flex items-center gap-1 mt-0.5">
-                <Calendar className="w-3 h-3" /> Atualização: Junho/2026
+                <Calendar className="w-3 h-3" /> {subtitle}
               </p>
             </div>
           </div>
@@ -98,10 +109,13 @@ export const PrivacyModal: React.FC<PrivacyModalProps> = ({ isOpen, onClose }) =
         {/* Rodapé do Modal com Botão de Ação */}
         <div className="border-t border-slate-100 dark:border-slate-800 pt-4 mt-4 flex justify-end shrink-0 select-none">
           <button
-            onClick={onClose}
+            onClick={() => {
+              onAccept?.();
+              onClose();
+            }}
             className="py-2.5 px-6 bg-gradient-to-r from-pink-700 to-pink-500 hover:scale-[1.02] active:scale-[0.98] text-white font-extrabold rounded-xl text-xs uppercase tracking-wider shadow-md shadow-pink-100 dark:shadow-none transition-all cursor-pointer"
           >
-            Entendi e Declaro Ciente
+            {acceptLabel}
           </button>
         </div>
       </div>

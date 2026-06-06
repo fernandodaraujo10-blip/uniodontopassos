@@ -23,18 +23,24 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
-  const [consent, setConsent] = useState(
-    typeof window === 'undefined' || 
-    (typeof (globalThis as any).process !== 'undefined' && (globalThis as any).process.env && (globalThis as any).process.env.NODE_ENV === 'test') ||
-    (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.MODE === 'test')
-  );
-
+  const [pendingUser, setPendingUser] = useState<User | null>(null);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
+
+  const consentStorageKey = 'uniodonto_privacy_consent_v1';
+
+  const hasAcceptedConsent = () => {
+    if (typeof window === 'undefined') return true;
+    try {
+      return localStorage.getItem(consentStorageKey) === 'true';
+    } catch {
+      return false;
+    }
+  };
 
   // Limpa mensagem de erro ao digitar
   useEffect(() => {
     if (errorMsg) setErrorMsg('');
-  }, [email, password, consent]);
+  }, [email, password]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,11 +48,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
     if (!email.trim() || !password.trim()) {
       setErrorMsg('Por favor, preencha todos os campos.');
-      return;
-    }
-
-    if (!consent) {
-      setErrorMsg('Você precisa aceitar os termos de consentimento e privacidade para prosseguir.');
       return;
     }
 
@@ -113,8 +114,27 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
       // Sucesso no login!
       setLoading(false);
-      onLoginSuccess(foundUser);
+      if (hasAcceptedConsent()) {
+        onLoginSuccess(foundUser);
+        return;
+      }
+
+      setPendingUser(foundUser);
+      setIsPrivacyOpen(true);
     }, 400);
+  };
+
+  const handleAcceptConsent = () => {
+    try {
+      localStorage.setItem(consentStorageKey, 'true');
+    } catch {
+      // Ignora erro de armazenamento e segue o fluxo
+    }
+
+    if (pendingUser) {
+      onLoginSuccess(pendingUser);
+      setPendingUser(null);
+    }
   };
 
   return (
@@ -215,32 +235,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             </div>
           </div>
 
-          {/* Checkbox Consentimento LGPD */}
-          <div className="flex items-start gap-2.5 mt-2 bg-slate-50/50 p-2.5 rounded-xl border border-slate-100">
-            <input
-              id="consent-checkbox"
-              type="checkbox"
-              checked={consent}
-              onChange={(e) => setConsent(e.target.checked)}
-              className="mt-0.5 rounded border-slate-300 text-pink-600 focus:ring-pink-500/20 cursor-pointer h-4 w-4 shrink-0"
-            />
-            <label htmlFor="consent-checkbox" className="text-[10px] sm:text-[11px] font-semibold text-gray-500 cursor-pointer select-none leading-normal text-left">
-              Ao entrar, você concorda que o sistema processe suas credenciais administrativas para fins de auditoria de segurança, em conformidade com a nossa{' '}
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setIsPrivacyOpen(true);
-                }}
-                className="text-pink-700 hover:text-pink-850 hover:underline font-bold focus:outline-none cursor-pointer inline-block"
-              >
-                Política de Privacidade
-              </button>
-              .
-            </label>
-          </div>
-
           {/* Botão Acessar */}
           <button
             type="submit"
@@ -270,7 +264,14 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       </div>
       
       {/* Modal de Politica de Privacidade LGPD */}
-      <PrivacyModal isOpen={isPrivacyOpen} onClose={() => setIsPrivacyOpen(false)} />
+      <PrivacyModal
+        isOpen={isPrivacyOpen}
+        onClose={() => setIsPrivacyOpen(false)}
+        onAccept={handleAcceptConsent}
+        title="Termo de Consentimento"
+        subtitle="Primeiro acesso"
+        acceptLabel="Aceitar e Entrar no Painel"
+      />
     </div>
   );
 };
