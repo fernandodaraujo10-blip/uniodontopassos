@@ -3,15 +3,19 @@ import { Mail, Eye, EyeOff, ShieldAlert, KeyRound, User as UserIcon } from 'luci
 import { User } from './Settings';
 import { hashPassword } from '../utils/security';
 import { PrivacyModal } from '../components/modals/PrivacyModal';
+import { getDefaultAllowedPagesByRole, normalizeAllowedPages } from '../utils/userPermissions';
 
 // Mock padrão igual ao Settings.tsx caso o localStorage esteja vazio
 const defaultMockUsers: User[] = [
-  { id: '1', name: 'FerTaise Tech Admin', email: 'fertaisetech@gmail.com', username: 'fertaisetech@gmail.com', role: 'Tech FerTaise', status: 'ativo', avatarColor: 'from-pink-600 to-rose-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4' },
-  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-blue-600 to-teal-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
-  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-purple-600 to-indigo-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
-  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-amber-600 to-orange-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
-  { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'ativo', avatarColor: 'from-emerald-600 to-green-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FJanaina.png?alt=media&token=82b39f8c-d63d-4f8a-96e9-681337df67c7' }
+  { id: '1', name: 'FerTaise Tech Admin', email: 'fertaisetech@gmail.com', username: 'fertaisetech@gmail.com', role: 'Tech FerTaise', status: 'ativo', avatarColor: 'from-pink-600 to-rose-400', allowedPages: getDefaultAllowedPagesByRole('Tech FerTaise'), password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4' },
+  { id: '6', name: 'test 1234', email: 'test@uniodontopassos.com', username: 'test', role: 'Gerente', status: 'ativo', avatarColor: 'from-cyan-600 to-blue-400', allowedPages: ['dashboard', 'relatorios'], password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4' },
+  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-blue-600 to-teal-400', allowedPages: getDefaultAllowedPagesByRole('Diretor'), password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
+  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-purple-600 to-indigo-400', allowedPages: getDefaultAllowedPagesByRole('Diretor'), password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
+  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-amber-600 to-orange-400', allowedPages: getDefaultAllowedPagesByRole('Diretor'), password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
+  { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'ativo', avatarColor: 'from-emerald-600 to-green-400', allowedPages: getDefaultAllowedPagesByRole('Gerente'), password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FJanaina.png?alt=media&token=82b39f8c-d63d-4f8a-96e9-681337df67c7' }
 ];
+
+const testUserMock: User = defaultMockUsers.find(user => user.id === '6') as User;
 
 interface LoginProps {
   onLoginSuccess: (user: User) => void;
@@ -75,7 +79,15 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             currentUsers = defaultMockUsers;
             localStorage.setItem('uniodonto_settings_users', JSON.stringify(defaultMockUsers));
           } else {
-            currentUsers = parsed;
+            currentUsers = parsed.map(user => ({
+              ...user,
+              allowedPages: normalizeAllowedPages(user.role, user.allowedPages)
+            }));
+
+            if (!currentUsers.some(user => user.id === testUserMock.id)) {
+              currentUsers = [...currentUsers, testUserMock];
+              localStorage.setItem('uniodonto_settings_users', JSON.stringify(currentUsers));
+            }
           }
         } catch (e) {
           currentUsers = defaultMockUsers;

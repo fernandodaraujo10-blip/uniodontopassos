@@ -4,6 +4,7 @@ import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import Dashboard from '@/pages/Dashboard';
 import { DashboardProvider } from '@/context/DashboardContext';
 import Login from '@/pages/Login';
+import { hasPageAccess } from '@/utils/userPermissions';
 
 // Importação síncrona apenas para o tipo User (não carrega o módulo completo)
 import type { User } from '@/pages/Settings';
@@ -51,6 +52,14 @@ export const App: React.FC = () => {
       document.documentElement.classList.remove('dark');
     }
   }, [theme]);
+
+  useEffect(() => {
+    if (!loggedUser) return;
+
+    if (!hasPageAccess(loggedUser.allowedPages, loggedUser.role, currentPage)) {
+      setCurrentPage('dashboard');
+    }
+  }, [currentPage, loggedUser]);
 
   const handleLoginSuccess = (user: User) => {
     localStorage.setItem('uniodonto_logged_user', JSON.stringify(user));

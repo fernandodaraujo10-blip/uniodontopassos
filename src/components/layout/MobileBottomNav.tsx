@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { LayoutGrid, BarChart3, Send, Settings, LogOut } from 'lucide-react';
 import { User } from '../../pages/Settings';
+import { hasPageAccess } from '../../utils/userPermissions';
 
 interface MobileBottomNavProps {
   currentPage: string;
@@ -38,6 +39,9 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
       action: () => setIsLogoutOpen(true),
     },
   ];
+  const visibleItems = loggedUser
+    ? items.filter((item) => hasPageAccess(loggedUser.allowedPages, loggedUser.role, item.id))
+    : items;
 
   const getInitials = (name: string) => {
     if (!name) return 'U';
@@ -66,7 +70,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
         style={{ height: 'calc(72px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
         aria-label="Navega??o principal"
       >
-        {items.map((item) => {
+        {visibleItems.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.id);
 

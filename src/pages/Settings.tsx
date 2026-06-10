@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { hashPassword, maskEmail } from '../utils/security';
 import { PrivacyModal } from '../components/modals/PrivacyModal';
 import { usePWAInstall } from '../hooks/usePWAInstall';
+import { AppPageId, getDefaultAllowedPagesByRole, normalizeAllowedPages } from '../utils/userPermissions';
 import { 
   Users, 
   Building2, 
@@ -33,17 +34,21 @@ export interface User {
   role: string;
   status: 'ativo' | 'inativo';
   avatarColor: string;
+  allowedPages?: AppPageId[];
   password?: string;
   photo?: string;
 }
 
 const mockUsers: User[] = [
-  { id: '1', name: 'FerTaise Tech Admin', email: 'fertaisetech@gmail.com', username: 'fertaisetech@gmail.com', role: 'Tech FerTaise', status: 'ativo', avatarColor: 'from-pink-600 to-rose-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4' },
-  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-blue-600 to-teal-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
-  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-purple-600 to-indigo-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
-  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-amber-600 to-orange-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
-  { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'ativo', avatarColor: 'from-emerald-600 to-green-400', password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FJanaina.png?alt=media&token=82b39f8c-d63d-4f8a-96e9-681337df67c7' }
+  { id: '1', name: 'FerTaise Tech Admin', email: 'fertaisetech@gmail.com', username: 'fertaisetech@gmail.com', role: 'Tech FerTaise', status: 'ativo', avatarColor: 'from-pink-600 to-rose-400', allowedPages: getDefaultAllowedPagesByRole('Tech FerTaise'), password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4' },
+  { id: '6', name: 'test 1234', email: 'test@uniodontopassos.com', username: 'test', role: 'Gerente', status: 'ativo', avatarColor: 'from-cyan-600 to-blue-400', allowedPages: ['dashboard', 'relatorios'], password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4' },
+  { id: '2', name: 'Dr. Elcio Beraldo', email: 'elcio@uniodonto.com', username: 'elcio@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-blue-600 to-teal-400', allowedPages: getDefaultAllowedPagesByRole('Diretor'), password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Elcio.png?alt=media&token=1ade4c11-ba33-4ff9-865e-7e19fe095943' },
+  { id: '3', name: 'Dr. Luiz Fernando', email: 'luiz@uniodonto.com', username: 'luiz@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-purple-600 to-indigo-400', allowedPages: getDefaultAllowedPagesByRole('Diretor'), password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.LuizFernando.png?alt=media&token=942f6b36-9a6a-4add-8470-13160ce7b4af' },
+  { id: '4', name: 'Dr. Mateus José', email: 'mateus@uniodonto.com', username: 'mateus@uniodonto.com', role: 'Diretor', status: 'ativo', avatarColor: 'from-amber-600 to-orange-400', allowedPages: getDefaultAllowedPagesByRole('Diretor'), password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FDr.Matheus.png?alt=media&token=924d0fcb-129a-4c06-8ffc-19f244545f07' },
+  { id: '5', name: 'Janaína Pádua', email: 'gerente@uniodonto.com', username: 'gerente@uniodonto.com', role: 'Gerente', status: 'ativo', avatarColor: 'from-emerald-600 to-green-400', allowedPages: getDefaultAllowedPagesByRole('Gerente'), password: '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4', photo: 'https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2FJanaina.png?alt=media&token=82b39f8c-d63d-4f8a-96e9-681337df67c7' }
 ];
+
+const testUserMock: User = mockUsers.find(user => user.id === '6') as User;
 
 interface SettingsProps {
   theme?: 'light' | 'dark';
@@ -71,7 +76,16 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
         if (isOldData) {
           return mockUsers;
         }
-        return parsed;
+        const normalizedUsers: User[] = parsed.map(user => ({
+          ...user,
+          allowedPages: normalizeAllowedPages(user.role, user.allowedPages)
+        }));
+
+        if (!normalizedUsers.some(user => user.id === testUserMock.id)) {
+          normalizedUsers.push(testUserMock);
+        }
+
+        return normalizedUsers;
       } catch (e) {
         return mockUsers;
       }
@@ -92,9 +106,35 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
   const [formUsername, setFormUsername] = useState('');
   const [formRole, setFormRole] = useState('Tech FerTaise');
   const [formStatus, setFormStatus] = useState<'ativo' | 'inativo'>('ativo');
+  const [formAllowedPages, setFormAllowedPages] = useState<AppPageId[]>(getDefaultAllowedPagesByRole('Tech FerTaise'));
   const [formPassword, setFormPassword] = useState('');
   const [showFormPassword, setShowFormPassword] = useState(false);
   const [formPhoto, setFormPhoto] = useState<string | undefined>(undefined);
+
+  const screenOptions: { id: AppPageId; label: string; description: string }[] = [
+    { id: 'dashboard', label: 'Dashboard', description: 'Visão geral do painel' },
+    { id: 'relatorios', label: 'Relatórios', description: 'Acesso aos relatórios' },
+    { id: 'envio', label: 'Envio', description: 'Tela de envio de dados' },
+    { id: 'configuracoes', label: 'Configurações', description: 'Perfil e ajustes' },
+  ];
+
+  const handleFormRoleChange = (role: string) => {
+    setFormRole(role);
+    setFormAllowedPages(getDefaultAllowedPagesByRole(role));
+  };
+
+  const handleToggleFormPage = (pageId: AppPageId) => {
+    if (formRole === 'Diretor' && pageId === 'envio') return;
+
+    setFormAllowedPages(prev => {
+      const exists = prev.includes(pageId);
+      if (exists) {
+        return prev.filter(page => page !== pageId);
+      }
+
+      return [...prev, pageId];
+    });
+  };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -164,6 +204,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
     setFormUsername('');
     setFormRole('Tech FerTaise');
     setFormStatus('ativo');
+    setFormAllowedPages(getDefaultAllowedPagesByRole('Tech FerTaise'));
     setFormPassword('');
     setShowFormPassword(false);
     setFormPhoto(undefined);
@@ -200,6 +241,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
       role: formRole,
       status: formStatus,
       avatarColor: randomColor,
+      allowedPages: normalizeAllowedPages(formRole, formAllowedPages),
       password: hashedPassword,
       photo: formPhoto
     };
@@ -217,6 +259,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
     setFormUsername(user.username || user.email);
     setFormRole(user.role);
     setFormStatus(user.status);
+    setFormAllowedPages(normalizeAllowedPages(user.role, user.allowedPages));
     setFormPassword('');
     setShowFormPassword(false);
     setFormPhoto(user.photo);
@@ -239,6 +282,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
       username: formUsername.trim() || formEmail.trim(),
       role: formRole,
       status: formStatus,
+      allowedPages: normalizeAllowedPages(formRole, formAllowedPages),
       password: hashedPassword,
       photo: formPhoto
     };
@@ -1142,20 +1186,6 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-[10px] font-bold text-gray-400 uppercase">Cargo / Função</label>
-                <select
-                  value={formRole}
-                  onChange={(e) => setFormRole(e.target.value)}
-                  className="px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold text-gray-700 bg-slate-50 focus:outline-none cursor-pointer"
-                >
-                  <option value="Diretor">Diretor</option>
-                  <option value="Gerente">Gerente</option>
-                  <option value="Secretaria">Secretaria</option>
-                  <option value="Tech FerTaise">Tech FerTaise</option>
-                </select>
-              </div>
-
-              <div className="flex flex-col gap-1">
                 <div className="flex justify-between items-center">
                   <label className="text-[10px] font-bold text-gray-400 uppercase">Usuário</label>
                   <button
@@ -1315,7 +1345,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                 <label className="text-[10px] font-bold text-gray-400 uppercase">Cargo / Função</label>
                 <select
                   value={formRole}
-                  onChange={(e) => setFormRole(e.target.value)}
+                  onChange={(e) => handleFormRoleChange(e.target.value)}
                   className="px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold text-gray-700 bg-slate-50 focus:outline-none cursor-pointer"
                 >
                   <option value="Diretor">Diretor</option>
@@ -1392,6 +1422,66 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                     Inativo
                   </button>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase">Telas Disponíveis</label>
+                  <span className="text-[9px] font-bold text-pink-700 uppercase tracking-wider">
+                    {formRole === 'Diretor' ? 'Sem acesso a Envio' : 'Acesso conforme função'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {screenOptions.map((screen) => {
+                    const isActive = formAllowedPages.includes(screen.id);
+                    const isDirectorBlocked = formRole === 'Diretor' && screen.id === 'envio';
+
+                    return (
+                      <button
+                        key={screen.id}
+                        type="button"
+                        onClick={() => handleToggleFormPage(screen.id)}
+                        disabled={isDirectorBlocked}
+                        className={`text-left rounded-2xl border p-2.5 transition-all duration-200 ${
+                          isActive
+                            ? 'border-pink-200 bg-pink-50/70'
+                            : 'border-slate-100 bg-slate-50 hover:bg-slate-100'
+                        } ${isDirectorBlocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="text-[10px] font-bold text-slate-700">{screen.label}</p>
+                            <p className="text-[8px] text-slate-500 mt-0.5 leading-tight">{screen.description}</p>
+                          </div>
+                          <div
+                            className={`w-4 h-4 rounded-md border flex items-center justify-center shrink-0 ${
+                              isActive ? 'bg-pink-700 border-pink-700 text-white' : 'bg-white border-slate-200 text-transparent'
+                            }`}
+                          >
+                            <CheckCircle2 className="w-3 h-3" />
+                          </div>
+                        </div>
+                        {isDirectorBlocked && (
+                          <p className="text-[8px] text-rose-500 font-semibold mt-2">Diretores não acessam a tela Envio</p>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold text-gray-400 uppercase">Cargo / Função</label>
+                <select
+                  value={formRole}
+                  onChange={(e) => handleFormRoleChange(e.target.value)}
+                  className="px-3 py-2 border border-slate-200 rounded-xl text-xs font-bold text-gray-700 bg-slate-50 focus:outline-none cursor-pointer"
+                >
+                  <option value="Diretor">Diretor</option>
+                  <option value="Gerente">Gerente</option>
+                  <option value="Secretaria">Secretaria</option>
+                  <option value="Tech FerTaise">Tech FerTaise</option>
+                </select>
               </div>
 
               <div className="flex gap-3 pt-3">

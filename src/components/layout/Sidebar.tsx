@@ -14,6 +14,7 @@ import {
   Settings
 } from 'lucide-react';
 import { User } from '../../pages/Settings';
+import { hasPageAccess } from '../../utils/userPermissions';
 
 interface SidebarProps {
   currentPage: string;
@@ -132,6 +133,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
     { id: 'relatorios', label: 'Relatórios', icon: BarChart3 },
     { id: 'envio', label: 'Envio e Integração', icon: Send },
   ];
+  const visibleNavItems = loggedUser
+    ? navItems.filter((item) => hasPageAccess(loggedUser.allowedPages, loggedUser.role, item.id))
+    : navItems;
 
   return (
     <>
@@ -170,7 +174,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentPage, setCurrentPage, o
 
         {/* Menu de Navegação */}
         <nav className={`mt-8 flex-grow space-y-2 ${isCollapsed ? 'px-2' : 'px-4'}`}>
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const Icon = item.icon;
             const isEnvio = item.id === 'envio';
             const isActive = currentPage === item.id || (isEnvio && currentPage.startsWith('envio'));

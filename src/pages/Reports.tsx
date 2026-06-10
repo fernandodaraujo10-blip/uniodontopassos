@@ -1026,7 +1026,7 @@ export const Reports: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-0.5 shrink-0">
                   {mobileKpis.map((kpi, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] p-1.25 flex flex-col justify-between min-h-[61px]">
+                    <div key={idx} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] p-1.5 flex flex-col justify-between min-h-[61px]">
                       <div className="flex items-center gap-1 min-w-0">
                         <div className="w-3.5 h-3.5 rounded-md bg-pink-50 text-pink-700 flex items-center justify-center shrink-0">
                           {kpi.icon}
@@ -1059,7 +1059,7 @@ export const Reports: React.FC = () => {
                   <p className="text-[9px] text-slate-500 mt-0.5 leading-snug line-clamp-2">{ceoAnalysis.explicacao}</p>
                   <div className="mt-0.5 space-y-0.5 overflow-hidden">
                     {ceoAnalysis.insights.slice(0, 2).map((insight, idx) => (
-                      <div key={idx} className="flex items-start gap-1.5 bg-slate-50 rounded-xl border border-slate-100 p-1.25">
+                      <div key={idx} className="flex items-start gap-1.5 bg-slate-50 rounded-xl border border-slate-100 p-1.5">
                         {renderIconeInsight(insight.tipo)}
                         <p className="text-[8px] text-slate-600 leading-snug line-clamp-2">{insight.texto}</p>
                       </div>
