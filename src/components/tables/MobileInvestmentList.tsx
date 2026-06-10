@@ -64,7 +64,7 @@ export const MobileInvestmentList: React.FC<MobileInvestmentListProps> = ({
 
   return (
     <div className={`bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden ${dense ? 'flex flex-col h-full min-h-0' : ''}`}>
-      <div className={`${dense ? 'px-3 pt-2.5 pb-2' : 'px-4 pt-4 pb-3'} border-b border-gray-50`}>
+      <div className={`${dense ? 'px-3 pt-2 pb-2' : 'px-4 pt-4 pb-3'} border-b border-gray-50`}>
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 shrink-0">
             <BarChart3 className={`${dense ? 'w-4 h-4' : 'w-5 h-5'} text-gray-700 flex-shrink-0`} />

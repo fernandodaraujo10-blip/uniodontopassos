@@ -30,16 +30,18 @@ export const InvestimentoCard: React.FC<InvestimentoCardProps> = ({ data, classN
           <h3 className={`font-bold text-pink-700 uppercase ${compact ? 'text-[9px]' : 'text-[10px]'}`}>Investimento</h3>
         </div>
         
-        <div className={`${compact ? 'mobile-card-value' : 'text-2xl'} font-bold text-gray-900 mb-0.5 value-transition`}>
-          {data.total}
-        </div>
-        
-        <div className={`font-semibold flex items-center value-transition ${compact ? 'text-[10px] mb-1.5' : 'text-[11px] mb-3'} ${
-          isUp ? 'text-green-500' : 'text-red-500'
-        }`}>
-          {isUp ? <TrendingUp className="w-3.5 h-3.5 mr-1" /> : <TrendingDown className="w-3.5 h-3.5 mr-1" />}
-          <span>{data.percentText}</span>
-          <span className="text-gray-400 font-normal ml-1">vs. anterior</span>
+        <div className={`flex items-baseline gap-2 ${compact ? 'flex-wrap mb-1' : 'mb-0.5'}`}>
+          <div className={`${compact ? 'mobile-card-value' : 'text-2xl'} font-bold text-gray-900 leading-none value-transition`}>
+            {data.total}
+          </div>
+          
+          <div className={`font-semibold flex items-center value-transition whitespace-nowrap ${compact ? 'text-[9px] mt-0.5' : 'text-[11px] mb-3'} ${
+            isUp ? 'text-green-500' : 'text-red-500'
+          }`}>
+            {isUp ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
+            <span>{data.percentText}</span>
+            <span className="text-gray-400 font-normal ml-1">vs. anterior</span>
+          </div>
         </div>
         
         <div className={`space-y-1.5 mt-2 pt-2 border-t border-gray-50 ${compact ? 'mobile-small' : 'text-[11px]'}`}>

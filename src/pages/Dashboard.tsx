@@ -151,20 +151,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
 
           <div className="mobile-content flex-1 min-h-0 mobile-scroll">
             {mobileSection === 'visao-geral' && (
-              <div className="flex flex-col gap-1.5 animate-fadeIn h-full min-h-0">
-                <section className="space-y-1.5 h-full min-h-0">
-                  <div className="flex items-end justify-between gap-2">
-                    <div className="min-w-0">
-                      <h2 className="mobile-title font-extrabold text-slate-800 tracking-tight">Visão Geral</h2>
-                      <p className="mobile-small text-slate-500 mt-0.5">
-                        Os seis cards principais do mês, no mesmo visual da versão desktop.
-                      </p>
-                    </div>
-                    <span className="text-[9px] font-bold uppercase text-pink-600 bg-pink-50 border border-pink-100 px-2 py-1 rounded-full whitespace-nowrap">
-                      6 cards
-                    </span>
-                  </div>
-
+              <div className="flex flex-col gap-1 animate-fadeIn h-full min-h-0">
+                <section className="space-y-1 h-full min-h-0">
                   <div className="min-h-0">
                     <KPICardGrid data={activeMonthData} area="geral" compact />
                   </div>
