@@ -45,6 +45,39 @@ export const Reports: React.FC = () => {
     end: reportFilter.endMonth
   });
 
+  const handleSelectAllMonths2026 = () => {
+    const months2026 = availableMonths
+      .map((month) => month.value)
+      .filter((month) => month.startsWith('2026-'));
+
+    const startMonth = months2026[0] || '2026-01';
+    const endMonth = months2026[months2026.length - 1] || '2026-12';
+
+    setReportFilter({
+      ...reportFilter,
+      startMonth,
+      endMonth,
+    });
+  };
+
+  const mobilePeriodValue =
+    reportFilter.startMonth === '2026-01' && reportFilter.endMonth === '2026-12'
+      ? 'all-2026'
+      : reportFilter.startMonth;
+
+  const handleMobilePeriodChange = (value: string) => {
+    if (value === 'all-2026') {
+      handleSelectAllMonths2026();
+      return;
+    }
+
+    setReportFilter({
+      ...reportFilter,
+      startMonth: value,
+      endMonth: value,
+    });
+  };
+
   // Atualiza os meses de in?cio/fim caso o m?s selecionado no painel mude e a caixa esteja ativa
   useEffect(() => {
     if (isCurrentMonthOnly) {
@@ -925,8 +958,8 @@ export const Reports: React.FC = () => {
         </div>
 
         {/* Layout Mobile Específico (Oculto no Desktop e na Impressão) */}
-        <div className="md:hidden mobile-page bg-slate-50 flex flex-col print:hidden">
-          <div className="shrink-0 h-[40px] px-2 pt-1">
+        <div className="md:hidden mobile-page h-[100dvh] overflow-hidden bg-slate-50 flex flex-col print:hidden">
+          <div className="shrink-0 h-[36px] px-2 pt-1">
             <div className="grid grid-cols-3 gap-1 h-full rounded-2xl bg-white border border-gray-100 p-1 shadow-[0_8px_30px_rgba(0,0,0,0.03)]">
               {[
                 { id: 'resumo', label: 'Resumo' },
@@ -945,77 +978,106 @@ export const Reports: React.FC = () => {
                     {item.label}
                   </button>
                 );
-              })}
+              })} 
             </div>
           </div>
 
-          <div className="mobile-content flex-1 mobile-scroll">
+          <div className="shrink-0 px-2 pt-1 pb-1">
+            <div className="flex items-center gap-2 rounded-2xl bg-white border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] px-2 py-1.5">
+              <div className="min-w-0 flex-1">
+                <p className="text-[7px] uppercase font-bold tracking-wider text-slate-400 leading-none">Período</p>
+                <p className="text-[8px] text-slate-500 leading-tight mt-0.5 line-clamp-2">Selecione um mês ou todos os meses de 2026</p>
+              </div>
+              <select
+                value={mobilePeriodValue}
+                onChange={(e) => handleMobilePeriodChange(e.target.value)}
+                className="shrink-0 min-w-[132px] h-8 rounded-lg border border-gray-100 bg-gray-50 px-2 text-[10px] font-semibold text-pink-700 focus:outline-none focus:border-pink-200"
+              >
+                <option value="all-2026">Todos 2026</option>
+                {availableMonths
+                  .filter((month) => month.value.startsWith('2026-'))
+                  .map((month) => (
+                    <option key={month.value} value={month.value}>
+                      {month.label}
+                    </option>
+                  ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="mobile-content flex-1 min-h-0 overflow-hidden pb-1">
             {mobileSection === 'resumo' && (
-              <div className="flex flex-col gap-2 h-full min-h-0 animate-fadeIn">
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-2.5 shrink-0">
-                  <div className="flex items-start justify-between gap-2">
+              <div className="flex flex-col gap-0.5 h-full min-h-0 animate-fadeIn">
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-1.5 shrink-0">
+                  <div className="flex items-start justify-between gap-1.5">
                     <div className="min-w-0">
-                      <p className="text-[9px] uppercase font-bold tracking-wider text-slate-400">Resumo do Relatório</p>
-                      <p className="mobile-title font-bold text-slate-800 leading-tight mt-1 line-clamp-2">{obterTituloRelatorio()}</p>
-                      <p className="text-[10px] text-slate-500 mt-0.5">{reportFilter.startMonth} a {reportFilter.endMonth}</p>
+                      <p className="text-[7px] uppercase font-bold tracking-wider text-slate-400">Resumo do Relatório</p>
+                      <p className="text-[15px] font-bold text-slate-800 leading-[1.05] mt-0.5 line-clamp-2 max-h-[31px] overflow-hidden">{obterTituloRelatorio()}</p>
+                      <p className="text-[8px] text-slate-500 mt-0.5 leading-none">{reportFilter.startMonth} a {reportFilter.endMonth}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-[9px] uppercase text-slate-400 font-bold">Canal</p>
-                      <p className="text-[11px] font-bold text-pink-700">
+                      <p className="text-[7px] uppercase text-slate-400 font-bold">Canal</p>
+                      <p className="text-[9px] font-bold text-pink-700">
                         {reportFilter.channel === 'all' ? 'Todos' : reportFilter.channel === 'google' ? 'Google' : reportFilter.channel === 'meta' ? 'Meta' : 'Offline'}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 shrink-0">
+                <div className="grid grid-cols-2 gap-0.5 shrink-0">
                   {mobileKpis.map((kpi, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] p-2 flex flex-col justify-between min-h-[88px]">
-                      <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-6 h-6 rounded-lg bg-pink-50 text-pink-700 flex items-center justify-center shrink-0">
+                    <div key={idx} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] p-1.25 flex flex-col justify-between min-h-[61px]">
+                      <div className="flex items-center gap-1 min-w-0">
+                        <div className="w-3.5 h-3.5 rounded-md bg-pink-50 text-pink-700 flex items-center justify-center shrink-0">
                           {kpi.icon}
                         </div>
-                        <p className="mobile-card-label uppercase font-bold tracking-wider text-slate-400 leading-tight">{kpi.label}</p>
+                        <p className="text-[7px] uppercase font-bold tracking-wider text-slate-400 leading-tight">{kpi.label}</p>
                       </div>
-                      <p className={`mt-1.5 mobile-card-value font-black leading-none ${kpi.label.includes('CAC') || kpi.label.includes('NPS') ? 'text-pink-700' : 'text-slate-800'}`}>
+                      <p
+                        className={`mt-0.5 font-black leading-none ${
+                          kpi.label === 'Total Investido'
+                            ? 'text-[15px] tracking-[-0.06em] text-pink-700 whitespace-nowrap'
+                            : 'text-[15px] tracking-[-0.05em] text-slate-800'
+                        } ${kpi.label.includes('CAC') || kpi.label.includes('NPS') ? 'text-pink-700' : ''}`}
+                      >
                         {kpi.value}
                       </p>
                     </div>
                   ))}
                 </div>
 
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-2.5 shrink-0 overflow-hidden">
-                  <div className="flex items-center justify-between gap-2 shrink-0">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <Info className="w-4 h-4 text-pink-700 shrink-0" />
-                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Análise CEO</p>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-1.5 shrink-0 overflow-hidden">
+                  <div className="flex items-center justify-between gap-1.5 shrink-0">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <Info className="w-3.5 h-3.5 text-pink-700 shrink-0" />
+                      <p className="text-[8px] uppercase font-bold text-slate-400 tracking-wider">Análise CEO</p>
                     </div>
-                    <span className="text-[9px] font-bold uppercase text-pink-700 bg-pink-50 border border-pink-100 px-2 py-0.5 rounded-full shrink-0">
+                    <span className="text-[7px] font-bold uppercase text-pink-700 bg-pink-50 border border-pink-100 px-1.5 py-0.5 rounded-full shrink-0">
                       Insights
                     </span>
                   </div>
-                  <p className="mobile-small text-slate-500 mt-1.5 leading-relaxed line-clamp-2">{ceoAnalysis.explicacao}</p>
-                  <div className="mt-2 space-y-1.5 overflow-hidden">
+                  <p className="text-[9px] text-slate-500 mt-0.5 leading-snug line-clamp-2">{ceoAnalysis.explicacao}</p>
+                  <div className="mt-0.5 space-y-0.5 overflow-hidden">
                     {ceoAnalysis.insights.slice(0, 2).map((insight, idx) => (
-                      <div key={idx} className="flex items-start gap-2 bg-slate-50 rounded-xl border border-slate-100 p-2">
+                      <div key={idx} className="flex items-start gap-1.5 bg-slate-50 rounded-xl border border-slate-100 p-1.25">
                         {renderIconeInsight(insight.tipo)}
-                        <p className="mobile-small text-slate-600 leading-relaxed line-clamp-3">{insight.texto}</p>
+                        <p className="text-[8px] text-slate-600 leading-snug line-clamp-2">{insight.texto}</p>
                       </div>
                     ))}
                   </div>
                 </div>
 
-                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-2.5 shrink-0 overflow-hidden">
-                  <div className="flex items-center justify-between gap-2 shrink-0 mb-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <TrendingUp className="w-4 h-4 text-pink-700 shrink-0" />
-                      <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Gráfico</p>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-1.5 shrink-0 overflow-hidden flex flex-col min-h-0">
+                  <div className="flex items-center justify-between gap-1.5 shrink-0 mb-1">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <TrendingUp className="w-3.5 h-3.5 text-pink-700 shrink-0" />
+                      <p className="text-[8px] uppercase font-bold text-slate-400 tracking-wider">Gráfico</p>
                     </div>
-                    <span className="text-[9px] font-bold uppercase text-pink-700 bg-pink-50 border border-pink-100 px-2 py-0.5 rounded-full shrink-0">
+                    <span className="text-[7px] font-bold uppercase text-pink-700 bg-pink-50 border border-pink-100 px-1.5 py-0.5 rounded-full shrink-0">
                       Compacto
                     </span>
                   </div>
-                  <div className="h-[170px] min-h-0 overflow-hidden">
+                  <div className="flex-1 min-h-[135px] overflow-hidden">
                     <TrendCharts
                       rows={consolidatedReport.rows}
                       reportType={reportFilter.reportType || 'executive'}
