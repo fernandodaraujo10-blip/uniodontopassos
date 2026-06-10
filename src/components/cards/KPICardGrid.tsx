@@ -15,8 +15,16 @@ interface KPICardGridProps {
   compact?: boolean;
 }
 
+type KpiCardKey = 'beneficiarios' | 'investimento' | 'roi' | 'nps' | 'leads' | 'conversoes';
+
 export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area, compact = false }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const clickStateRef = useRef<{ key: KpiCardKey | null; count: number; timeoutId: ReturnType<typeof window.setTimeout> | null }>({
+    key: null,
+    count: 0,
+    timeoutId: null,
+  });
+  const [expandedCard, setExpandedCard] = useState<KpiCardKey | null>(null);
   const [showPrevArrow, setShowPrevArrow] = useState(false);
   const [showNextArrow, setShowNextArrow] = useState(true);
 
@@ -68,6 +76,82 @@ export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area, compact = 
     };
   }, [data, area]);
 
+  useEffect(() => {
+    return () => {
+      const timer = clickStateRef.current.timeoutId;
+      if (timer) {
+        window.clearTimeout(timer);
+      }
+    };
+  }, []);
+
+  const clearCardClickState = () => {
+    const state = clickStateRef.current;
+    if (state.timeoutId) {
+      window.clearTimeout(state.timeoutId);
+      state.timeoutId = null;
+    }
+    state.key = null;
+    state.count = 0;
+  };
+
+  const handleCardClick = (key: KpiCardKey) => {
+    if (!compact || area !== 'geral') return;
+
+    const state = clickStateRef.current;
+
+    if (state.key === key) {
+      state.count += 1;
+    } else {
+      clearCardClickState();
+      state.key = key;
+      state.count = 1;
+    }
+
+    if (state.count >= 3) {
+      clearCardClickState();
+      setExpandedCard(key);
+      return;
+    }
+
+    if (state.timeoutId) {
+      window.clearTimeout(state.timeoutId);
+    }
+
+    state.timeoutId = window.setTimeout(() => {
+      clearCardClickState();
+    }, 550);
+  };
+
+  const closeExpandedCard = () => {
+    setExpandedCard(null);
+    clearCardClickState();
+  };
+
+  const getExpandedCardClassName = () =>
+    'bg-white relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 w-full h-full min-h-[calc(100vh-6rem)] p-4 rounded-[28px] border border-gray-100';
+
+  const renderKpiCard = (key: KpiCardKey, fullscreen = false) => {
+    const cardClassName = fullscreen ? getExpandedCardClassName() : undefined;
+    const cardCompact = fullscreen ? false : compact;
+    switch (key) {
+      case 'beneficiarios':
+        return <BeneficiariosCard data={data.beneficiarios} compact={cardCompact} className={cardClassName} />;
+      case 'investimento':
+        return <InvestimentoCard data={data.investimento} compact={cardCompact} className={cardClassName} />;
+      case 'roi':
+        return <RoiCard data={data.roi} compact={cardCompact} className={cardClassName} />;
+      case 'nps':
+        return <NpsCard data={data.nps} compact={cardCompact} className={cardClassName} />;
+      case 'leads':
+        return <LeadsCard data={data.leads} compact={cardCompact} className={cardClassName} />;
+      case 'conversoes':
+        return <ConversoesCard data={data.conversoes} compact={cardCompact} className={cardClassName} />;
+      default:
+        return null;
+    }
+  };
+
   // Se a área for 'marketing' ou 'analise', mostramos grids estáticos de 4 colunas (sem carrossel)
   if (area === 'marketing') {
     return (
@@ -97,15 +181,54 @@ export const KPICardGrid: React.FC<KPICardGridProps> = ({ data, area, compact = 
 
   if (compact) {
     return (
-      <div className="w-full shrink-0">
+      <div className="w-full shrink-0 relative">
         <div className="grid grid-cols-2 gap-3 transition-all duration-300">
-          <BeneficiariosCard data={data.beneficiarios} compact />
-          <InvestimentoCard data={data.investimento} compact />
-          <RoiCard data={data.roi} compact />
-          <NpsCard data={data.nps} compact />
-          <LeadsCard data={data.leads} compact />
-          <ConversoesCard data={data.conversoes} compact />
+          <div role="button" tabIndex={0} onClick={() => handleCardClick('beneficiarios')} className="text-left cursor-zoom-in">
+            {renderKpiCard('beneficiarios')}
+          </div>
+          <div role="button" tabIndex={0} onClick={() => handleCardClick('investimento')} className="text-left cursor-zoom-in">
+            {renderKpiCard('investimento')}
+          </div>
+          <div role="button" tabIndex={0} onClick={() => handleCardClick('roi')} className="text-left cursor-zoom-in">
+            {renderKpiCard('roi')}
+          </div>
+          <div role="button" tabIndex={0} onClick={() => handleCardClick('nps')} className="text-left cursor-zoom-in">
+            {renderKpiCard('nps')}
+          </div>
+          <div role="button" tabIndex={0} onClick={() => handleCardClick('leads')} className="text-left cursor-zoom-in">
+            {renderKpiCard('leads')}
+          </div>
+          <div role="button" tabIndex={0} onClick={() => handleCardClick('conversoes')} className="text-left cursor-zoom-in">
+            {renderKpiCard('conversoes')}
+          </div>
         </div>
+
+        {expandedCard && (
+          <div
+            className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md px-3 py-4 flex items-stretch justify-center"
+            onClick={closeExpandedCard}
+          >
+            <div className="w-full max-w-[430px] h-full flex flex-col gap-3" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between text-white px-1">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-white/60 font-bold">Visualização expandida</p>
+                  <h3 className="text-lg font-bold leading-tight">Toque em voltar para fechar</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={closeExpandedCard}
+                  className="rounded-full bg-white/10 hover:bg-white/20 text-white px-3 py-2 text-xs font-bold transition-colors"
+                >
+                  Voltar ao normal
+                </button>
+              </div>
+
+              <div className="flex-1 min-h-0">
+                {renderKpiCard(expandedCard, true)}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

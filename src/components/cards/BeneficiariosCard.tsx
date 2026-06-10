@@ -4,15 +4,16 @@ import { BeneficiariosData } from '../../types/dashboard';
 
 interface BeneficiariosCardProps {
   data: BeneficiariosData;
+  className?: string;
   compact?: boolean;
 }
 
-export const BeneficiariosCard: React.FC<BeneficiariosCardProps> = ({ data, compact = false }) => {
+export const BeneficiariosCard: React.FC<BeneficiariosCardProps> = ({ data, className, compact = false }) => {
   const [showHelp, setShowHelp] = useState(false);
   const isUp = data.percentType === 'up';
 
   return (
-    <div className={`bg-white relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full ${
+    <div className={className || `bg-white relative overflow-hidden card-shadow flex flex-col justify-between transition-all duration-300 h-full ${
       compact ? 'mobile-card min-h-[190px] p-2 border border-gray-100' : 'p-4 rounded-2xl border border-gray-100'
     }`}>
       <button
