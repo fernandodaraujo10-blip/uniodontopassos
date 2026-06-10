@@ -125,7 +125,7 @@ export const MobileAdsPerformanceCard: React.FC<MobileAdsPerformanceCardProps> =
 
   if (analysisMode) {
     return (
-      <div className="flex-[1.35] min-h-0 rounded-2xl p-2.5 bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden">
+      <div className="flex-[1.15] min-h-0 rounded-2xl p-2.5 bg-white border border-slate-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] flex flex-col overflow-hidden">
         <div className="shrink-0">
           <div className="flex items-center justify-between gap-2 mb-1.5">
             <div>
@@ -155,11 +155,11 @@ export const MobileAdsPerformanceCard: React.FC<MobileAdsPerformanceCardProps> =
           </div>
         </div>
 
-        <div className="shrink-0 h-[92px] mt-1.5">
+        <div className="shrink-0 h-[80px] mt-1.5">
           <Bar
             data={chartData}
             options={chartOptions}
-            height={92}
+            height={80}
             width={100}
           />
         </div>
@@ -175,7 +175,7 @@ export const MobileAdsPerformanceCard: React.FC<MobileAdsPerformanceCardProps> =
           ].map(([label, value]) => (
             <div
               key={String(label)}
-              className="h-[38px] rounded-xl px-2.5 py-1.5 bg-slate-50 border border-slate-100 flex flex-col justify-center overflow-hidden"
+              className="h-[34px] rounded-xl px-2.5 py-[4px] bg-slate-50 border border-slate-100 flex flex-col justify-center overflow-hidden"
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="text-[8px] uppercase text-slate-400 font-bold leading-none">{label}</span>

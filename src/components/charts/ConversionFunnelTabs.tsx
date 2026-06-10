@@ -56,7 +56,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
     <div className={`col-span-12 lg:col-span-5 bg-white rounded-2xl border border-gray-100 card-shadow flex flex-col justify-between h-full min-h-0 w-full min-w-0 overflow-hidden ${compact ? 'p-2.5' : 'p-4'}`}>
       
       {/* Abas Superiores */}
-      <div className={`flex gap-1 md:gap-1.5 bg-gray-50 p-1 rounded-xl shrink-0 select-none overflow-x-auto scrollbar-hide ${compact ? 'mb-1.5' : 'mb-3'}`}>
+      <div className={`flex gap-1 md:gap-1.5 bg-gray-50 p-1 rounded-xl shrink-0 select-none overflow-x-auto scrollbar-hide ${compact ? 'mb-1' : 'mb-3'}`}>
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
           return (
@@ -80,47 +80,47 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
       {/* Conteúdo 1: Funil de Conversão */}
       {activeTab === 'funnel' && (
         <div
-          className={`flex-grow flex items-center justify-between min-h-0 animate-fade-in-tab overflow-hidden ${compact ? 'gap-1' : 'gap-1 md:gap-2'}`}
+          className={`flex-grow flex items-center justify-between min-h-0 animate-fade-in-tab overflow-hidden ${compact ? 'gap-0.5' : 'gap-1 md:gap-2'}`}
           style={{ minHeight: compact ? '0' : '200px' }}
         >
           
           {/* Funil Métrica Esquerda (Absoluto) */}
-          <div className={`flex flex-col justify-between h-full shrink-0 select-none ${compact ? 'py-0.5 text-[8px] w-11' : 'py-1 text-[10px] w-16 md:w-20'}`}>
+          <div className={`flex flex-col justify-between h-full shrink-0 select-none ${compact ? 'py-[2px] text-[7px] w-10' : 'py-1 text-[10px] w-16 md:w-20'}`}>
             <div className="hover:scale-105 transition-transform duration-200">
               <p className="text-gray-400 font-medium leading-none">Impressões</p>
-              <p className={`font-bold text-gray-800 ${compact ? 'text-[10px]' : 'text-xs'} mt-0.5`}>{funnelData.impressoes}</p>
+              <p className={`font-bold text-gray-800 ${compact ? 'text-[9px]' : 'text-xs'} mt-0.5`}>{funnelData.impressoes}</p>
               {renderTrend(funnelData.impressoesChange, funnelData.impressoesChangeType)}
             </div>
             <div className="hover:scale-105 transition-transform duration-200">
               <p className="text-gray-400 font-medium leading-none">Cliques</p>
-              <p className={`font-bold text-gray-800 ${compact ? 'text-[10px]' : 'text-xs'} mt-0.5`}>{funnelData.cliques}</p>
+              <p className={`font-bold text-gray-800 ${compact ? 'text-[9px]' : 'text-xs'} mt-0.5`}>{funnelData.cliques}</p>
               {renderTrend(funnelData.cliquesChange, funnelData.cliquesChangeType)}
             </div>
             <div className="hover:scale-105 transition-transform duration-200">
               <p className="text-gray-400 font-medium leading-none">Leads</p>
-              <p className={`font-bold text-gray-800 ${compact ? 'text-[10px]' : 'text-xs'} mt-0.5`}>{funnelData.leads}</p>
+              <p className={`font-bold text-gray-800 ${compact ? 'text-[9px]' : 'text-xs'} mt-0.5`}>{funnelData.leads}</p>
               {renderTrend(funnelData.leadsChange, funnelData.leadsChangeType)}
             </div>
             <div className="hover:scale-105 transition-transform duration-200">
               <p className="text-gray-400 font-medium leading-none">Agendamentos</p>
-              <p className={`font-bold text-gray-800 ${compact ? 'text-[10px]' : 'text-xs'} mt-0.5`}>{funnelData.agendamentos}</p>
+              <p className={`font-bold text-gray-800 ${compact ? 'text-[9px]' : 'text-xs'} mt-0.5`}>{funnelData.agendamentos}</p>
               {renderTrend(funnelData.agendamentosChange, funnelData.agendamentosChangeType)}
             </div>
             <div className="hover:scale-105 transition-transform duration-200">
               <p className="text-gray-400 font-medium leading-none">Vendas</p>
-              <p className={`font-bold text-gray-800 ${compact ? 'text-[10px]' : 'text-xs'} mt-0.5`}>{funnelData.vendas}</p>
+              <p className={`font-bold text-gray-800 ${compact ? 'text-[9px]' : 'text-xs'} mt-0.5`}>{funnelData.vendas}</p>
               {renderTrend(funnelData.vendasChange, funnelData.vendasChangeType)}
             </div>
           </div>
           
           {/* Representação Visual do Funil */}
-          <div className={`flex-grow flex flex-col items-center min-w-0 select-none ${compact ? 'gap-1' : 'gap-1.5 md:gap-2'}`}>
+          <div className={`flex-grow flex flex-col items-center min-w-0 select-none ${compact ? 'gap-[3px]' : 'gap-1.5 md:gap-2'}`}>
             {/* Step 1 - Impressões */}
             <div
               onMouseEnter={() => setHoveredStep(1)}
               onMouseLeave={() => setHoveredStep(null)}
               style={{ opacity: hoveredStep === null || hoveredStep === 1 ? 1 : 0.5 }}
-              className={`funnel-step bg-pink-50 w-full flex items-center justify-center text-pink-700 shadow-sm cursor-pointer ${compact ? 'h-7' : 'h-9 md:h-[46px]'}`}
+              className={`funnel-step bg-pink-50 w-full flex-1 min-h-[22px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer ${compact ? '' : 'h-9 md:h-[46px]'}`}
               title="Impressões"
             >
               <Eye className={`${compact ? 'w-4 h-4' : 'w-5 h-5'}`} />
@@ -131,7 +131,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
               onMouseEnter={() => setHoveredStep(2)}
               onMouseLeave={() => setHoveredStep(null)}
               style={{ opacity: hoveredStep === null || hoveredStep === 2 ? 1 : 0.5 }}
-              className={`funnel-step bg-pink-100 w-[85%] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer ${compact ? 'h-7' : 'h-9 md:h-[46px]'}`}
+              className={`funnel-step bg-pink-100 w-[85%] flex-1 min-h-[22px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer ${compact ? '' : 'h-9 md:h-[46px]'}`}
               title="Cliques"
             >
               <MousePointerClick className={`${compact ? 'w-4 h-4' : 'w-5 h-5'}`} />
@@ -142,7 +142,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
               onMouseEnter={() => setHoveredStep(3)}
               onMouseLeave={() => setHoveredStep(null)}
               style={{ opacity: hoveredStep === null || hoveredStep === 3 ? 1 : 0.5 }}
-              className={`funnel-step bg-pink-200 w-[70%] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer ${compact ? 'h-7' : 'h-9 md:h-[46px]'}`}
+              className={`funnel-step bg-pink-200 w-[70%] flex-1 min-h-[22px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer ${compact ? '' : 'h-9 md:h-[46px]'}`}
               title="Leads"
             >
               <Users className={`${compact ? 'w-4 h-4' : 'w-5 h-5'}`} />
@@ -153,7 +153,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
               onMouseEnter={() => setHoveredStep(4)}
               onMouseLeave={() => setHoveredStep(null)}
               style={{ opacity: hoveredStep === null || hoveredStep === 4 ? 1 : 0.5 }}
-              className={`funnel-step bg-pink-300 w-[55%] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer ${compact ? 'h-7' : 'h-9 md:h-[46px]'}`}
+              className={`funnel-step bg-pink-300 w-[55%] flex-1 min-h-[22px] flex items-center justify-center text-pink-700 shadow-sm cursor-pointer ${compact ? '' : 'h-9 md:h-[46px]'}`}
               title="Agendamentos"
             >
               <Calendar className={`${compact ? 'w-4 h-4' : 'w-5 h-5'}`} />
@@ -164,7 +164,7 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
               onMouseEnter={() => setHoveredStep(5)}
               onMouseLeave={() => setHoveredStep(null)}
               style={{ opacity: hoveredStep === null || hoveredStep === 5 ? 1 : 0.5 }}
-              className={`funnel-step bg-pink-400 w-[40%] flex items-center justify-center text-white shadow-sm cursor-pointer ${compact ? 'h-7' : 'h-9 md:h-[46px]'}`}
+              className={`funnel-step bg-pink-400 w-[40%] flex-1 min-h-[22px] flex items-center justify-center text-white shadow-sm cursor-pointer ${compact ? '' : 'h-9 md:h-[46px]'}`}
               title="Vendas"
             >
               <ShoppingCart className={`${compact ? 'w-4 h-4' : 'w-5 h-5'}`} />
@@ -172,25 +172,25 @@ export const ConversionFunnelTabs: React.FC<ConversionFunnelTabsProps> = ({
           </div>
           
           {/* Funil Taxa Direita (Conversão Relativa) */}
-          <div className={`flex flex-col justify-around h-full shrink-0 border-l border-gray-50 select-none ${compact ? 'py-0.5 text-[7px] w-14 pl-1' : 'py-1 text-[8px] md:text-[9px] w-20 md:w-24 pl-1.5 md:pl-2'}`}>
+          <div className={`flex flex-col justify-around h-full shrink-0 border-l border-gray-50 select-none ${compact ? 'py-[2px] text-[7px] w-12 pl-1' : 'py-1 text-[8px] md:text-[9px] w-20 md:w-24 pl-1.5 md:pl-2'}`}>
             <div>
               <p className="text-gray-400 font-medium leading-none">CTR (Cliques/Imp.)</p>
-              <p className={`font-bold text-gray-800 ${compact ? 'text-[10px]' : 'text-xs'} mt-0.5`}>{funnelData.txCtr}</p>
+              <p className={`font-bold text-gray-800 ${compact ? 'text-[9px]' : 'text-xs'} mt-0.5`}>{funnelData.txCtr}</p>
               {renderFunnelTaxaTrend(funnelData.txCtrChange, funnelData.txCtrChangeType)}
             </div>
             <div>
               <p className="text-gray-400 font-medium leading-none">Conversão Leads</p>
-              <p className={`font-bold text-gray-800 ${compact ? 'text-[10px]' : 'text-xs'} mt-0.5`}>{funnelData.txLeads}</p>
+              <p className={`font-bold text-gray-800 ${compact ? 'text-[9px]' : 'text-xs'} mt-0.5`}>{funnelData.txLeads}</p>
               {renderFunnelTaxaTrend(funnelData.txLeadsChange, funnelData.txLeadsChangeType)}
             </div>
             <div>
               <p className="text-gray-400 font-medium leading-none">Tx. Agendamento</p>
-              <p className={`font-bold text-gray-800 ${compact ? 'text-[10px]' : 'text-xs'} mt-0.5`}>{funnelData.txAgendamentos}</p>
+              <p className={`font-bold text-gray-800 ${compact ? 'text-[9px]' : 'text-xs'} mt-0.5`}>{funnelData.txAgendamentos}</p>
               {renderFunnelTaxaTrend(funnelData.txAgendamentosChange, funnelData.txAgendamentosChangeType)}
             </div>
             <div>
               <p className="text-gray-400 font-medium leading-none">Aprov. Comercial</p>
-              <p className={`font-bold text-gray-800 ${compact ? 'text-[10px]' : 'text-xs'} mt-0.5`}>{funnelData.txVendas}</p>
+              <p className={`font-bold text-gray-800 ${compact ? 'text-[9px]' : 'text-xs'} mt-0.5`}>{funnelData.txVendas}</p>
               {renderFunnelTaxaTrend(funnelData.txVendasChange, funnelData.txVendasChangeType)}
             </div>
           </div>

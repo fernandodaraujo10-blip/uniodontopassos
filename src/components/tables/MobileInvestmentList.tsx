@@ -62,6 +62,104 @@ export const MobileInvestmentList: React.FC<MobileInvestmentListProps> = ({
 
   const total = filteredInvestments.reduce((acc, item) => acc + item.valorInt, 0);
 
+  if (dense) {
+    return (
+      <div className="bg-white rounded-[20px] border border-pink-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden flex flex-col min-h-0">
+        <div className="px-3 pt-3 pb-2.5 border-b border-gray-100">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-start gap-2 min-w-0">
+              <BarChart3 className="w-5 h-5 text-slate-700 shrink-0 mt-0.5" />
+              <div className="min-w-0">
+                <h2 className="text-[17px] leading-none font-extrabold text-slate-900 tracking-tight">
+                  Investimentos do Mês
+                </h2>
+              </div>
+            </div>
+
+            <div className="text-right shrink-0">
+              <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-slate-400 leading-none">
+                Total
+              </p>
+              <p className="mt-1 text-[22px] leading-none font-black text-pink-700">
+                {total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-3 flex gap-1.5 overflow-x-auto scrollbar-hide pb-0.5">
+            {categories.map((category) => {
+              const active = selectedCategory === category;
+              return (
+                <button
+                  key={category}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`h-8 px-3 rounded-lg border whitespace-nowrap font-bold transition-all duration-200 cursor-pointer text-[11px] shrink-0 ${
+                    active
+                      ? 'bg-pink-700 text-white border-pink-700 shadow-sm'
+                      : 'bg-white text-slate-500 border-pink-100 hover:bg-pink-50 hover:text-slate-700'
+                  }`}
+                >
+                  {category}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="px-3 pt-3 pb-2">
+          <div className="grid grid-cols-[72px_1fr_auto] gap-2 text-[11px] font-bold text-slate-400 uppercase tracking-wide pb-2 border-b border-gray-100">
+            <span>Mês</span>
+            <span>Métrica</span>
+            <span className="text-right">Valor</span>
+          </div>
+        </div>
+
+        <div className="flex-1 min-h-0 overflow-y-auto mobile-scroll px-3 pb-2">
+          <div className="divide-y divide-gray-50">
+            {filteredInvestments.length === 0 ? (
+              <div className="py-6 text-center text-[12px] text-gray-400 italic">
+                Nenhum investimento nesta categoria.
+              </div>
+            ) : (
+              filteredInvestments.map((item, index) => (
+                <div
+                  key={`${selectedCategory}-${item.metric}-${index}`}
+                  className="grid grid-cols-[72px_1fr_auto] gap-2 items-center py-2.5"
+                >
+                  <span className="text-[11px] font-semibold text-slate-400">
+                    {monthLabel}
+                  </span>
+
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span
+                      className={`w-2 h-2 rounded-full shrink-0 ${getTagColorClass(item.categoria)}`}
+                    />
+                    <span className="text-[12px] font-medium text-slate-700 truncate">
+                      {item.metric}
+                    </span>
+                  </div>
+
+                  <span className="text-[12px] font-extrabold text-slate-900 text-right whitespace-nowrap">
+                    {item.valor}
+                  </span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {showFooter && (
+          <div className="safe-bottom px-3 py-2 text-[9px] flex items-center gap-2 text-gray-400 border-t border-gray-50">
+            <Clock className="w-3.5 h-3.5 flex-shrink-0" />
+            <span>
+              Última atualização: <span className="font-semibold">{timestamp}</span>
+            </span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={`bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] overflow-hidden ${dense ? 'flex flex-col h-full min-h-0' : ''}`}>
       <div className={`${dense ? 'px-3 pt-2 pb-2' : 'px-4 pt-4 pb-3'} border-b border-gray-50`}>

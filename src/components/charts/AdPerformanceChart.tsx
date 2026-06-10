@@ -145,13 +145,13 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
   };
 
   return (
-    <div className={`col-span-12 lg:col-span-7 bg-[#0D040A] text-white rounded-3xl shadow-xl flex flex-col justify-between h-full min-h-0 w-full min-w-0 overflow-hidden ${compact ? 'p-2.5' : 'p-4 md:p-5'}`}>
+    <div className={`col-span-12 lg:col-span-7 bg-[#0D040A] text-white rounded-3xl shadow-xl flex flex-col justify-between h-full min-h-0 w-full min-w-0 overflow-hidden ${compact ? 'p-2' : 'p-4 md:p-5'}`}>
       <div className="shrink-0">
-        <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center ${compact ? 'mb-1.5 gap-2' : 'mb-2 gap-3'}`}>
+        <div className={`flex flex-col sm:flex-row justify-between items-start sm:items-center ${compact ? 'mb-1 gap-1.5' : 'mb-2 gap-3'}`}>
           <h2 className={`${compact ? 'mobile-subtitle' : 'text-xl'} font-bold text-pink-500`}>Desempenho de Anúncios</h2>
           
           {/* Seleção da Plataforma de Anúncio */}
-          <div className={`flex bg-[#1A0A14] rounded-xl p-1 gap-1 border border-white/5 self-end ${compact ? 'scale-[0.88] origin-right flex-wrap' : ''}`}>
+          <div className={`flex bg-[#1A0A14] rounded-xl p-1 gap-1 border border-white/5 self-end ${compact ? 'scale-[0.8] origin-right flex-wrap' : ''}`}>
             {platforms.map((p) => {
               const isActive = p === platform;
               return (
@@ -162,7 +162,7 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
                     isActive
                       ? 'bg-pink-700 text-white shadow-sm'
                       : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
+                  } ${compact ? 'px-2 py-0.5 text-[8px]' : ''}`}
                 >
                   {p}
                 </button>
@@ -171,13 +171,13 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
           </div>
         </div>
         
-        <p className={`${compact ? 'text-[9px] mb-0.5' : 'text-[10px] mb-1'} text-gray-400`}>
+        <p className={`${compact ? 'text-[8px] mb-0.5 leading-tight' : 'text-[10px] mb-1'} text-gray-400`}>
           Desempenho semanal em {platform} (Pistas geradas por dia)
         </p>
       </div>
       
       {/* Gráfico Canvas */}
-      <div className={`relative flex-grow min-h-0 w-full flex items-center justify-center ${compact ? 'py-1 h-[200px]' : 'py-2 h-[120px] md:h-[160px]'}`}>
+      <div className={`relative flex-grow min-h-0 w-full flex items-center justify-center ${compact ? 'py-0 h-[145px]' : 'py-2 h-[120px] md:h-[160px]'}`}>
         <Bar
           data={data}
           options={{
@@ -188,7 +188,7 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
                 ticks: {
                   ...options.scales.y.ticks,
                   font: {
-                    size: compact ? 7 : 9,
+                    size: compact ? 5 : 9,
                     family: 'Inter',
                   },
                 },
@@ -198,7 +198,7 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
                 ticks: {
                   ...options.scales.x.ticks,
                   font: {
-                    size: compact ? 7 : 9,
+                    size: compact ? 5 : 9,
                     family: 'Inter',
                   },
                 },
@@ -209,13 +209,13 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
       </div>
       
       {/* Grid de métricas do anúncio — 2 colunas no mobile, 3 no desktop */}
-      <div className={`grid grid-cols-2 md:grid-cols-3 ${compact ? 'gap-1.5 mt-1.5 text-[10px]' : 'gap-2 mt-3 text-xs'} shrink-0 select-none`}>
-        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1.5' : 'p-2'}`}>
-          <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Visualizações</p>
+      <div className={`grid grid-cols-2 md:grid-cols-3 ${compact ? 'gap-1 mt-0.5 text-[10px]' : 'gap-2 mt-3 text-xs'} shrink-0 select-none`}>
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1' : 'p-2'}`}>
+          <p className="text-gray-500 text-[7px] uppercase font-bold tracking-wider">Visualizações</p>
           <p className={`${compact ? 'mobile-small' : 'text-sm'} font-bold text-white transition-all duration-300`}>{activePlatformData.views}</p>
         </div>
-        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 flex flex-col justify-between ${compact ? 'p-1.5' : 'p-2'}`}>
-          <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Campanhas</p>
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 flex flex-col justify-between ${compact ? 'p-1' : 'p-2'}`}>
+          <p className="text-gray-500 text-[7px] uppercase font-bold tracking-wider">Campanhas</p>
           <div className="flex items-baseline justify-between">
             <p className={`${compact ? 'mobile-small' : 'text-sm'} font-bold text-white transition-all duration-300`}>
               {activePlatformData.groups.split(' ')[0]}
@@ -223,20 +223,20 @@ export const AdPerformanceChart: React.FC<AdPerformanceChartProps> = ({
             {renderGroupsChange(activePlatformData.groupsChange)}
           </div>
         </div>
-        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1.5' : 'p-2'}`}>
-          <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Investido</p>
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1' : 'p-2'}`}>
+          <p className="text-gray-500 text-[7px] uppercase font-bold tracking-wider">Investido</p>
           <p className={`${compact ? 'mobile-small' : 'text-sm'} font-bold text-white transition-all duration-300`}>{activePlatformData.invested}</p>
         </div>
-        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1.5' : 'p-2'}`}>
-          <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Leads</p>
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1' : 'p-2'}`}>
+          <p className="text-gray-500 text-[7px] uppercase font-bold tracking-wider">Leads</p>
           <p className={`${compact ? 'mobile-small' : 'text-sm'} font-bold text-white transition-all duration-300`}>{activePlatformData.leads}</p>
         </div>
-        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1.5' : 'p-2'}`}>
-          <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Conversões</p>
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1' : 'p-2'}`}>
+          <p className="text-gray-500 text-[7px] uppercase font-bold tracking-wider">Conversões</p>
           <p className={`${compact ? 'mobile-small' : 'text-sm'} font-bold text-white transition-all duration-300`}>{activePlatformData.conversions}</p>
         </div>
-        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1.5' : 'p-2'}`}>
-          <p className="text-gray-500 text-[8px] uppercase font-bold tracking-wider">Tx. Agendamento</p>
+        <div className={`bg-[#1A0A14] rounded-xl border border-white/5 transition-all duration-200 hover:border-pink-500/20 ${compact ? 'p-1' : 'p-2'}`}>
+          <p className="text-gray-500 text-[7px] uppercase font-bold tracking-wider">Tx. Agendamento</p>
           <p className={`${compact ? 'mobile-small' : 'text-sm'} font-bold text-white transition-all duration-300`}>{activePlatformData.schedRate}</p>
         </div>
       </div>

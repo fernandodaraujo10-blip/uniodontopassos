@@ -96,7 +96,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
     <div className="flex-grow overflow-hidden md:overflow-y-auto overflow-x-hidden bg-[#F8F9FA] page-transition h-full scrollbar-hide">
       {isPerformanceMobile ? (
         <div className="md:hidden mobile-page bg-slate-50 flex flex-col">
-          <div className="shrink-0 h-[56px] px-2 flex items-center justify-between">
+          <div className="shrink-0 h-[50px] px-2 flex items-center justify-between">
             <MobileDashboardHeader
               title={getMobileSectionTitle()}
               currentMonthKey={selectedMonth}
@@ -105,7 +105,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
             />
           </div>
 
-          <div className="shrink-0 h-[40px] px-2">
+          <div className="shrink-0 h-[36px] px-2">
             <MobileDashboardSectionTabs
               currentSection={mobileSection}
               onChangeSection={setMobileSection}
@@ -114,15 +114,15 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
           </div>
 
           <div className="mobile-content flex-1 mobile-scroll">
-            <div className="flex flex-col gap-2 h-full min-h-0">
-              <div className="flex-[1.3] min-h-0">
+            <div className="flex flex-col gap-1 h-full min-h-0">
+              <div className="flex-[1.02] min-h-0">
                 <AdPerformanceChart
                   anunciosData={activeMonthData.anuncios}
                   monthLabel={currentMonthData?.summary.monthLabel || ''}
                   compact
                 />
               </div>
-              <div className="flex-[1] min-h-0">
+              <div className="flex-[0.98] min-h-0">
                 <ConversionFunnelTabs
                   funnelData={activeMonthData.funil}
                   leadsData={activeMonthData.leads}
