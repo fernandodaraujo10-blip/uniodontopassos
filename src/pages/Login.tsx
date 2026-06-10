@@ -150,10 +150,10 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         <div className="flex flex-col items-center mb-6 sm:mb-8 text-center">
           <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-pink-100/50 mb-4 animate-scaleUp border border-pink-100/30 p-0 overflow-hidden flex-shrink-0">
             <img 
-              src="https://firebasestorage.googleapis.com/v0/b/gen-lang-client-0420780722.firebasestorage.app/o/1.1-Uniodonto%2F1.1-Imagens%2Flogo1.png?alt=media&token=60a2de29-a8cd-4cb1-bdb9-123cc2353dcf" 
+              src="/pwa-512x512.png" 
               alt="Uniodonto Logo" 
               className="w-full h-full object-contain"
-              style={{ transform: 'scale(1.8)' }}
+              style={{ transform: 'scale(1.15)' }}
             />
           </div>
           <h2 className="text-gray-800 font-black text-lg sm:text-xl tracking-tight leading-tight">

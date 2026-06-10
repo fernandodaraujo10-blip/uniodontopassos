@@ -884,7 +884,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                         <Smartphone className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="font-extrabold text-slate-800 text-sm">Instalar Aplicativo Nativo (PWA)</h3>
+                      <h3 className="font-extrabold text-slate-800 text-sm">Instalar aplicativo</h3>
                         <p className="text-xs text-slate-500 mt-0.5">Instale o Dashboard no seu dispositivo para uso rápido, sem barras do navegador.</p>
                       </div>
                     </div>
@@ -898,7 +898,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
                       }}
                       className="px-5 py-2.5 bg-gradient-to-r from-pink-700 to-pink-500 text-white rounded-xl font-bold text-[11px] shadow-md shadow-pink-200 hover:scale-105 active:scale-95 transition-all shrink-0 uppercase tracking-wider"
                     >
-                      Instalar App
+                      Instalar aplicativo
                     </button>
                   </div>
                 )}
