@@ -958,7 +958,7 @@ export const Reports: React.FC = () => {
         </div>
 
         {/* Layout Mobile Específico (Oculto no Desktop e na Impressão) */}
-        <div className="md:hidden mobile-page h-[100dvh] overflow-hidden bg-slate-50 flex flex-col print:hidden">
+        <div className="md:hidden mobile-page min-h-[100dvh] overflow-x-hidden overflow-y-auto bg-slate-50 flex flex-col print:hidden">
           <div className="shrink-0 h-[36px] px-2 pt-1">
             <div className="grid grid-cols-3 gap-1 h-full rounded-2xl bg-white border border-gray-100 p-1 shadow-[0_8px_30px_rgba(0,0,0,0.03)]">
               {[
@@ -991,7 +991,7 @@ export const Reports: React.FC = () => {
               <select
                 value={mobilePeriodValue}
                 onChange={(e) => handleMobilePeriodChange(e.target.value)}
-                className="shrink-0 min-w-[132px] h-8 rounded-lg border border-gray-100 bg-gray-50 px-2 text-[10px] font-semibold text-pink-700 focus:outline-none focus:border-pink-200"
+                className="shrink-0 min-w-[112px] max-w-[42vw] h-8 rounded-lg border border-gray-100 bg-gray-50 px-2 text-[10px] font-semibold text-pink-700 focus:outline-none focus:border-pink-200"
               >
                 <option value="all-2026">Todos 2026</option>
                 {availableMonths
@@ -1005,14 +1005,14 @@ export const Reports: React.FC = () => {
             </div>
           </div>
 
-          <div className="mobile-content flex-1 min-h-0 overflow-hidden pb-1">
+          <div className="mobile-content flex-1 min-h-0 overflow-x-hidden overflow-y-visible pb-3">
             {mobileSection === 'resumo' && (
               <div className="flex flex-col gap-0.5 h-full min-h-0 animate-fadeIn">
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-1.5 shrink-0">
                   <div className="flex items-start justify-between gap-1.5">
                     <div className="min-w-0">
                       <p className="text-[7px] uppercase font-bold tracking-wider text-slate-400">Resumo do Relatório</p>
-                      <p className="text-[15px] font-bold text-slate-800 leading-[1.05] mt-0.5 line-clamp-2 max-h-[31px] overflow-hidden">{obterTituloRelatorio()}</p>
+                      <p className="text-[14px] font-bold text-slate-800 leading-[1.08] mt-0.5 line-clamp-2 overflow-hidden">{obterTituloRelatorio()}</p>
                       <p className="text-[8px] text-slate-500 mt-0.5 leading-none">{reportFilter.startMonth} a {reportFilter.endMonth}</p>
                     </div>
                     <div className="text-right shrink-0">
@@ -1026,19 +1026,20 @@ export const Reports: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-0.5 shrink-0">
                   {mobileKpis.map((kpi, idx) => (
-                    <div key={idx} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] p-1.5 flex flex-col justify-between min-h-[61px]">
+                    <div key={idx} className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.03)] p-1.5 flex flex-col justify-between min-h-[56px]">
                       <div className="flex items-center gap-1 min-w-0">
                         <div className="w-3.5 h-3.5 rounded-md bg-pink-50 text-pink-700 flex items-center justify-center shrink-0">
                           {kpi.icon}
                         </div>
-                        <p className="text-[7px] uppercase font-bold tracking-wider text-slate-400 leading-tight">{kpi.label}</p>
+                        <p className="text-[7px] uppercase font-bold tracking-wider text-slate-400 leading-tight line-clamp-2">{kpi.label}</p>
                       </div>
                       <p
                         className={`mt-0.5 font-black leading-none ${
                           kpi.label === 'Total Investido'
-                            ? 'text-[15px] tracking-[-0.06em] text-pink-700 whitespace-nowrap'
-                            : 'text-[15px] tracking-[-0.05em] text-slate-800'
+                            ? 'text-[14px] tracking-[-0.06em] text-pink-700 whitespace-nowrap'
+                            : 'text-[14px] tracking-[-0.05em] text-slate-800'
                         } ${kpi.label.includes('CAC') || kpi.label.includes('NPS') ? 'text-pink-700' : ''}`}
+                        style={{ fontSize: kpi.label === 'Total Investido' ? 'clamp(13px, 4.2vw, 15px)' : 'clamp(13px, 4vw, 15px)' }}
                       >
                         {kpi.value}
                       </p>
@@ -1077,7 +1078,7 @@ export const Reports: React.FC = () => {
                       Compacto
                     </span>
                   </div>
-                  <div className="flex-1 min-h-[135px] overflow-hidden">
+                  <div className="flex-1 min-h-[145px] overflow-hidden">
                     <TrendCharts
                       rows={consolidatedReport.rows}
                       reportType={reportFilter.reportType || 'executive'}
@@ -1090,7 +1091,7 @@ export const Reports: React.FC = () => {
             )}
 
             {mobileSection === 'graficos' && (
-              <div className="h-full min-h-0 animate-fadeIn overflow-hidden">
+              <div className="h-full min-h-0 animate-fadeIn overflow-x-hidden overflow-y-auto">
                 <TrendCharts
                   rows={consolidatedReport.rows}
                   reportType={reportFilter.reportType || 'executive'}
@@ -1101,7 +1102,7 @@ export const Reports: React.FC = () => {
             )}
 
             {mobileSection === 'acoes' && (
-              <div className="flex flex-col gap-2 h-full min-h-0 animate-fadeIn overflow-hidden">
+              <div className="flex flex-col gap-2 h-full min-h-0 animate-fadeIn overflow-x-hidden overflow-y-auto">
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_30px_rgba(0,0,0,0.04)] p-3 shrink-0">
                   <div className="flex items-center gap-2 mb-3 border-b border-gray-50 pb-2.5 select-none">
                     <Calendar className="w-4 h-4 text-pink-700" />

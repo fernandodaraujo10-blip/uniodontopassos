@@ -370,7 +370,7 @@ export const Settings: React.FC<SettingsProps> = ({ theme = 'light', setTheme, l
   const { isInstallable, installApp, isInstalled } = usePWAInstall();
 
   return (
-    <div className="mobile-page h-[100dvh] overflow-hidden md:overflow-y-auto p-3 md:p-5 pb-0 md:pb-5 bg-[#F8F9FA] flex flex-col md:max-h-screen page-transition text-slate-800">
+    <div className="mobile-page min-h-[100dvh] overflow-x-hidden overflow-y-auto md:overflow-y-auto p-3 md:p-5 pb-0 md:pb-5 bg-[#F8F9FA] flex flex-col md:max-h-screen page-transition text-slate-800">
       <header className="mb-2 md:mb-5 shrink-0 flex justify-between items-start md:items-center select-none">
         <div>
           <h1 className="text-[18px] md:text-3xl font-black text-gray-800 leading-none">Configurações</h1>

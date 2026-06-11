@@ -66,8 +66,14 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   return (
     <>
       <nav
-        className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[80] bg-white border-t border-gray-100 flex items-stretch"
-        style={{ height: 'calc(72px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+        className="mobile-bottom-nav md:hidden fixed bottom-0 left-0 right-0 z-[80] bg-white border-t border-gray-100 grid items-stretch overflow-hidden"
+        style={{
+          height: 'calc(76px + env(safe-area-inset-bottom, 0px))',
+          paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+          paddingLeft: 'max(8px, env(safe-area-inset-left, 0px))',
+          paddingRight: 'max(8px, env(safe-area-inset-right, 0px))',
+          gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+        }}
         aria-label="Navega??o principal"
       >
         {visibleItems.map((item) => {
@@ -132,6 +138,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
                 className={`text-[10px] font-semibold leading-none transition-all duration-200 ${
                   active ? 'opacity-100' : 'opacity-70'
                 }`}
+                style={{ fontSize: 'clamp(10px, 2.8vw, 13px)', whiteSpace: 'nowrap' }}
               >
                 {item.label}
               </span>

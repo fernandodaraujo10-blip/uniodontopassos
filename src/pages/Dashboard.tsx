@@ -95,7 +95,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
   return (
     <div className="flex-grow overflow-hidden md:overflow-y-auto overflow-x-hidden bg-[#F8F9FA] page-transition h-full scrollbar-hide">
       {isPerformanceMobile ? (
-        <div className="md:hidden mobile-page bg-slate-50 flex flex-col">
+        <div className="md:hidden mobile-page min-h-[100dvh] overflow-x-hidden overflow-y-auto bg-slate-50 flex flex-col">
           <div className="shrink-0 h-[50px] px-2 flex items-center justify-between">
             <MobileDashboardHeader
               title={getMobileSectionTitle()}
@@ -134,7 +134,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setCurrentPage }) => {
           </div>
         </div>
       ) : (
-        <div className="flex flex-col md:hidden w-full h-full min-h-0 px-0 pt-2 pb-0 gap-1">
+        <div className="flex flex-col md:hidden w-full h-full min-h-0 px-0 pt-2 pb-0 gap-1 overflow-x-hidden overflow-y-auto">
           <div className="shrink-0 space-y-1.5">
             <MobileDashboardHeader
               title={getMobileSectionTitle()}
